@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+.demo{ font-family: 'Poppins', sans-serif; }
+.panel{
+    padding: 10px;
+    border-radius: 0;
+}
+.panel .panel-heading{ padding: 20px 15px 0; }
+.panel .panel-heading .title{
+    color: #222;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 30px;
+    margin: 0;
+}
+.panel .panel-heading .btn{
+    background-color: #6D7AE0;
+    padding: 6px 12px;
+    border-radius: 0;
+    border: none;
+    transition: all 0.3s ease 0s;
+}
+.panel .panel-heading .btn:hover{
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.08);
+}
+.panel .panel-body .table{
+    margin: 0;
+    border: 1px solid #e7e7e7;
+}
+.panel .panel-body .table tr td{ border-color: #e7e7e7; }
+.panel .panel-body .table thead tr.active th{
+    color: #fff;
+    background-color: #6D7AE0;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px;
+    border: 1px solid #6D7AE0;
+}
+.panel .panel-body .table tbody tr:hover{ background-color: rgba(109, 122, 224, 0.1); }
+.panel .panel-body .table tbody tr td{
+    color: #555;
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+.panel .panel-body .table tbody .btn{
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+.panel .panel-body .table tbody .btn:hover{ box-shadow: 0 0 0 2px #333; }
+.panel .panel-footer{
+    background-color: #fff;
+    padding: 0 15px 5px;
+    border: none;
+}
+.panel .panel-footer .col{
+    line-height: 35px;
+}
+.pagination{
+    margin: 0;
+}
+.pagination li a{
+    font-size: 15px;
+    font-weight: 600;
+    color: #6D7AE0;
+    text-align: center;
+    height: 35px;
+    width: 35px;
+    line-height: 33px;
+    padding: 0;
+    margin: 0 2px;
+    display: block;
+    transition: all 0.3s ease 0s;
+}
+.pagination li:first-child a,
+.pagination li:last-child a{
+    border-radius: 0;
+}
+.pagination li a:hover,
+.pagination li a:focus,
+.pagination li.active a{
+    color: #fff;
+    background-color: #6D7AE0;
+}
+.w-66 {
+    width: 66% !important;
+}
+.editDelete{
+    display: flex;
+    height: 143px;
+    justify-content: center;
+    align-items: center;
+}
+.editbtn{
+    width: 65px;
+    margin-left: 10px;
+    height: 30px;
+}
