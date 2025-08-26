@@ -24,7 +24,7 @@ class CreateUserRequest extends FormRequest
         return [
             'firstName' => 'required|string|min:2',
             'lastName' => 'required|string|min:2',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:8',
             'hobbie' => 'required',
             'gender' => 'required',
@@ -32,9 +32,10 @@ class CreateUserRequest extends FormRequest
         ];
     }
 
-    public function messages(): array{
+            public function messages(): array{
         return [
             'firstName.required' => 'Enter your first name.',
+            'lastName.required' => 'Enter your last name.',
         ];
     }
 }

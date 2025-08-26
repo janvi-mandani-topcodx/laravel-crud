@@ -7,6 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('/users' , UserController::class);
-Route::get('/usersData' , function (){
-    return view('usersData');
-});
+//Route::get('/usersData' , function (){
+//    return view('usersData');
+//});
