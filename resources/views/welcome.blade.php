@@ -1,20 +1,16 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-</head>
-<body>
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
-        <div class="row justify-content-center align-items-center h-100">
-            <div class="col-12 col-lg-9 col-xl-7">
-                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
-                    <div class="card-body p-4 p-md-5">
-                        <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create User</h3>
-                        <form method="POST" enctype="multipart/form-data" action="{{ route('users.store') }}">
+@extends('layout')
+
+
+@section('content')
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create User</h3>
+{{--                            <form method="POST" enctype="multipart/form-data" action="{{ route('users.store') }}">--}}
+                            <form method="POST" enctype="multipart/form-data" action="">
                                 @csrf
                                 <div class="row mb-4">
                                     <div class="col">
@@ -76,6 +72,8 @@
                                             cooking
                                         </label>
                                     </div>
+                                    <span style="color: darkred">@error('hobbie') {{ $message }} @enderror</span>
+
                                 </div>
 
                                 <div class="form-outline mb-4">
@@ -94,15 +92,58 @@
 
                                 <div class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="customFile">Image</label>
-                                    <input type="file" class="form-control" id="customFile" name="image"/>
+                                    <input type="file" class="form-control" id="customFile" name="image"  />
+                                    <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block mb-4">Submit</button>
+                                <button type="button" class="btn btn-primary btn-block mb-4 submitbtn">Submit</button>
                             </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-</body>
-</html>
+    </section>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.submitbtn', function (e) {
+                e.preventDefault();
+                let form = $(this).closest('form')[0];
+                let formData = new FormData(form);
+                $.ajax({
+                    url: "{{ route('users.store') }}",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        form.reset();
+                        let newRow = `
+                        <tr id="oneuser" data-id='${response.id}>
+                            <td>${response.id}</td>
+                            <td>${response.first_name}</td>
+                            <td>${response.last_name}</td>
+                            <td>${response.email}</td>
+                            <td>${response.gender}</td>
+                            <td>${Array.isArray(response.hobbies) ? response.hobbies.join(', ') : ''}</td>
+                            <td><img src="${response.image_url}" width="50"/></td>
+                            <td style="" class="editDelete">
+                                        <form action="" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>
+                                        </form>
+                                            <a href="" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="${response.id}">Edit</a>
+                                        </td>
+                        </tr>
+                    `;
+                        $('#userDataContainer tbody').append(newRow);
+                        window.location ='{{ route('users.index') }}';
+                        {{--window.location.href = "{{ route('users.index') }}";--}}
+                    },
+                });
+            });
+        });
+    </script>
+@endsection

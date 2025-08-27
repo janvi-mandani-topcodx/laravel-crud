@@ -12,26 +12,18 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $users = User::get();
         return view('usersData', compact('users'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-//        return view('users.create');
     }
     public function store(CreateUserRequest  $request)
     {
         $path = $request->file('image')->store('images', 'public');
-        User::create([
+        $user = User::create([
             'first_name' => $request->firstName,
             'last_name' => $request->lastName,
             'email' => $request->email,
@@ -40,12 +32,21 @@ class UserController extends Controller
             'gender' => $request->gender,
             'image' => $path,
         ]);
-        return redirect()->route('users.index');
+//        return response()->json([
+//            'id' => $user->id,
+//            'first_name' => $user->first_name,
+//            'last_name' => $user->last_name,
+//            'email' => $user->email,
+//            'gender' => $user->gender,
+//            'hobbies' => json_decode($user->hobbies),
+//            'image_url' => asset('storage/' . $user->image),
+//        ]);
+
+        return response()->json(['success'=>'user Create Successfully.']);
 
     }
     public function show(string $id)
     {
-        //
     }
 
     public function edit(string $id)
@@ -64,7 +65,7 @@ class UserController extends Controller
             $path = $user->image;
         }
 
-         $user->update([
+        $user->update([
             'first_name' => $request->firstName,
             'last_name' => $request->lastName,
             'email' => $request->email,
@@ -73,8 +74,8 @@ class UserController extends Controller
             'gender' => $request->gender,
             'image' => $path,
         ]);
+        return response()->json(['success'=>'user update Successfully.']);
 
-        return redirect()->route('users.index');
     }
     public function destroy(string $id)
     {
@@ -83,9 +84,30 @@ class UserController extends Controller
         $imagePath = public_path('storage/') . $user->image;
 
         if(file_exists($imagePath)){
-            @unlink($imagePath);
+            Storage::disk('public')->delete($user->image);
         }
-        return redirect()->route('users.index');
-
+        return response()->json(['success'=>'user delete Successfully.']);
+    }
+    public function viewlogin()
+    {
+        return view('loginUser');
+    }
+    public  function login(Request $request)
+    {
+            $email = $request->email;
+            $password =$request->password;
+            $users = User::where('email',$email)->get();
+            if(count($users) == 1){
+                $userPassword = $users[0]->password;
+                if(Hash::check($password , $userPassword)){
+                    return redirect('/users');
+                }
+                else{
+                    return "Password is incorrect";
+                }
+            }
+            else{
+                return "user is not found";
+            }
     }
 }
