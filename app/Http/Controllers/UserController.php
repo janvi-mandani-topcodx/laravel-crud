@@ -6,6 +6,7 @@ use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -87,27 +88,5 @@ class UserController extends Controller
             Storage::disk('public')->delete($user->image);
         }
         return response()->json(['success'=>'user delete Successfully.']);
-    }
-    public function viewlogin()
-    {
-        return view('loginUser');
-    }
-    public  function login(Request $request)
-    {
-            $email = $request->email;
-            $password = $request->password;
-            $user = User::where('email',$email)->first();
-            if($user){
-                if(Hash::check($password , $user->password)){
-                    session(['email' => $email , 'id' => $user->id]);
-                    return redirect('/users');
-                }
-                else{
-                    return "Password is incorrect";
-                }
-            }
-            else{
-                return "user is not found";
-            }
     }
 }

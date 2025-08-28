@@ -119,26 +119,26 @@
                     processData: false,
                     success: function (response) {
                         form.reset();
-                        let newRow = `
-                        <tr id="oneuser" data-id='${response.id}>
-                            <td>${response.id}</td>
-                            <td>${response.first_name}</td>
-                            <td>${response.last_name}</td>
-                            <td>${response.email}</td>
-                            <td>${response.gender}</td>
-                            <td>${Array.isArray(response.hobbies) ? response.hobbies.join(', ') : ''}</td>
-                            <td><img src="${response.image_url}" width="50"/></td>
-                            <td style="" class="editDelete">
-                                        <form action="" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>
-                                        </form>
-                                            <a href="" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="${response.id}">Edit</a>
-                                        </td>
-                        </tr>
-                    `;
-                        $('#userDataContainer tbody').append(newRow);
+                    {{--    let newRow = `--}}
+                    {{--    <tr id="oneuser" data-id='${response.id}>--}}
+                    {{--        <td>${response.id}</td>--}}
+                    {{--        <td>${response.first_name}</td>--}}
+                    {{--        <td>${response.last_name}</td>--}}
+                    {{--        <td>${response.email}</td>--}}
+                    {{--        <td>${response.gender}</td>--}}
+                    {{--        <td>${Array.isArray(response.hobbies) ? response.hobbies.join(', ') : ''}</td>--}}
+                    {{--        <td><img src="${response.image_url}" width="50"/></td>--}}
+                    {{--        <td style="" class="editDelete">--}}
+                    {{--                    <form action="" method="POST">--}}
+                    {{--                        @csrf--}}
+                    {{--                        @method('DELETE')--}}
+                    {{--                        <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>--}}
+                    {{--                    </form>--}}
+                    {{--                        <a href="" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="${response.id}">Edit</a>--}}
+                    {{--                    </td>--}}
+                    {{--    </tr>--}}
+                    {{--`;--}}
+                    //     $('#userDataContainer tbody').append(newRow);
                         window.location ='{{ route('users.index') }}';
                         {{--window.location.href = "{{ route('users.index') }}";--}}
                     },

@@ -2,66 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreatePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $posts = Post::all();
-//        return view('postData' ,compact('posts'));
+        $posts = Post::where('user_id' ,Auth::user()->id)->get();
+        return view('posts.post-data', compact('posts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(CreatePostRequest $request)
     {
-        $path = $request->file('image')->store('images', 'public');
-        $post = Post::create([
-            'user_id' => session()->get('id'),
+        $path = $request->file('imagePost')->store('images', 'public');
+         Post::create([
+            'user_id' => Auth::user()->id,
             'title' => $request->title,
             'description' => $request->description,
             'status' => $request->status,
             'image' => $path,
         ]);
-        dd($post);
+        return redirect('/posts');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    }
     public function edit(string $id)
     {
-        //
+        $posts = Post::find($id);
+        return view('posts.edit-post', compact('posts'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdatePostRequest $request, string $id)
     {
-        //
+        $post = Post::find($id);
+
+        if($request->hasFile('imagePost')){
+            $path = $request->file('imagePost')->store('images', 'public');
+            Storage::disk('public')->delete($post->image);
+        } else{
+            $path = $post->image;
+        }
+        $post->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status,
+            'image' => $path,
+        ]);
+        return redirect('/posts');
+//        return response()->json(['success'=>'user update Successfully.']);
     }
 
     /**
@@ -69,6 +71,31 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post = Post::find($id);
+        $post->delete();
+        $imagePath = public_path('storage/') . $post->image;
+
+        if(file_exists($imagePath)){
+            Storage::disk('public')->delete($post->image);
+        }
+        return response()->json(['success'=>'user delete Successfully.']);
+    }
+
+    public  function searchPost(Request $request)
+    {
+        $searchTerm = $request->input('searchpost');
+
+        if ($searchTerm) {
+            $posts = Post::where('title', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('status', 'LIKE', '%' . $searchTerm . '%')
+                ->get();
+
+            return response()->json([
+                'html' => view('posts.search-post', compact('posts'))->render()
+            ]);
+        }
+
+        return response()->json(['html' => '']);
     }
 }

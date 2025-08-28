@@ -25,21 +25,16 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(Request $request): array
     {
-        $rules = [
-                'firstName' => 'required|string|min:2',
-                'lastName' => 'required|string|min:2',
-                'email' => 'required|email|unique:users,email,'.$request->user,
-                'hobbie' => 'required',
-                'gender' => 'required',
+        return [
+                'firstName'       => 'required|string|min:2',
+                'lastName'        => 'required|string|min:2',
+                'email'           => 'required|email|unique:users,email,'.$request->user,
+                'hobbie'          => 'required',
+                'gender'          => 'required',
+                'password'        =>['required', Password::min(8)->mixedCase()->numbers()],
+                'confirmPassword' =>'required|min:8|same:password',
+                'image'           => ['nullable',File::image()->max('1mb')]
         ];
-        if ($this->filled('password')) {
-            $rules['password'] = ['required', Password::min(8)->mixedCase()->numbers()];
-            $rules['confirmPassword'] = 'required|min:8|confirmed';
-        }
-        if($this->hasFile('image')){
-            $rules['image'] = [File::image()->max('1mb')];
-        }
-        return $rules;
     }
     public function messages() : array
     {
@@ -58,7 +53,6 @@ class UpdateUserRequest extends FormRequest
             'password.numbers' => 'Please enter at least 1 number',
             'confirmPassword.required' => 'Enter your confirm password',
             'confirmPassword.min' => 'Please enter at least 8 character',
-            'confirmPassword.confirmed' => 'Confirm password is does not match password',
             'hobbie.required' => 'Enter your hobbie',
             'gender.required' => 'Enter your gender',
             'image.image' => 'The uploaded file must be a valid image.',

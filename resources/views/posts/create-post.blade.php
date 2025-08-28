@@ -8,7 +8,7 @@
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create Post</h3>
-                            <form method="POST" enctype="multipart/form-data" action="{{route('posts.store')}}">
+                            <form method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row mb-4 ">
                                     <div class="col">
@@ -42,7 +42,7 @@
                                     <input type="file" class="form-control" id="customFiles" name="imagePost"/>
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block mb-4 submitbtn">Submit</button>
+                                <button type="submit" class="btn btn-primary btn-block mb-4 submitpost">Submit</button>
                             </form>
                         </div>
                     </div>
