@@ -7,7 +7,7 @@
         <td>{{$post->description}}</td>
         <td>{{$post->status}}</td>
         <td>
-            <img class="img-fluid img-thumbnail" src="{{ asset('storage/' . $post->image) }}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
+            <img class="img-fluid img-thumbnail" src="{{$post->postImageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
         </td>
         <td style="height: 176px;" class="editDelete d-flex justify-content-center align-items-center" >
             <form action="{{route('posts.destroy', $post->id)}}" method="POST" class="col-6">

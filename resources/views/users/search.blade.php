@@ -8,7 +8,7 @@
         <td>{{ implode(',', json_decode($user->hobbies)) }}</td>
         <td>{{$user->gender}}</td>
         <td>
-            <img class="img-fluid img-thumbnail" src="{{ asset('storage/' . $user->image) }}" alt="Uploaded Image" width="200" style="height: 126px;">
+            <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
         </td>
         <td style="" class="editDelete">
             <form action="{{route('users.destroy', $user->id)}}" method="POST">

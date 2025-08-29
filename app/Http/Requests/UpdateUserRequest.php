@@ -10,19 +10,11 @@ use Illuminate\Validation\Rules\Password;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(Request $request): array
     {
         return [
@@ -31,8 +23,8 @@ class UpdateUserRequest extends FormRequest
                 'email'           => 'required|email|unique:users,email,'.$request->user,
                 'hobbie'          => 'required',
                 'gender'          => 'required',
-                'password'        =>['required', Password::min(8)->mixedCase()->numbers()],
-                'confirmPassword' =>'required|min:8|same:password',
+                'password'        =>['nullable', Password::min(8)->mixedCase()->numbers()],
+                'confirmPassword' =>'nullable|min:8|same:password',
                 'image'           => ['nullable',File::image()->max('1mb')]
         ];
     }
@@ -53,8 +45,8 @@ class UpdateUserRequest extends FormRequest
             'password.numbers' => 'Please enter at least 1 number',
             'confirmPassword.required' => 'Enter your confirm password',
             'confirmPassword.min' => 'Please enter at least 8 character',
-            'hobbie.required' => 'Enter your hobbie',
-            'gender.required' => 'Enter your gender',
+            'hobbie.required' => 'Select your hobbie',
+            'gender.required' => 'Select your gender',
             'image.image' => 'The uploaded file must be a valid image.',
             'image.max' => 'The image size must not exceed 2MB.',
         ];

@@ -16,14 +16,20 @@ class UserController extends Controller
     public function index()
     {
         $users = User::get();
-        return view('usersData', compact('users'));
+        return view('users.index', compact('users'));
     }
     public function create()
     {
+        return view('users.create');
     }
     public function store(CreateUserRequest  $request)
     {
-        $path = $request->file('image')->store('images', 'public');
+        if($request->hasFile('image')){
+            $path = $request->file('image')->store('images', 'public');
+        }
+        else{
+            $path = $request->file('image');
+        }
         $user = User::create([
             'first_name' => $request->firstName,
             'last_name' => $request->lastName,
@@ -33,27 +39,14 @@ class UserController extends Controller
             'gender' => $request->gender,
             'image' => $path,
         ]);
-//        return response()->json([
-//            'id' => $user->id,
-//            'first_name' => $user->first_name,
-//            'last_name' => $user->last_name,
-//            'email' => $user->email,
-//            'gender' => $user->gender,
-//            'hobbies' => json_decode($user->hobbies),
-//            'image_url' => asset('storage/' . $user->image),
-//        ]);
+        return redirect()->route('users.index');
 
-        return response()->json(['success'=>'user Create Successfully.']);
 
     }
-    public function show(string $id)
-    {
-    }
-
     public function edit(string $id)
     {
-        $users = User::find($id);
-        return view('editUser', compact('users'));
+        $user = User::find($id);
+        return view('users.edit', compact('user'));
     }
     public function update(UpdateUserRequest $request, string $id)
     {
@@ -61,7 +54,9 @@ class UserController extends Controller
 
         if($request->hasFile('image')){
             $path = $request->file('image')->store('images', 'public');
-            Storage::disk('public')->delete($user->image);
+            if($user->image){
+                Storage::disk('public')->delete($user->image);
+            }
         } else{
             $path = $user->image;
         }
@@ -82,11 +77,31 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $user->delete();
-        $imagePath = public_path('storage/') . $user->image;
-
-        if(file_exists($imagePath)){
-            Storage::disk('public')->delete($user->image);
-        }
+        Storage::disk('public')->delete($user->image);
         return response()->json(['success'=>'user delete Successfully.']);
+    }
+    public function search(Request $request)
+    {
+            $searchTerm = $request->input('search');
+
+            if ($searchTerm) {
+                $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('hobbies', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%')
+                    ->get();
+
+                return response()->json([
+                    'html' => view('users.search', compact('users'))->render()
+                ]);
+            }
+            else{
+                $users = User::all();
+                return response()->json([
+                    'html' => view('users.search', compact('users'))->render()
+                ]);
+            }
+
     }
 }

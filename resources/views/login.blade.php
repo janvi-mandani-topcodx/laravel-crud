@@ -17,7 +17,8 @@
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                             <div data-mdb-input-init class="form-outline flex-fill mb-0">
                                                 <label class="form-label" for="email">Your Email</label>
-                                                <input type="email" id="email" name="email" class="form-control" />
+                                                <input type="email" id="email" name="email" class="form-control"  value="{{old('email')}}"/>
+                                                <span style="color: darkred">@error('email') {{$message}} @enderror</span>
                                             </div>
                                         </div>
 
@@ -25,12 +26,16 @@
                                             <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
                                             <div data-mdb-input-init class="form-outline flex-fill mb-0">
                                                 <label class="form-label" for="password">Password</label>
-                                                <input type="password" id="password" name="password" class="form-control" />
+                                                <input type="password" id="password" name="password" class="form-control"  value="{{old('password')}}"/>
+                                                <span style="color: darkred">@error('password') {{$message}} @enderror</span>
                                             </div>
                                         </div>
 
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <button  type="submit" class="btn btn-primary btn-lg" name="loginbutton">Login</button>
+                                            <button  type="button" class="btn btn-primary btn-lg loginUSer" name="loginbutton">Login</button>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="{{route('forgot.password')}}">Go to Forget Password</a>
                                         </div>
                                     </form>
                                 </div>
@@ -45,4 +50,42 @@
             </div>
         </div>
     </section>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $(document).on('click', '.loginUSer', function (e) {
+                e.preventDefault()
+                let form = $(this).closest('form')[0];
+                console.log(form)
+                let formData = new FormData(form);
+
+                $.ajax({
+                    url: "/login",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = '{{ route('posts.index') }}';
+                    },
+                    error: function (response) {
+                        console.log(response.responseJSON);
+                        let errors = response.responseJSON.errors;
+                        if (errors.email) {
+                            $('#email').siblings('span').text(errors.email[0]);
+                        }
+                        if (errors.password) {
+                            $('#password').siblings('span').text(errors.password[0]);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

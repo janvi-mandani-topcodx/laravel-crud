@@ -8,11 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     protected $guarded = [];
-    public function users()
+    public function user()
     {
-        return  $this->belongsToMany(User::class);
+        return  $this->belongsTo(User::class);
     }
-    protected function postimageUrl() : Attribute
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+    protected function postImageUrl() : Attribute
     {
         return Attribute::make(
             get: function (){

@@ -8,23 +8,22 @@
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Edit User</h3>
-                            <form method="POST" enctype="multipart/form-data" id="editUserForm" action="{{ route('users.update', $users->id) }}">
-
-                            @csrf
+                            <form method="POST" enctype="multipart/form-data" id="editUserForm" action="{{ route('users.update', $user->id) }}">
+                                @csrf
                                 @method('PUT')
-                                <input type="hidden" id="editUserId" data-id="{{$users->id}}">
+                                <input type="hidden" id="editUserId" data-id="{{$user->id}}">
                                 <div class="row mb-4">
                                     <div class="col">
                                         <div  class="form-outline">
                                             <label class="form-label fw-bold" for="firstName">First name</label>
-                                            <input type="text" id="firstName" class="form-control"  value="{{$users->first_name}}"  name="firstName" placeholder="Enter First name"/>
+                                            <input type="text" id="firstName" class="form-control"  value="{{$user->first_name}}"  name="firstName" placeholder="Enter First name"/>
                                             <span style="color: darkred">@error('firstName') {{$message}} @enderror</span>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div  class="form-outline">
                                             <label class="form-label fw-bold" for="lastName">Last name</label>
-                                            <input type="text" id="lastName" class="form-control" value="{{$users->last_name}}" name="lastName" placeholder="Enter Last name"/>
+                                            <input type="text" id="lastName" class="form-control" value="{{$user->last_name}}" name="lastName" placeholder="Enter Last name"/>
                                             <span style="color: darkred">@error('lastName') {{$message}} @enderror</span>
                                         </div>
                                     </div>
@@ -32,22 +31,22 @@
 
                                 <div  class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="email">Email address</label>
-                                    <input type="email" id="email" class="form-control" value="{{$users->email}}" name="email" placeholder="Enter your email" />
+                                    <input type="email" id="email" class="form-control" value="{{$user->email}}" name="email" placeholder="Enter your email" />
                                     <span style="color: darkred">@error('email') {{$message}} @enderror</span>
                                 </div>
 
                                 <div  class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="password">Password</label>
-                                    <input type="text" id="password" class="form-control"  value="" name="password" placeholder="Enter password"/>
+                                    <input type="password" id="password" class="form-control"  value="" name="password" placeholder="Enter password"/>
                                     <span style="color: darkred">@error('password') {{$message}} @enderror</span>
                                 </div>
                                 <div  class="form-outline mb-4">
-                                    <label class="form-label fw-bold" for="confirmPassword">Confirm Password</label>
-                                    <input type="text" id="confirmPassword" class="form-control"  value="" name="confirmPassword" placeholder="Enter confirm password"/>
+                                    <label class="form-label fw-bold" for="confirmPassword">Confirm password</label>
+                                    <input type="password" id="confirmPassword" class="form-control"  value="" name="confirmPassword" placeholder="Enter confirm password"/>
                                     <span style="color: darkred">@error('confirmPassword') {{$message}} @enderror</span>
                                 </div>
                                 @php
-                                    $userHobbies = old('hobbie', json_decode($users->hobbies));
+                                    $userHobbies = old('hobbie', json_decode($user->hobbies));
                                 @endphp
                                 <div class="form-outline mb-4 ">
                                     <label class="form-label fw-bold">Hobbies</label>
@@ -75,27 +74,29 @@
                                             cooking
                                         </label>
                                     </div>
+                                    <span style="color: darkred" class="hobbieError">@error('gender') {{ $message }} @enderror</span>
+
                                 </div>
 
                                 <div class="form-outline mb-4">
                                     <label class="form-label fw-bold" >Gender</label>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" {{ $users->gender == 'male' ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" {{ $user->gender == 'male' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="male">Male</label>
                                     </div>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="radio" name="gender" id="female" value="female" {{ $users->gender == 'female' ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="radio" name="gender" id="female" value="female" {{ $user->gender == 'female' ? 'checked' : '' }}>
                                         <label class="form-check-label" for="female">Female</label>
                                     </div>
 
-                                    <span style="color: darkred">@error('gender') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="genderError">@error('gender') {{ $message }} @enderror</span>
                                 </div>
 
                                 <div class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="customFile">Image</label>
                                     <input type="file" class="form-control" id="customFile" name="image"/>
-                                    @if ($users->image)
-                                        <img src="{{$users->imageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
+                                    @if ($user->image)
+                                        <img src="{{$user->imageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
                                     @else
                                         <p class="text-muted">No image uploaded.</p>
                                     @endif
@@ -115,43 +116,53 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
             $(document).on('click', '#editbutton', function (e) {
                 e.preventDefault();
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
                 console.log("heloo")
                 $.ajax({
-                    url: "{{route('users.update', $users->id)}}",
+                    url: "{{route('users.update', $user->id)}}",
                     method: "POST",
                     data: formData,
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                    {{--    form.reset();--}}
-                    {{--    let newRow = `--}}
-                    {{--    <tr id="oneuser" data-id='${response.id}>--}}
-                    {{--        <td>${response.id}</td>--}}
-                    {{--        <td>${response.first_name}</td>--}}
-                    {{--        <td>${response.last_name}</td>--}}
-                    {{--        <td>${response.email}</td>--}}
-                    {{--        <td>${response.gender}</td>--}}
-                    {{--        <td>${Array.isArray(response.hobbies) ? response.hobbies.join(', ') : ''}</td>--}}
-                    {{--        <td><img src="${response.image_url}" width="50"/></td>--}}
-                    {{--        <td style="" class="editDelete">--}}
-                    {{--                    <form action="" method="POST">--}}
-                    {{--                        @csrf--}}
-                    {{--    @method('DELETE')--}}
-                    {{--    <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>--}}
-                    {{--                    </form>--}}
-                    {{--                        <a href="" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="${response.id}">Edit</a>--}}
-                    {{--                    </td>--}}
-                    {{--    </tr>--}}
-                    {{--`;--}}
-                    //     $('#userDataContainer tbody').append(newRow);
-                        console.log("hsdgrtyty");
-                        history.pushState(null,'' , '{{route('users.index')}}')
-                        {{--window.location.href = "{{route('users.index')}}";--}}
+                        window.location.href = "{{route('users.index')}}";
                     },
+                    error:function (response){
+                        console.log(response.responseJSON);
+                        let errors = response.responseJSON.errors;
+                        if (errors.firstName) {
+                            $('#firstName').siblings('span').text(errors.firstName[0]);
+                        }
+                        if (errors.lastName) {
+                            $('#lastName').siblings('span').text(errors.lastName[0]);
+                        }
+                        if (errors.email) {
+                            $('#email').siblings('span').text(errors.email[0]);
+                        }
+                        if (errors.password) {
+                            $('#password').siblings('span').text(errors.password[0]);
+                        }
+                        if (errors.confirmPassword) {
+                            $('#confirmPassword').siblings('span').text(errors.confirmPassword[0]);
+                        }
+                        if (errors.hobbie) {
+                            $('.hobbieError').text(errors.hobbie[0]);
+                        }
+                        if (errors.gender) {
+                            $('.genderError').text(errors.gender[0]);
+                        }
+                        if (errors.image) {
+                            $('#customFile').siblings('span').text(errors.image[0]);
+                        }
+                    }
                 });
             });
         });

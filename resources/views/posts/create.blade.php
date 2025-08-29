@@ -14,7 +14,7 @@
                                     <div class="col">
                                         <div  class="form-outline">
                                             <label class="form-label fw-bold " for="title">Title</label>
-                                            <input type="text" id="title" class="form-control"  value="{{old('title')}}"  name="title" placeholder="Enter First name"/>
+                                            <input type="text" id="title" class="form-control"  value="{{old('title')}}"  name="title" placeholder="Enter title"/>
                                             <span style="color: darkred">@error('title') {{$message}} @enderror</span>
                                         </div>
                                     </div>
@@ -23,23 +23,27 @@
                                     <div class="col">
                                         <div  class="form-outline">
                                             <label class="form-label fw-bold" for="description">Description</label>
-                                            <input type="text" id="description" class="form-control" value="{{old('description')}}" name="description" placeholder="Enter Last name"/>
+                                            <input type="text" id="description" class="form-control" value="{{old('description')}}" name="description" placeholder="Enter description"/>
                                             <span style="color: darkred">@error('description') {{$message}} @enderror</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col">
+
                                         <div  class="form-outline">
-                                            <label class="form-label fw-bold" for="status">Status</label>
-                                            <input type="text" id="status" class="form-control" value="{{old('status')}}" name="status" placeholder="Enter Last name"/>
+                                            <label class="form-label fw-bold w-100" for="status">Status</label>
+                                            <select name="status" id="status" class="px-2 form-control">
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
+                                            </select>
                                             <span style="color: darkred">@error('status') {{$message}} @enderror</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="customFiles">Image</label>
-                                    <input type="file" class="form-control" id="customFiles" name="imagePost"/>
+                                    <input type="file" class="form-control" id="customFiles" name="image"/>
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block mb-4 submitpost">Submit</button>
@@ -50,4 +54,44 @@
             </div>
         </div>
     </section>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $(document).on('click', '.submitpost', function (e) {
+                e.preventDefault()
+                let form = $(this).closest('form')[0];
+                let formData = new FormData(form);
+
+                $.ajax({
+                    url: "/posts",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = '{{ route('posts.index') }}';
+                    },
+                    error: function (response) {
+                        console.log(response.responseJSON);
+                        let errors = response.responseJSON.errors;
+                        if (errors.title) {
+                            $('#title').siblings('span').text(errors.title[0]);
+                        }
+                        if (errors.description) {
+                            $('#description').siblings('span').text(errors.description[0]);
+                        }
+                        if (errors.status) {
+                            $('#status').siblings('span').text(errors.status[0]);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

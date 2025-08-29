@@ -9,8 +9,7 @@
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Create User</h3>
-{{--                            <form method="POST" enctype="multipart/form-data" action="{{ route('users.store') }}">--}}
-                            <form method="POST" enctype="multipart/form-data" action="">
+                            <form method="POST" enctype="multipart/form-data" action="{{ route('users.store') }}">
                                 @csrf
                                 <div class="row mb-4">
                                     <div class="col">
@@ -37,12 +36,12 @@
 
                                 <div  class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="password">Password</label>
-                                    <input type="text" id="password" class="form-control"  value="{{old('password')}}" name="password" placeholder="Enter password"/>
+                                    <input type="password" id="password" class="form-control"  value="{{old('password')}}" name="password" placeholder="Enter password"/>
                                     <span style="color: darkred">@error('password') {{$message}} @enderror</span>
                                 </div>
                                 <div  class="form-outline mb-4">
                                     <label class="form-label fw-bold" for="confirmPassword">Confirm password</label>
-                                    <input type="text" id="confirmPassword" class="form-control"  value="{{old('confirmPassword')}}" name="confirmPassword" placeholder="Enter confirm password"/>
+                                    <input type="password" id="confirmPassword" class="form-control"  value="{{old('confirmPassword')}}" name="confirmPassword" placeholder="Enter confirm password"/>
                                     <span style="color: darkred">@error('confirmPassword') {{$message}} @enderror</span>
                                 </div>
 
@@ -72,7 +71,7 @@
                                             cooking
                                         </label>
                                     </div>
-                                    <span style="color: darkred">@error('hobbie') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="hobbieError">@error('hobbie') {{ $message }} @enderror</span>
 
                                 </div>
 
@@ -87,7 +86,7 @@
                                         <label class="form-check-label" for="female">Female</label>
                                     </div>
 
-                                    <span style="color: darkred">@error('gender') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="genderError">@error('gender') {{ $message }} @enderror</span>
                                 </div>
 
                                 <div class="form-outline mb-4">
@@ -107,43 +106,56 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
             $(document).on('click', '.submitbtn', function (e) {
-                e.preventDefault();
+                e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
+
                 $.ajax({
-                    url: "{{ route('users.store') }}",
+                    url: "/users",
                     method: "POST",
                     data: formData,
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        form.reset();
-                    {{--    let newRow = `--}}
-                    {{--    <tr id="oneuser" data-id='${response.id}>--}}
-                    {{--        <td>${response.id}</td>--}}
-                    {{--        <td>${response.first_name}</td>--}}
-                    {{--        <td>${response.last_name}</td>--}}
-                    {{--        <td>${response.email}</td>--}}
-                    {{--        <td>${response.gender}</td>--}}
-                    {{--        <td>${Array.isArray(response.hobbies) ? response.hobbies.join(', ') : ''}</td>--}}
-                    {{--        <td><img src="${response.image_url}" width="50"/></td>--}}
-                    {{--        <td style="" class="editDelete">--}}
-                    {{--                    <form action="" method="POST">--}}
-                    {{--                        @csrf--}}
-                    {{--                        @method('DELETE')--}}
-                    {{--                        <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>--}}
-                    {{--                    </form>--}}
-                    {{--                        <a href="" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="${response.id}">Edit</a>--}}
-                    {{--                    </td>--}}
-                    {{--    </tr>--}}
-                    {{--`;--}}
-                    //     $('#userDataContainer tbody').append(newRow);
-                        window.location ='{{ route('users.index') }}';
-                        {{--window.location.href = "{{ route('users.index') }}";--}}
+                        window.location.href = '{{ route('users.index') }}';
                     },
+                    error: function (response) {
+                        console.log(response.responseJSON);
+                            let errors = response.responseJSON.errors;
+                            if (errors.firstName) {
+                                $('#firstName').siblings('span').text(errors.firstName[0]);
+                            }
+                            if (errors.lastName) {
+                                $('#lastName').siblings('span').text(errors.lastName[0]);
+                            }
+                            if (errors.email) {
+                                $('#email').siblings('span').text(errors.email[0]);
+                            }
+                            if (errors.password) {
+                                $('#password').siblings('span').text(errors.password[0]);
+                            }
+                            if (errors.confirmPassword) {
+                                $('#confirmPassword').siblings('span').text(errors.confirmPassword[0]);
+                            }
+                            if (errors.hobbie) {
+                                $('.hobbieError').text(errors.hobbie[0]);
+                            }
+                            if (errors.gender) {
+                                $('.genderError').text(errors.gender[0]);
+                            }
+                            if (errors.image) {
+                                $('#customFile').siblings('span').text(errors.image[0]);
+                            }
+                    }
                 });
             });
         });
     </script>
 @endsection
+

@@ -108,3 +108,7 @@
 .editpost{
     height: 32px;
 }
+.dropdown-toggle::after
+{
+    content: none !important;
+}
