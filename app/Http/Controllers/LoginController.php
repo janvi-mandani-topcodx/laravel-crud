@@ -17,9 +17,9 @@ class LoginController extends Controller
     }
     public  function login(LoginRequest $request)
     {
-
-        $email = $request->email;
-        $password = $request->password;
+        $input = $request->all();
+        $email = $input['email'];
+        $password = $input['password'];
         $user = User::where('email',$email)->first();
         if($user){
             if(Hash::check($password , $user->password)){
@@ -77,10 +77,11 @@ class LoginController extends Controller
 
     public function reset(ResetRequest $request)
     {
-        $email = $request->email;
-        $oldPassword = $request->oldPassword;
-        $newPassword = $request->newPassword;
-        $confirmpassword = $request->confirmPassword;
+        $input = $request->all();
+        $email = $input['email'];
+        $oldPassword = $input['oldPassword'];
+        $newPassword = $input['newPassword'];
+        $confirmpassword = $input['confirmPassword'];
         $user = User::where('email',$email)->first();
         if($user){
             if(Hash::check($oldPassword , $user->password)){

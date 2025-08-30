@@ -13,9 +13,47 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::get();
+        $searchTerm = $request->input('search');
+        if ($searchTerm) {
+            $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('hobbies', 'LIKE', '%' . $searchTerm . '%')
+                ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%')
+                ->get();
+        }
+        else{
+            $users = User::all();
+        }
+        if ($request->ajax()) {
+            $html = '';
+            foreach ($users as $user) {
+                $html .= '  <tr id="oneUser" data-id="'. $user->id .'">
+                                    <td>'. $user->id .'</td>
+                                    <td>'. $user->first_name.'</td>
+                                    <td>'. $user->last_name .'</td>
+                                    <td>'. $user->email .'</td>
+                                    <td>'. implode(',', json_decode($user->hobbies)).'</td>
+                                    <td>'. $user->gender.'</td>
+                                    <td>
+                                        <img class="img-fluid img-thumbnail" src="'. $user->imageUrl .'" alt="Uploaded Image" width="200" style="height: 126px;">
+                                    </td>
+                                    <td style="" class="editDelete">
+                                        <form action="'. route('users.destroy', $user->id) .'" method="POST">
+                                           '. @csrf_field() .'
+                                            '. method_field('DELETE') .'
+                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
+                                        </form>
+                                        <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
+                                    </td>
+                                </tr>
+                            ';
+            }
+            return response()->json(['html' => $html]);
+        }
+
         return view('users.index', compact('users'));
     }
     public function create()
@@ -24,19 +62,20 @@ class UserController extends Controller
     }
     public function store(CreateUserRequest  $request)
     {
+        $input = $request->all();
         if($request->hasFile('image')){
-            $path = $request->file('image')->store('images', 'public');
+            $path = $input['image']->store('images', 'public');
         }
         else{
-            $path = $request->file('image');
+            $path = $input['image'];
         }
         $user = User::create([
-            'first_name' => $request->firstName,
-            'last_name' => $request->lastName,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'hobbies' => json_encode($request->hobbie),
-            'gender' => $request->gender,
+            'first_name' => $input['firstName'],
+            'last_name' => $input['lastName'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+            'hobbies' => json_encode($input['hobbie']),
+            'gender' => $input['gender'],
             'image' => $path,
         ]);
         return redirect()->route('users.index');
@@ -51,9 +90,9 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, string $id)
     {
         $user = User::find($id);
-
+        $input = $request->all();
         if($request->hasFile('image')){
-            $path = $request->file('image')->store('images', 'public');
+            $path = $input['image']->store('images', 'public');
             if($user->image){
                 Storage::disk('public')->delete($user->image);
             }
@@ -62,12 +101,12 @@ class UserController extends Controller
         }
 
         $user->update([
-            'first_name' => $request->firstName,
-            'last_name' => $request->lastName,
-            'email' => $request->email,
-            'password' => $request->password == null ? $user->password : hash::make($request->password),
-            'hobbies' => json_encode($request->hobbie),
-            'gender' => $request->gender,
+            'first_name' => $input['firstName'],
+            'last_name' => $input['lastName'],
+            'email' => $input['email'],
+            'password' => $input['password'] == null ? $user->password : hash::make($input['password']),
+            'hobbies' => json_encode($input['hobbie']),
+            'gender' => $input['gender'],
             'image' => $path,
         ]);
         return response()->json(['success'=>'user update Successfully.']);
@@ -80,28 +119,5 @@ class UserController extends Controller
         Storage::disk('public')->delete($user->image);
         return response()->json(['success'=>'user delete Successfully.']);
     }
-    public function search(Request $request)
-    {
-            $searchTerm = $request->input('search');
 
-            if ($searchTerm) {
-                $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('hobbies', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%')
-                    ->get();
-
-                return response()->json([
-                    'html' => view('users.search', compact('users'))->render()
-                ]);
-            }
-            else{
-                $users = User::all();
-                return response()->json([
-                    'html' => view('users.search', compact('users'))->render()
-                ]);
-            }
-
-    }
 }

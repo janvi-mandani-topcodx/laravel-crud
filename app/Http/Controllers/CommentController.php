@@ -11,10 +11,11 @@ class CommentController extends Controller
 {
     public function store(Request $request)
     {
+        $input = $request->all();
         $comment = Comment::create([
             'user_id' => Auth::user()->id,
-            'post_id' => $request->post_id,
-            'comment' => $request->comment,
+            'post_id' => $input['post_id'],
+            'comment' => $input['comment'],
         ]);
         return response()->json([
             'id' => $comment->id,

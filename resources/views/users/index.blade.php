@@ -37,7 +37,29 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @include('users.search')
+
+                            @foreach($users as $user)
+                                <tr id="oneUser" data-id="{{$user->id}}">
+                                    <td>{{$user->id}}</td>
+                                    <td>{{$user->first_name}}</td>
+                                    <td>{{$user->last_name}}</td>
+                                    <td>{{$user->email}}</td>
+                                    <td>{{ implode(',', json_decode($user->hobbies)) }}</td>
+                                    <td>{{$user->gender}}</td>
+                                    <td>
+                                        <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
+                                    </td>
+                                    <td style="" class="editDelete">
+                                        <form action="{{route('users.destroy', $user->id)}}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
+                                        </form>
+                                        <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+
                             </tbody>
                         </table>
                     </div>
@@ -54,13 +76,12 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $('#search').on('keyup', function () {
+            $(document).on('keyup', '#search' ,  function () {
                 let query = $(this).val();
                     $.ajax({
-                        url: "{{route('users.search')}}",
-                        method: "POST",
+                        url: "{{route('users.index')}}",
+                        method: "GET",
                         data: {
-                            _token: '{{ csrf_token() }}',
                             search: query
                         },
                         success: function (response) {
@@ -73,7 +94,7 @@
             });
             $(document).on('submit', '#editbtn', function () {
                 e.preventDefault();
-                let $row = $(this).closest('#oneuser');
+                let $row = $(this).closest('#oneUser');
                 let userId = $row.data('id');
                 let formData = $(this).serialize();
                 console.log(userId);
@@ -94,7 +115,7 @@
             $(document).on('click', '#deleteUsers', function () {
 
                 console.log('asdasdad');
-                let $row = $(this).closest('#oneuser');
+                let $row = $(this).closest('#oneUser');
                 let userId = $row.data('id');
                 console.log(userId)
                 $.ajax({

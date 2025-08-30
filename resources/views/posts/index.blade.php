@@ -36,7 +36,26 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @include('posts.search')
+                            @foreach($posts as $post)
+                                <tr id="onePost" data-id="{{$post->id}}">
+                                    <td>{{$post->id}}</td>
+                                    <td>{{$post->user_id}}</td>
+                                    <td>{{$post->title}}</td>
+                                    <td>{{$post->description}}</td>
+                                    <td>{{$post->status}}</td>
+                                    <td>
+                                        <img class="img-fluid img-thumbnail" src="{{$post->postImageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
+                                    </td>
+                                    <td style="height: 176px;" class="editDelete d-flex justify-content-center align-items-center" >
+                                        <form action="{{route('posts.destroy', $post->id)}}" method="POST" class="col-6">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="{{$post->id}}">DELETE</button>
+                                        </form>
+                                        <a href="{{route('posts.edit', $post->id)}}" class="btn btn-warning editpost d-flex justify-content-center align-items-center col-6" data-id="{{$post->id}}">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -56,10 +75,9 @@
             $(document).on('keyup', '#searchPost', function () {
                 let query = $(this).val();
                 $.ajax({
-                    url: "{{route('posts.search')}}",
-                    method: "POST",
+                    url: "{{ route('posts.index') }}",
+                    method: "GET",
                     data: {
-                        _token: '{{ csrf_token() }}',
                         search: query
                     },
                     success: function (response) {
@@ -72,7 +90,7 @@
             });
             $(document).on('submit', '.editpost', function () {
                 e.preventDefault();
-                let $row = $(this).closest('#onepost');
+                let $row = $(this).closest('#onePost');
                 let postId = $row.data('id');
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
@@ -95,7 +113,7 @@
             $(document).on('click', '#deletePost', function () {
 
                 console.log('asdasdad');
-                let $row = $(this).closest('#onepost');
+                let $row = $(this).closest('#onePost');
                 let postId = $row.data('id');
                 console.log(postId)
                 $.ajax({

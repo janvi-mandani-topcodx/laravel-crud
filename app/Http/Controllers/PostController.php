@@ -12,16 +12,46 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-
-    public function index()
+    public function index(Request $request)
     {
-        if(Auth::check()){
-            $posts = Post::get();
+        if (Auth::check()) {
+            $searchTerm = $request->input('search');
+
+            if ($searchTerm) {
+                $posts = Post::where('title', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('status', 'LIKE', '%' . $searchTerm . '%')
+                    ->get();
+            } else {
+                $posts = Post::all();
+            }
+
+            if ($request->ajax()) {
+                $html = '';
+                foreach ($posts as $post) {
+                    $html .= '<tr id="onePost" data-id="' . $post->id . '">
+                    <td>' . $post->id . '</td>
+                    <td>' . $post->user_id . '</td>
+                    <td>' . $post->title . '</td>
+                    <td>' . $post->description . '</td>
+                    <td>' . $post->status . '</td>
+                    <td><img class="img-fluid img-thumbnail" src="' . $post->postImageUrl . '" width="200" height="100" style="height:126px;"></td>
+                    <td class="d-flex justify-content-center align-items-center" style="height:176px;">
+                        <form action="' . route('posts.destroy', $post->id) . '" method="POST" class="col-6">
+                            ' . csrf_field() . method_field('DELETE') . '
+                            <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="' . $post->id . '">DELETE</button>
+                        </form>
+                        <a href="' . route('posts.edit', $post->id) . '" class="btn btn-warning d-flex justify-content-center align-items-center col-6">Edit</a>
+                    </td>
+                </tr>';
+                }
+                return response()->json(['html' => $html]);
+            }
+
+            return view('posts.index', compact('posts'));
         }
-        else{
-            $posts = collect();
-        }
-        return view('posts.index', compact('posts'));
+
+        return view('posts.index', ['posts' => collect()]);
     }
 
     public function create()
@@ -31,12 +61,13 @@ class PostController extends Controller
 
     public function store(CreatePostRequest $request)
     {
-        $path = $request->file('image')->store('images', 'public');
-         Post::create([
+        $input = $request->all();
+        $path = $input['image']->store('images', 'public');
+        Post::create([
             'user_id' => Auth::user()->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => $request->status,
+            'title' => $input['title'],
+            'description' => $input['description'],
+            'status' => $input['status'],
             'image' => $path,
         ]);
         return response()->json(['success'=>'Post create successfully.']);
@@ -56,7 +87,7 @@ class PostController extends Controller
         $input = $request->all();
 
         if($request->hasFile('image')){
-            $path = $request->file('image')->store('images', 'public');
+            $path = $input['image']->store('images', 'public');
             Storage::disk('public')->delete($post->image);
         } else{
             $path = $post->image;
@@ -77,27 +108,5 @@ class PostController extends Controller
         $post->delete();
         Storage::disk('public')->delete($post->image);
         return response()->json(['success'=>'user delete Successfully.']);
-    }
-
-    public  function searchPost(Request $request)
-    {
-        $searchTerm = $request->input('search');
-
-        if ($searchTerm) {
-            $posts = Post::where('title', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('status', 'LIKE', '%' . $searchTerm . '%')
-                ->get();
-
-            return response()->json([
-                'html' => view('posts.search', compact('posts'))->render()
-            ]);
-        }
-        else {
-            $posts = Post::where('user_id', Auth::user()->id)->get();
-            return response()->json([
-                'html' => view('posts.search', compact('posts'))->render()
-            ]);
-        }
     }
 }
