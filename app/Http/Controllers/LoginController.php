@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetRequest;
+use App\Mail\EmailVarification;
+use App\Mail\ResetPassword;
 use App\Models\User;
+use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class LoginController extends Controller
 {
@@ -24,7 +30,12 @@ class LoginController extends Controller
         if($user){
             if(Hash::check($password , $user->password)){
                 Auth::login($user);
-                return redirect()->route('posts.index');
+                if($user->email_verified_at == null) {
+                    return response()->json(['verify'=>'email.verify']);
+                }
+                else{
+                    return response()->json(['posts'=>'posts.index']);
+                }
             }
             else{
                 if ($request->ajax()) {
@@ -59,7 +70,11 @@ class LoginController extends Controller
         $email = $request->email;
         $user = User::where('email',$email)->first();
         if($user){
-            return redirect()->route('reset.password');
+                $to = 'aaa@gmail.com';
+                $message = "hello Welcome";
+                $subject = "Mail send";
+                $url = route('reset.password') ."?email=".$request->email;
+                Mail::to($to)->send(new ResetPassword($message , $subject , $url));
         }
         else{
             if ($request->ajax()) {
@@ -69,10 +84,10 @@ class LoginController extends Controller
             }
         }
     }
-
-    public function viewReset()
+    public function viewReset(Request $request)
     {
-        return view('reset-password');
+        $email = $request->email;
+        return view('reset-password'  , compact('email'));
     }
 
     public function reset(ResetRequest $request)
@@ -107,4 +122,20 @@ class LoginController extends Controller
         }
     }
 
+    public function viewVerify()
+    {
+        return view('email-verify');
+    }
+
+    public function verify()
+    {
+        $email = Auth::user()->email;
+        $user = User::where('email',$email)->first();
+        $to = 'aaa@gmail.com';
+        $message = "hello Welcome";
+        $subject = "Mail send";
+        Mail::to($to)->send(new EmailVarification($message , $subject));
+        $user->email_verified_at = now();
+        $user->save();
+    }
 }

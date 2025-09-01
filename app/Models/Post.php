@@ -24,4 +24,12 @@ class Post extends Model
             }
         );
     }
+    protected function firstLetter() : Attribute
+    {
+        return Attribute::make(
+            get: function (){
+                return $this->user->first_name . ' ' . $this->user->last_name;
+            }
+        );
+    }
 }

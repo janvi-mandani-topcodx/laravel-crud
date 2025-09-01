@@ -50,11 +50,9 @@
                                         <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
                                     <td style="" class="editDelete">
-                                        <form action="{{route('users.destroy', $user->id)}}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
+
                                             <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
-                                        </form>
+
                                         <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
                                     </td>
                                 </tr>

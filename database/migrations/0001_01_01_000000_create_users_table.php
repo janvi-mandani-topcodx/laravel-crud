@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('hobbies');
             $table->string('gender');
             $table->string('image');
+            $table->timestamp('email_verified_at');
             $table->timestamps();
         });
 

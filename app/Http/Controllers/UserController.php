@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Mail\EmailVarification;
+use App\Mail\ResetPassword;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -30,7 +33,7 @@ class UserController extends Controller
         if ($request->ajax()) {
             $html = '';
             foreach ($users as $user) {
-                $html .= '  <tr id="oneUser" data-id="'. $user->id .'">
+                $html .= '<tr id="oneUser" data-id="'. $user->id .'">
                                     <td>'. $user->id .'</td>
                                     <td>'. $user->first_name.'</td>
                                     <td>'. $user->last_name .'</td>
@@ -41,11 +44,7 @@ class UserController extends Controller
                                         <img class="img-fluid img-thumbnail" src="'. $user->imageUrl .'" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
                                     <td style="" class="editDelete">
-                                        <form action="'. route('users.destroy', $user->id) .'" method="POST">
-                                           '. @csrf_field() .'
-                                            '. method_field('DELETE') .'
-                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
-                                        </form>
+                                        <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
                                         <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
                                     </td>
                                 </tr>
@@ -63,12 +62,7 @@ class UserController extends Controller
     public function store(CreateUserRequest  $request)
     {
         $input = $request->all();
-        if($request->hasFile('image')){
-            $path = $input['image']->store('images', 'public');
-        }
-        else{
-            $path = $input['image'];
-        }
+        $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
         $user = User::create([
             'first_name' => $input['firstName'],
             'last_name' => $input['lastName'],
@@ -78,9 +72,7 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => $path,
         ]);
-        return redirect()->route('users.index');
-
-
+        return response()->json(['success'=>'User create successfully.']);
     }
     public function edit(string $id)
     {
@@ -109,15 +101,16 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => $path,
         ]);
-        return response()->json(['success'=>'user update Successfully.']);
-
+        return response()->json(['success'=>'User update successfully.']);
     }
     public function destroy(string $id)
     {
         $user = User::find($id);
         $user->delete();
-        Storage::disk('public')->delete($user->image);
-        return response()->json(['success'=>'user delete Successfully.']);
+        if($user->image != null){
+            Storage::disk('public')->delete($user->image);
+        }
+        return response()->json(['success'=>'User delete successfully.']);
     }
 
 }

@@ -35,12 +35,13 @@ class PostController extends Controller
                     <td>' . $post->title . '</td>
                     <td>' . $post->description . '</td>
                     <td>' . $post->status . '</td>
-                    <td><img class="img-fluid img-thumbnail" src="' . $post->postImageUrl . '" width="200" height="100" style="height:126px;"></td>
+                    <td>
+                        <img class="img-fluid img-thumbnail" src="' . $post->postImageUrl . '" width="200" height="100" style="height:126px;">
+                    </td>
                     <td class="d-flex justify-content-center align-items-center" style="height:176px;">
-                        <form action="' . route('posts.destroy', $post->id) . '" method="POST" class="col-6">
-                            ' . csrf_field() . method_field('DELETE') . '
+
                             <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="' . $post->id . '">DELETE</button>
-                        </form>
+
                         <a href="' . route('posts.edit', $post->id) . '" class="btn btn-warning d-flex justify-content-center align-items-center col-6">Edit</a>
                     </td>
                 </tr>';
@@ -62,9 +63,10 @@ class PostController extends Controller
     public function store(CreatePostRequest $request)
     {
         $input = $request->all();
-        $path = $input['image']->store('images', 'public');
-        Post::create([
-            'user_id' => Auth::user()->id,
+        $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
+
+        $user = Auth::user();
+        $user->posts()->create([
             'title' => $input['title'],
             'description' => $input['description'],
             'status' => $input['status'],
@@ -75,9 +77,8 @@ class PostController extends Controller
     public function edit(string $id)
     {
         $post = Post::find($id);
-        $comments = $post->comments;
 
-        return view('posts.edit', compact('post' , 'comments'));
+        return view('posts.edit', compact('post' ));
     }
 
     public function update(UpdatePostRequest $request, string $id)
@@ -88,8 +89,11 @@ class PostController extends Controller
 
         if($request->hasFile('image')){
             $path = $input['image']->store('images', 'public');
-            Storage::disk('public')->delete($post->image);
-        } else{
+            if($post->image){
+                Storage::disk('public')->delete($post->image);
+            }
+        }
+        else{
             $path = $post->image;
         }
 
@@ -100,13 +104,15 @@ class PostController extends Controller
             'image' => $path,
         ]);
 
-        return response()->json(['success'=>'Post create successfully.']);
+        return response()->json(['success'=>'Post update successfully.']);
     }
     public function destroy(string $id)
     {
         $post = Post::find($id);
         $post->delete();
-        Storage::disk('public')->delete($post->image);
-        return response()->json(['success'=>'user delete Successfully.']);
+        if($post->image != null){
+            Storage::disk('public')->delete($post->image);
+        }
+        return response()->json(['success'=>'Post delete successfully.']);
     }
 }

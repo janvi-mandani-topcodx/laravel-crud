@@ -84,7 +84,7 @@
                                     </div>
                                 </form>
                             <div class="comment_data">
-                                @foreach($comments as $comment)
+                                @foreach($post->comments as $comment)
                                 <div class='my-5 dots rounded p-2 oneComment' id="commentData-{{$comment->id}}">
                                     <div class='d-flex align-items-center justify-content-between'>
                                         <div class='d-flex align-items-center'>
@@ -92,7 +92,7 @@
                                                 <b class="bg-black text-light rounded rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
                                                     {{substr($comment->user->first_name , 0 ,1)}}{{substr($comment->user->last_name , 0 ,1)}}
                                                 </b>
-                                                <div class="mx-2 fw-bold">{{$comment->user->first_name. " " .$comment->user->last_name}}</div>
+                                                <div class="mx-2 fw-bold">{{$comment->firstLetter}}</div>
 
                                             </div>
                                         </div>

@@ -18,5 +18,5 @@ Route::get('/forgot', [LoginController::class, 'viewForgot'])->name('forgot.pass
 Route::post('/forgot', [LoginController::class, 'forgot'])->name('forgot.submit');
 Route::get('/reset', [LoginController::class, 'viewReset'])->name('reset.password');
 Route::post('/reset', [LoginController::class, 'reset'])->name('reset.submit');
-
-Route::get('/mail' , [MailController::class , 'mail']);
+Route::get('/verify', [LoginController::class, 'viewVerify'])->name('email.verify');
+Route::post('/verify', [LoginController::class, 'verify'])->name('verify.user');

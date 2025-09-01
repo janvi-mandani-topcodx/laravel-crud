@@ -32,7 +32,7 @@
                                         </div>
 
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <button  type="button" class="btn btn-primary btn-lg loginUSer" name="loginbutton">Login</button>
+                                            <input  type="button" class="btn btn-primary btn-lg loginUSer" name="loginbutton" value="Login">
                                         </div>
                                         <div class="text-end">
                                             <a href="{{route('forgot.password')}}">Go to Forget Password</a>
@@ -72,7 +72,12 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        window.location.href = '{{ route('posts.index') }}';
+                        if (response.verify){
+                            window.location.href = '{{ route('email.verify') }}';
+                        }
+                        else{
+                            window.location.href = '{{ route('posts.index') }}';
+                        }
                     },
                     error: function (response) {
                         console.log(response.responseJSON);

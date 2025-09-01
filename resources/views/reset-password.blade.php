@@ -15,7 +15,7 @@
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                                             <div data-mdb-input-init class="form-outline flex-fill mb-0">
                                                 <label class="form-label" for="email">Email</label>
-                                                <input type="email" id="email" name="email" class="form-control"  value="{{old('email')}}"/>
+                                                <input type="email" id="email" name="email" class="form-control"  value="{{$email}}"/>
                                                 <span style="color: darkred">@error('email') {{$message}} @enderror</span>
                                             </div>
                                         </div>

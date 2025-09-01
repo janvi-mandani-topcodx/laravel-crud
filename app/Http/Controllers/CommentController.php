@@ -12,8 +12,8 @@ class CommentController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
-        $comment = Comment::create([
-            'user_id' => Auth::user()->id,
+        $user = Auth::user();
+        $comment = $user->comments()->create([
             'post_id' => $input['post_id'],
             'comment' => $input['comment'],
         ]);
@@ -22,7 +22,7 @@ class CommentController extends Controller
             'comment' => $comment->comment,
             'created_at' => $comment->created_at->toDateTimeString(),
             'post_id' => $comment->post_id,
-            'full_name' => $comment->user->first_name . ' ' . $comment->user->last_name,
+            'full_name' => $comment->firstLetter,
             'shortname' => strtoupper(substr($comment->user->first_name, 0, 1) . substr($comment->user->last_name, 0, 1)),
         ]);
     }
