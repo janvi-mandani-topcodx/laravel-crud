@@ -1,10 +1,9 @@
-@php use Illuminate\Support\Facades\Auth; @endphp
 @extends('layout')
 @section('content')
     <div class="container">
         @if(session('error'))
-            <div class="alert alert-danger my-2">
-                {{session('error')}}
+            <div class="alert alert-danger">
+                {{ session('error') }}
             </div>
         @endif
         <div class="row">
@@ -13,7 +12,7 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col col-12 text-center">
-                                <h2 class="">Posts</h2>
+                                <h2 class="">Roles</h2>
                             </div>
                         </div>
                         <div class="row my-3">
@@ -23,15 +22,9 @@
                                            placeholder="Search...">
                                 </div>
                             </div>
-                            @php
-                                $user = Auth::user();
-                                $role = $user->roles->first();
-                            @endphp
-                            @if ($role->permissions->contains('name', 'create post'))
-                                <div class="col-xs-8 text-right w-66 p-0">
-                                    <a href="/posts/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
-                                </div>
-                            @endif
+                            <div class="col-xs-8 text-right w-66 p-0">
+                                <a href="/roles/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
+                            </div>
                         </div>
                     </div>
                     <div class="panel-body table-responsive">
@@ -39,32 +32,24 @@
                             <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>User Name</th>
-                                <th>title</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th>Image</th>
-                                <th>Actions</th>
+                                <th>Name</th>
+                                <th>Permissions</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($posts as $post)
-                                <tr id="onePost" data-id="{{$post->id}}">
-                                    <td>{{$post->id}}</td>
-                                    <td>{{$post->fullName}}</td>
-                                    <td>{{$post->title}}</td>
-                                    <td>{{$post->description}}</td>
-                                    <td>{{$post->status}}</td>
+                            @foreach($roles as $role)
+                                <tr id="oneRole" data-id="{{$role->id}}">
+                                    <td>{{$role->id}}</td>
+                                    <td>{{$role->name}}</td>
                                     <td>
-                                            <img class="img-fluid img-thumbnail" src="{{$post->postImageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
+                                        @foreach($role->permissions as $permission)
+                                            <span class="text-dark">{{ $permission->name}} @if(!$loop->last), @endif</span>
+                                        @endforeach
                                     </td>
                                     <td style="height: 176px;" class="editDelete d-flex justify-content-center align-items-center gap-2" >
-                                        @if ($role->permissions->where('name', 'delete post')->isNotEmpty())
-                                            <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="{{$post->id}}">DELETE</button>
-                                        @endif
-                                        @if($role->permissions->where('name', 'update post')->isNotEmpty())
-                                            <a href="{{route('posts.edit', $post->id)}}" class="btn btn-warning editpost d-flex justify-content-center align-items-center col-6" data-id="{{$post->id}}">Edit</a>
-                                        @endif
+                                        <button type="button" id="deleteRole" class="btn btn-danger btn-sm my-3" data-id="{{$role->id}}">DELETE</button>
+                                        <a href="{{route('roles.edit', $role->id)}}" class="btn btn-warning editRole d-flex justify-content-center align-items-center col-6" data-id="{{$role->id}}" style="width: 67px; height: 31px;">Edit</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -100,16 +85,15 @@
                     }
                 });
             });
-            $(document).on('submit', '.editpost', function () {
+                $(document).on('submit', '.editRole', function () {
                 e.preventDefault();
-                let $row = $(this).closest('#onePost');
-                let postId = $row.data('id');
+                let $row = $(this).closest('#oneRole');
+                let roleId = $row.data('id');
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
-                console.log(postId);
 
                 $.ajax({
-                    url: `/users/${postId}/edit`,
+                    url: `/roles/${roleId}/edit`,
                     method: "POST",
                     contentType: false,
                     processData: false,
@@ -118,21 +102,19 @@
                         _token: $('meta[name="csrf-token"]').attr('content'),
                     },
                     success: function (data) {
-                        window.location.href = `/posts/${postId}/edit`;
+                        window.location.href = `/roles/${roleId}/edit`;
                     }
                 });
             });
-            $(document).on('click', '#deletePost', function () {
-
-                console.log('asdasdad');
-                let $row = $(this).closest('#onePost');
-                let postId = $row.data('id');
-                console.log(postId)
+            $(document).on('click', '#deleteRole', function () {
+                let $row = $(this).closest('#oneRole');
+                let roleId = $row.data('id');
+                console.log(roleId)
                 $.ajax({
-                    url: `/posts/${postId}`,
+                    url: `/roles/${roleId}`,
                     type: "DELETE",
                     data: {
-                        delete_id: postId,
+                        delete_id: roleId,
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (data) {

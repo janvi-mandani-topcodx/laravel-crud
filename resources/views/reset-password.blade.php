@@ -13,7 +13,7 @@
                                         @csrf
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                            <div data-mdb-input-init class="form-group flex-fill mb-0">
                                                 <label class="form-label" for="email">Email</label>
                                                 <input type="email" id="email" name="email" class="form-control"  value="{{$email}}"/>
                                                 <span style="color: darkred">@error('email') {{$message}} @enderror</span>
@@ -21,7 +21,7 @@
                                         </div>
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                            <div data-mdb-input-init class="form-group flex-fill mb-0">
                                                 <label class="form-label" for="oldPassword">Old password</label>
                                                 <input type="password" id="oldPassword" name="oldPassword" class="form-control"  value="{{old('oldPassword')}}"/>
                                                 <span style="color: darkred">@error('oldPassword') {{$message}} @enderror</span>
@@ -29,7 +29,7 @@
                                         </div>
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                            <div data-mdb-input-init class="form-group flex-fill mb-0">
                                                 <label class="form-label" for="newPassword">New password</label>
                                                 <input type="password" id="newPassword" name="newPassword" class="form-control"  value="{{old('newPassword')}}"/>
                                                 <span style="color: darkred">@error('newPassword') {{$message}} @enderror</span>
@@ -37,7 +37,7 @@
                                         </div>
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                            <div data-mdb-input-init class="form-group flex-fill mb-0">
                                                 <label class="form-label" for="confirmPassword">Confirm password</label>
                                                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"  value="{{old('confirmPassword')}}"/>
                                                 <span style="color: darkred">@error('confirmPassword') {{$message}} @enderror</span>

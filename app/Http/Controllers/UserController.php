@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Jobs\SendEmailUserData;
 use App\Mail\EmailVarification;
 use App\Mail\ResetPassword;
+use App\Models\Message;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,12 +55,19 @@ class UserController extends Controller
             }
             return response()->json(['html' => $html]);
         }
-
         return view('users.index', compact('users'));
     }
     public function create()
     {
-        return view('users.create');
+            $user = Auth::user();
+            $role = $user->roles->first();
+            if ($role->permissions->where('name', 'create user')->isNotEmpty()) {
+                $roles = Role::all();
+                return view('users.create' , compact('roles'));
+            }
+            else{
+                return redirect()->route('users.index')->with(['error' => "You don't have permission to create user."]);
+            }
     }
     public function store(CreateUserRequest  $request)
     {
@@ -72,12 +82,22 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => $path,
         ]);
+        $user->roles()->sync($input['role']);
         return response()->json(['success'=>'User create successfully.']);
     }
     public function edit(string $id)
     {
-        $user = User::find($id);
-        return view('users.edit', compact('user'));
+        $user = Auth::user();
+        $role = $user->roles->first();
+        if ($role->permissions->where('name', 'update user')->isNotEmpty()) {
+                $user = User::find($id);
+                $roles = Role::all();
+                return view('users.edit', compact('user', 'roles'));
+        }
+        else{
+            return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);
+        }
+
     }
     public function update(UpdateUserRequest $request, string $id)
     {
@@ -101,16 +121,27 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => $path,
         ]);
+        $user->roles()->sync($input['role']);
         return response()->json(['success'=>'User update successfully.']);
     }
     public function destroy(string $id)
     {
-        $user = User::find($id);
-        $user->delete();
-        if($user->image != null){
-            Storage::disk('public')->delete($user->image);
+        $user = Auth::user();
+        $role = $user->roles->first();
+        if ($role->permissions->where('name', 'create user')->isNotEmpty()) {
+                $user = User::find($id);
+                $user->delete();
+                if ($user->image != null) {
+                    Storage::disk('public')->delete($user->image);
+                }
+                return response()->json(['success' => 'User delete successfully.']);
         }
-        return response()->json(['success'=>'User delete successfully.']);
+        else{
+            return redirect()->route('users.index')->with(['error' => "You don't have permission to delete user."]);
+        }
     }
-
+    public function exports()
+    {
+        SendEmailUserData::dispatch();
+    }
 }

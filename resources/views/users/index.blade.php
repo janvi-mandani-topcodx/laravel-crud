@@ -1,6 +1,12 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
 @extends('layout')
 @section('content')
     <div class="container">
+        @if(session('error'))
+            <div class="alert alert-danger my-2">
+                {{session('error')}}
+            </div>
+        @endif
         <div class="row">
             <div class="col-md-12">
                 <div class="panel">
@@ -10,15 +16,26 @@
                                 <h2 class="">Users</h2>
                             </div>
                         </div>
-                        <div class="row my-3">
-                            <div class="col-sm-4 col-xs-12 ">
+                        <div class="d-flex justify-content-between my-3">
+                            <div class="">
                                 <div class="search-box">
                                     <input type="text" class="form-control" id="search" name="search"
                                            placeholder="Search...">
                                 </div>
                             </div>
-                            <div class="col-xs-8 text-right w-66">
-                                <a href="/users/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
+                            @php
+                                $user = Auth::user();
+                                $role = $user->roles->first();
+                            @endphp
+                            @if ($role->permissions->where('name', 'create user')->isNotEmpty())
+                                <div class="col-xs-8 text-right w-66 p-0">
+                                    <a href="/users/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
+                                </div>
+                            @endif
+                            <div class="">
+                                    <div class="col-xs-8 text-right w-66 p-0">
+                                        <button type="button" class="btn btn-sm btn-primary" id="exports" name="exports">Exports</button>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -37,7 +54,6 @@
                             </tr>
                             </thead>
                             <tbody>
-
                             @foreach($users as $user)
                                 <tr id="oneUser" data-id="{{$user->id}}">
                                     <td>{{$user->id}}</td>
@@ -50,10 +66,12 @@
                                         <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
                                     <td style="" class="editDelete">
-
+                                        @if ($role->permissions->where('name', 'delete user')->isNotEmpty())
                                             <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
-
-                                        <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
+                                        @endif
+                                        @if ($role->permissions->where('name', 'update user')->isNotEmpty())
+                                            <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -126,6 +144,16 @@
                     success: function (data) {
                         console.log(data);
                         $row.remove();
+                    }
+                });
+            });
+            $(document).on('click', '#exports', function () {
+                let exports = $(this);
+                $.ajax({
+                    url: "/usersData",
+                    method: "POST",
+                    data: exports ,
+                    success: function (response) {
                     }
                 });
             });

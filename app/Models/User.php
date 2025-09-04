@@ -42,4 +42,23 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class , 'user_roles')->withTimestamps();
+    }
+
+    protected function fullName() : Attribute
+    {
+        return Attribute::make(
+            get: function (){
+                return $this->first_name . ' ' . $this->last_name;
+            }
+        );
+    }
 }

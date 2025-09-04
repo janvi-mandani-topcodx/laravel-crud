@@ -1,16 +1,23 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\MailController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\SearchConroller;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::resource('/users' , UserController::class);
-Route::resource('/posts' , PostController::class);
-Route::resource('comments', CommentController::class);
+Route::middleware('emailVerify')->group(function (){
+    Route::resource('users' , UserController::class);
+    Route::resource('posts' , PostController::class);
+    Route::resource('comments', CommentController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+    Route::resource('chats', ChatController::class);
+});
+
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout.view');
 Route::get('/login', [LoginController::class, 'viewLogin'])->name('login.view');
 Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
@@ -20,3 +27,7 @@ Route::get('/reset', [LoginController::class, 'viewReset'])->name('reset.passwor
 Route::post('/reset', [LoginController::class, 'reset'])->name('reset.submit');
 Route::get('/verify', [LoginController::class, 'viewVerify'])->name('email.verify');
 Route::post('/verify', [LoginController::class, 'verify'])->name('verify.user');
+Route::post('/usersData', [UserController::class, 'exports'])->name('exports.user');
+Route::get('/chat/search', [ChatController::class, 'chat'])->name('chat.admin.user');
+Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.message');
+Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');

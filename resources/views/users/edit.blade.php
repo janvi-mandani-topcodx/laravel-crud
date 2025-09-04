@@ -14,14 +14,14 @@
                                 <input type="hidden" id="editUserId" data-id="{{$user->id}}">
                                 <div class="row mb-4">
                                     <div class="col">
-                                        <div  class="form-outline">
+                                        <div  class="form-group">
                                             <label class="form-label fw-bold" for="firstName">First name</label>
                                             <input type="text" id="firstName" class="form-control"  value="{{$user->first_name}}"  name="firstName" placeholder="Enter First name"/>
                                             <span style="color: darkred">@error('firstName') {{$message}} @enderror</span>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <div  class="form-outline">
+                                        <div  class="form-group">
                                             <label class="form-label fw-bold" for="lastName">Last name</label>
                                             <input type="text" id="lastName" class="form-control" value="{{$user->last_name}}" name="lastName" placeholder="Enter Last name"/>
                                             <span style="color: darkred">@error('lastName') {{$message}} @enderror</span>
@@ -29,18 +29,18 @@
                                     </div>
                                 </div>
 
-                                <div  class="form-outline mb-4">
+                                <div  class="form-group mb-4">
                                     <label class="form-label fw-bold" for="email">Email address</label>
                                     <input type="email" id="email" class="form-control" value="{{$user->email}}" name="email" placeholder="Enter your email" />
                                     <span style="color: darkred">@error('email') {{$message}} @enderror</span>
                                 </div>
 
-                                <div  class="form-outline mb-4">
+                                <div  class="form-group mb-4">
                                     <label class="form-label fw-bold" for="password">Password</label>
                                     <input type="password" id="password" class="form-control"  value="" name="password" placeholder="Enter password"/>
                                     <span style="color: darkred">@error('password') {{$message}} @enderror</span>
                                 </div>
-                                <div  class="form-outline mb-4">
+                                <div  class="form-group mb-4">
                                     <label class="form-label fw-bold" for="confirmPassword">Confirm password</label>
                                     <input type="password" id="confirmPassword" class="form-control"  value="" name="confirmPassword" placeholder="Enter confirm password"/>
                                     <span style="color: darkred">@error('confirmPassword') {{$message}} @enderror</span>
@@ -48,7 +48,7 @@
                                 @php
                                     $userHobbies = old('hobbie', json_decode($user->hobbies));
                                 @endphp
-                                <div class="form-outline mb-4 ">
+                                <div class="form-group mb-4 ">
                                     <label class="form-label fw-bold">Hobbies</label>
                                     <div class="form-check ms-4">
                                         <input class="form-check-input" type="checkbox" name="hobbie[]" value="singing" id="singing" {{ in_array('singing', $userHobbies) ? 'checked' : '' }} >
@@ -78,7 +78,7 @@
 
                                 </div>
 
-                                <div class="form-outline mb-4">
+                                <div class="form-group mb-4">
                                     <label class="form-label fw-bold" >Gender</label>
                                     <div class="form-check ms-4">
                                         <input class="form-check-input" type="radio" name="gender" id="male" value="male" {{ $user->gender == 'male' ? 'checked' : '' }}>
@@ -92,7 +92,17 @@
                                     <span style="color: darkred" class="genderError">@error('gender') {{ $message }} @enderror</span>
                                 </div>
 
-                                <div class="form-outline mb-4">
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold" >Role</label>
+                                    <select class="form-select" name="role" id="mySelect">
+                                        <option >Select Role</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{$role->id}}" {{ $user->roles->contains('id', $role->id) ? 'selected' : '' }}>{{$role->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-4">
                                     <label class="form-label fw-bold" for="customFile">Image</label>
                                     <input type="file" class="form-control" id="customFile" name="image"/>
                                     @if ($user->image)

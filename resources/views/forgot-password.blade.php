@@ -13,7 +13,7 @@
                                         @csrf
                                         <div class="d-flex flex-row align-items-center mb-4">
                                             <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
-                                            <div data-mdb-input-init class="form-outline flex-fill mb-0">
+                                            <div data-mdb-input-init class="form-group flex-fill mb-0">
                                                 <label class="form-label" for="email">Your Email</label>
                                                 <input type="email" id="email" name="email" class="form-control"  value="{{old('email')}}"/>
                                                 <span style="color: darkred">@error('email') {{$message}} @enderror</span>

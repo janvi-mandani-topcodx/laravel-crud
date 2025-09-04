@@ -17,7 +17,7 @@ class Comment extends Model
         return $this->belongsTo(Post::class);
     }
 
-    protected function firstLetter() : Attribute
+    protected function fullName() : Attribute
     {
         return Attribute::make(
             get: function (){

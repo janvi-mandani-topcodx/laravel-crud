@@ -34,7 +34,7 @@
     box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.08);
 }
 .panel .panel-body .table{
-    margin: 0;
+    margin: 0 auto;
     border: 1px solid #e7e7e7;
 }
 .panel .panel-body .table tr td{ border-color: #e7e7e7; }
@@ -46,6 +46,7 @@
     padding: 12px;
     border: 1px solid #6D7AE0;
 }
+
 .panel .panel-body .table tbody tr:hover{ background-color: rgba(109, 122, 224, 0.1); }
 .panel .panel-body .table tbody tr td{
     color: #555;

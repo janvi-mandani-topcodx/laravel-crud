@@ -57,7 +57,14 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        $user = Auth::user();
+        $role = $user->roles->first();
+        if ($role->permissions->where('name', 'create post')->isNotEmpty()) {
+                return view('posts.create');
+        }
+        else{
+            return redirect()->route('posts.index')->with(['error' => "You don't have permission to create post."]);
+        }
     }
 
     public function store(CreatePostRequest $request)
@@ -76,9 +83,16 @@ class PostController extends Controller
     }
     public function edit(string $id)
     {
-        $post = Post::find($id);
+        $user = Auth::user();
+        $role = $user->roles->first();
+        if ($role->permissions->where('name', 'update post')->isNotEmpty()) {
+                $post = Post::find($id);
+                return view('posts.edit', compact('post'));
+        }
+        else{
+            return redirect()->route('posts.index')->with(['error' => "You don't have permission to update post."]);
+        }
 
-        return view('posts.edit', compact('post' ));
     }
 
     public function update(UpdatePostRequest $request, string $id)
@@ -108,11 +122,19 @@ class PostController extends Controller
     }
     public function destroy(string $id)
     {
-        $post = Post::find($id);
-        $post->delete();
-        if($post->image != null){
-            Storage::disk('public')->delete($post->image);
+        $AuthUser = Auth::user();
+        foreach ($AuthUser->roles as $role) {
+            if ($role->permissions->contains('name', 'delete post')) {
+                $post = Post::find($id);
+                $post->delete();
+                if ($post->image != null) {
+                    Storage::disk('public')->delete($post->image);
+                }
+                return response()->json(['success' => 'Post delete successfully.']);
+
+            } else {
+                return redirect()->route('posts.index')->with(['error' => "You don't have permission to delete post."]);
+            }
         }
-        return response()->json(['success'=>'Post delete successfully.']);
     }
 }

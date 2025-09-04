@@ -24,7 +24,7 @@ class Post extends Model
             }
         );
     }
-    protected function firstLetter() : Attribute
+    protected function fullName() : Attribute
     {
         return Attribute::make(
             get: function (){

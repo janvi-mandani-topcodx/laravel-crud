@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\ResetRequest;
+use App\Jobs\SendEmailVerify;
 use App\Mail\EmailVarification;
 use App\Mail\ResetPassword;
 use App\Models\User;
@@ -70,7 +71,7 @@ class LoginController extends Controller
         $email = $request->email;
         $user = User::where('email',$email)->first();
         if($user){
-                $to = 'aaa@gmail.com';
+                $to = $user;
                 $message = "hello Welcome";
                 $subject = "Mail send";
                 $url = route('reset.password') ."?email=".$request->email;
@@ -124,6 +125,10 @@ class LoginController extends Controller
 
     public function viewVerify()
     {
+
+        if(auth()->user()->email_verified_at != null){
+            return redirect()->route('posts.index');
+        }
         return view('email-verify');
     }
 
@@ -131,11 +136,13 @@ class LoginController extends Controller
     {
         $email = Auth::user()->email;
         $user = User::where('email',$email)->first();
-        $to = 'aaa@gmail.com';
+
+
         $message = "hello Welcome";
         $subject = "Mail send";
-        Mail::to($to)->send(new EmailVarification($message , $subject));
+        SendEmailVerify::dispatch($message, $subject);
         $user->email_verified_at = now();
         $user->save();
+
     }
 }

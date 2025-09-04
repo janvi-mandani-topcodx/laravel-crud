@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
 @extends('layout')
 
 @section('content')
@@ -14,7 +15,7 @@
                                 <input type="hidden" id="editUserId" data-id="{{$post->id}}">
                                 <div class="row mb-4 ">
                                     <div class="col">
-                                        <div  class="form-outline">
+                                        <div  class="form-group">
                                             <label class="form-label fw-bold " for="title">Title</label>
                                             <input type="text" id="title" class="form-control"  value="{{$post->title}}" name="title" placeholder="Enter title"/>
                                             <span style="color: darkred">@error('title') {{$message}} @enderror</span>
@@ -23,7 +24,7 @@
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col">
-                                        <div  class="form-outline">
+                                        <div  class="form-group">
                                             <label class="form-label fw-bold" for="description">Description</label>
                                             <input type="text" id="description" class="form-control"  value="{{$post->description}}" name="description" placeholder="Enter description"/>
                                             <span style="color: darkred">@error('description') {{$message}} @enderror</span>
@@ -32,7 +33,7 @@
                                 </div>
                                 <div class="row mb-4">
                                     <div class="col">
-                                        <div  class="form-outline">
+                                        <div  class="form-group">
                                             <label class="form-label fw-bold w-100" for="status">Status</label>
                                             <select name="status" id="status" class="px-2 form-control">
                                                 <option value="active" {{ $post->status == 'active' ? 'selected' : '' }}>Active</option>
@@ -41,7 +42,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-outline mb-4">
+                                <div class="form-group mb-4">
                                     <label class="form-label fw-bold" for="customFilepost">Image</label>
                                     <input type="file" class="form-control" id="customFilepost" name="image"/>
                                     @if ($post->image)
@@ -53,7 +54,6 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block mb-4 updatePost">Update</button>
                             </form>
-
                         </div>
                     </div>
                 </div>
@@ -66,21 +66,29 @@
                 <div class="col-12 col-lg-9 col-xl-7">
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 text-center">Create Comment</h3>
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 text-center">Comments</h3>
                                 <form method="POST" enctype="multipart/form-data" action="{{ route('comments.store') }}" id="commentForm">
                                     @csrf
                                     <input type="hidden" id="post_id" name="post_id" data-id="{{$post->id}}" value="{{$post->id}}">
                                     <input type="hidden" id="editCommentId" name="editCommentId" value="">
-                                    <div class="row mb-4 ">
-                                        <div class="col-8">
-                                            <div  class="form-outline">
-                                                <input type="text" id="comment" class="form-control"  value="" name="comment" placeholder="Enter Comment"/>
-                                                <span style="color: darkred">@error('comment') {{$message}} @enderror</span>
+                                    @php
+                                        $user = Auth::user();
+                                        $role = $user->roles->first();
+                                    @endphp
+                                    <div class="row mb-4 updateCommentInput">
+                                        @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
+                                            <div class="col-8">
+                                                <div class="form-group">
+                                                    <input type="text" id="comment" class="form-control"  value="" name="comment" placeholder="Enter Comment"/>
+                                                    <span style="color: darkred">@error('comment') {{$message}} @enderror</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <button type="submit" class="btn btn-primary btn-block mb-4 createComment" id="commentSubmitBtn">Add Comment</button>
-                                        </div>
+                                        @endif
+                                        @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
+                                            <div class="col-4">
+                                                <button type="submit" class="btn btn-primary btn-block mb-4 createComment" id="commentSubmitBtn">Add Comment</button>
+                                            </div>
+                                        @endif
                                     </div>
                                 </form>
                             <div class="comment_data">
@@ -92,7 +100,7 @@
                                                 <b class="bg-black text-light rounded rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
                                                     {{substr($comment->user->first_name , 0 ,1)}}{{substr($comment->user->last_name , 0 ,1)}}
                                                 </b>
-                                                <div class="mx-2 fw-bold">{{$comment->firstLetter}}</div>
+                                                <div class="mx-2 fw-bold">{{$comment->fullName}}</div>
 
                                             </div>
                                         </div>
@@ -104,14 +112,18 @@
                                                     </svg>
                                                 </button>
                                                 <ul class='dropdown-menu'>
-                                                    <li class='mb-2'>
-                                                        <input type='hidden' name='edit_comment' value="{{$comment->id}}">
-                                                        <input type='hidden' name='postId' value="{{$comment->post->id}}">
-                                                        <span  class='edit_btn dropdown-item' data-comment = "{{$comment->comment}}" data-action="{{$comment->id}}" > Edit </span>
-                                                    </li>
-                                                    <li>
-                                                        <span class='delete_btn dropdown-item' data-comment="{{$comment->id}}">Delete</span>
-                                                    </li>
+                                                    @if ($role->permissions->where('name', 'update comment')->isNotEmpty())
+                                                        <li class='mb-2'>
+                                                            <input type='hidden' name='edit_comment' value="{{$comment->id}}">
+                                                            <input type='hidden' name='postId' value="{{$comment->post->id}}">
+                                                            <span  class='edit_btn dropdown-item' data-comment = "{{$comment->comment}}" data-action="{{$comment->id}}" > Edit </span>
+                                                        </li>
+                                                    @endif
+                                                    @if ($role->permissions->where('name', 'delete comment')->isNotEmpty())
+                                                        <li>
+                                                            <span class='delete_btn dropdown-item' data-comment="{{$comment->id}}">Delete</span>
+                                                        </li>
+                                                    @endif
                                                 </ul>
                                             </div>
                                         @endif
@@ -184,12 +196,23 @@
             });
             $(document).on('click', '.edit_btn', function () {
                 const commentId = $(this).data('action');
-                const commentText = $(this).data('comment');
+                const commentText = $(`#commentData-${commentId}`).find('.comment-text').text();
 
+                const editComment = `
+                    <div class='row updateCommentInput'>
+                        <div class="col-8">
+                            <div  class="form-group">
+                                <input type="text" id="comment" class="form-control"  value="${commentText}" name="comment" placeholder="Enter Comment"/>
+                                <span style="color: darkred">@error('comment') {{$message}} @enderror</span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block mb-4 createComment" id="commentSubmitBtn">Update Comment</button>
+                        </div>
+                    </div>`;
+                $('.updateCommentInput').replaceWith(editComment);
                 $('#comment').val(commentText);
                 $('#editCommentId').val(commentId);
-
-                $('#commentSubmitBtn').text('Update Comment');
             });
             $('#commentForm').on('submit', function (e) {
                 e.preventDefault();
@@ -207,9 +230,16 @@
                         },
                         success: function (response) {
                             $('#commentData-' + commentId).find('.comment-text').text(response.comment);
-                            $('#comment').val('');
-                            $('#editCommentId').val('');
-                            $('#commentSubmitBtn').text('Add Comment');
+                            if(response.addComment === true){
+                                $('#comment').val('');
+                                $('#editCommentId').val('');
+                                $('#commentSubmitBtn').text('Add Comment');
+                            }
+                            else{
+                                $('#comment').val('');
+                                $('#editCommentId').val('');
+                                $('.updateCommentInput').hide();
+                            }
                         }
                     });
                 } else {

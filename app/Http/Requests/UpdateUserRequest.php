@@ -25,6 +25,7 @@ class UpdateUserRequest extends FormRequest
                 'gender'          => 'required',
                 'password'        =>['nullable', Password::min(8)->mixedCase()->numbers()],
                 'confirmPassword' =>'nullable|min:8|same:password',
+                'role'            =>'required',
                 'image'           => ['nullable',File::image()->max('1mb')]
         ];
     }
@@ -47,6 +48,7 @@ class UpdateUserRequest extends FormRequest
             'confirmPassword.min' => 'Please enter at least 8 character',
             'hobbie.required' => 'Select your hobbie',
             'gender.required' => 'Select your gender',
+            'role.required' => 'Select your role',
             'image.image' => 'The uploaded file must be a valid image.',
             'image.max' => 'The image size must not exceed 2MB.',
         ];
