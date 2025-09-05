@@ -40,7 +40,7 @@
                             <a class="nav-link" href="{{route('permissions.index')}}">Permissions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{route('chats.index')}}">Chat</a>
+                            <a class="nav-link" href="{{route('chats.index')}}">Chats</a>
                         </li>
                     @endif
                 </ul>

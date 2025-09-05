@@ -7,9 +7,10 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\LoginMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('emailVerify')->group(function (){
+Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('users' , UserController::class);
     Route::resource('posts' , PostController::class);
     Route::resource('comments', CommentController::class);
@@ -29,5 +30,5 @@ Route::get('/verify', [LoginController::class, 'viewVerify'])->name('email.verif
 Route::post('/verify', [LoginController::class, 'verify'])->name('verify.user');
 Route::post('/usersData', [UserController::class, 'exports'])->name('exports.user');
 Route::get('/chat/search', [ChatController::class, 'chat'])->name('chat.admin.user');
-Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.message');
+Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.messages');
 Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');

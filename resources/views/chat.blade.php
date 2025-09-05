@@ -10,12 +10,11 @@
                             <input type="text" class="form-control" id="search" name="search"
                                    placeholder="Search user...">
                         </div>
-                        <div class="userSearchData pt-2 ">
+                        <div class="user-search-data pt-2 ">
                         </div>
-                        <div class="messageData">
+                        <div class="message-data">
                             @foreach($messages as $message)
-                                @if($message->user)
-                                    <div id="User" style="display:flex;" data-user-id="{{$message->user->id}}" data-id="{{$message->id}}" data-image="{{$message->user->imageUrl}}" data-fullname="{{$message->user->fullName}}">
+                                    <div id="user" style="display:flex;" data-user-id="{{$message->admin_id}}" data-id="{{$message->id}}" data-image="{{$message->user->imageUrl}}" data-fullname="{{$message->user->fullName}}">
                                         <div class="col-4 p-0" style="width: 100px">
                                             <img style="height: 48px;  width: 46px;" class="img-fluid rounded-circle" src="{{$message->user->imageUrl}}" alt="Uploaded Image" >
                                         </div>
@@ -23,9 +22,6 @@
                                             <p>{{$message->user->fullName}}</p>
                                         </div>
                                     </div>
-                                @else
-                                    <p>not user found</p>
-                                @endif
                             @endforeach
                         </div>
                     </div>
@@ -34,19 +30,23 @@
             <div class="col-8">
                 <div class="card" style="height: 768px !important;">
                     <div class="card-body" style="position: relative">
-                        <div class="userChat">
+                        <div class="user-chat">
 
                         </div>
-                        <div style="height:84%; overflow: scroll" id="allMessages" class="overflow-x-hidden">
+                        <div style="height:84%; overflow: scroll" id="all-messages" class="overflow-x-hidden">
                         </div>
                         <div class=" d-flex align-items-end p-1" style="position: absolute; bottom: 0; left:0; width: 100%">
                             <div class="search-box w-100">
-                                <form action="" id="messageForm" method="post" class="d-flex justify-content-around gap-3" >
-                                    @csrf
-                                    <input type="hidden" id="editchatId"  value="">
-                                    <input type="text" class="form-control" id="message" placeholder="Enter your chat...">
-                                    <input type="submit" class="btn btn-primary" value="Send" id="messageSend">
-                                </form>
+                                @if($messages)
+                                    <div id="message-input">
+                                        <form action="" id="message-form" method="post" class="d-flex justify-content-around gap-3" >
+                                            @csrf
+                                            <input type="hidden" id="edit-chat-id"  value="">
+                                            <input type="text" class="form-control" id="message" placeholder="Enter your chat...">
+                                            <input type="submit" class="btn btn-primary" value="Send" id="message-send">
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -63,6 +63,12 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $('#message-input').hide();
+            if($('.messages-name') == ''){
+                $('#message-input').show();
+            } else {
+                $('#message-input').hide();
+            }
             $(document).on('keyup', '#search' ,  function () {
                 let query = $(this).val();
                 $.ajax({
@@ -72,52 +78,63 @@
                         search: query
                     },
                     success: function (response) {
-                        $('.userSearchData').html(response.html);
+                        $('.user-search-data').html(response.html);
                     },
                     error: function (response){
-                        $('.userSearchData').html(response.html);
+                        $('.user-search-data').html(response.html);
                     }
+
                 });
+                $('.message-data').hide();
             });
 
             $(document).on('click' , '#oneUser', function (){
                 let fullName = $(this).data('fullname');
                 let image = $(this).data('image');
                 let id = $(this).data('id');
+
+                $('.message-data').show();
                 let userHtml = `
-                        <div class="d-flex align-items-center mb-3">
+                        <div class="d-flex align-items-center mb-3 messages-name" data-id="${id}">
                             <img src="${image}" alt="User Image" style="height: 50px; width: 50px;" class="rounded-circle me-2">
                             <div class="d-flex">
                                 <strong class="pe-2">${fullName}</strong>
                             </div>
                         </div>
                         <hr>`;
-                    $.ajax({
-                        url: "{{route('chat.message')}}",
+                 $('#message-input').show();
+                $.ajax({
+                        url: "{{route('chat.messages')}}",
                         method: "GET",
                         data: {
                             id:id
                         },
                         success: function (response) {
-
+                            $('.message-data').append(response.html);
                         }
                     });
-                $('.userChat').html(userHtml);
+                $('.user-chat').html(userHtml);
+                $('.user-search-data').text('');
+                $('#search').val('')
+                $('#all-messages').text('')
+
             });
 
-            $(document).on('click' , '#User', function (){
+            $(document).on('click' , '#user', function (){
                 let fullName = $(this).data('fullname');
                 let image = $(this).data('image');
                 let messageId = $(this).data('id');
+                console.log(messageId);
                 let userHtml = `
-                        <div class="d-flex align-items-center mb-3 messagesName" data-id='${messageId}'>
+                        <div class="d-flex align-items-center mb-3 messages-name" data-id='${messageId}'>
                             <img src="${image}" alt="User Image" style="height: 50px; width: 50px;" class="rounded-circle me-2">
                             <div class="d-flex">
                                 <strong class="pe-2">${fullName}</strong>
                             </div>
                         </div>
                         <hr>`;
-                $('.userChat').html(userHtml);
+                $('.user-chat').html(userHtml);
+                $('#message-input').show();
                 $.ajax({
                     url: "{{ route('chat.message') }}",
                     method: "GET",
@@ -125,7 +142,8 @@
                         id: messageId
                     },
                     success: function (response) {
-                        $('#allMessages').html(response.html);
+                        $('#all-messages').html(response.html);
+
                     }
                 });
             });
@@ -136,16 +154,16 @@
                 const message = $(this).data('message');
                 console.log(message)
                 $('#message').val(message);
-                $('#editchatId').val(chatId);
-                $('#messageSend').text('Update Message');
+                $('#edit-chat-id').val(chatId);
+                $('#message-send').val('Update');
             });
 
-            $('#messageForm').on('submit', function (e) {
+            $('#message-form').on('submit', function (e) {
                 e.preventDefault();
 
                 const message = $('#message').val();
-                const messageId = $('.messagesName').data('id');
-                const editChatId = $('#editchatId').val();
+                const messageId = $('#user').data('id');
+                const editChatId = $('#edit-chat-id').val();
                 if (editChatId) {
                     $.ajax({
                         url: '/chats/' + editChatId,
@@ -154,11 +172,11 @@
                             message: message,
                         },
                         success: function (response) {
-                            $('.messageData-' + editChatId).find('.messageText').text(response.message);
+                            $('.message-data-' + editChatId).find('.message-text').text(response.message);
                             console.log(response.message)
                             $('#message').val('');
-                            $('#editchatId').val('');
-                            $('#messageSend').text('Send');
+                            $('#edit-chat-id').val('');
+                            $('#message-send').text('Send');
                         }
                     });
                 }else{
@@ -171,10 +189,12 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (response) {
+                            console.log(response.send_by_admin)
+                            const sendByAdmin = response.send_by_admin == 1 ? 'text-end' : 'text-start';
                             const newMessageHTML = `
-                                    <div data-id="${response.id}" data-send="${response.send_by_admin}" class="oneMessage text-right messageData-${response.id}">
+                                    <div data-id="${response.id}" data-send="${response.send_by_admin}" class="one-message ${sendByAdmin} message-data-${response.id}">
                                         <small>${response.created_at}</small>
-                                        <p class="messageText">${response.message}</p>
+                                        <div class="message-text">${response.message}</div>
                                         <div class="dropdown">
                                                 <button type="button" class="border-0 dropdown-toggle"  data-bs-toggle="dropdown">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
@@ -194,7 +214,7 @@
                                             </div>
                                     </div>
                                 `;
-                            $('#allMessages').append(newMessageHTML);
+                            $('#all-messages').append(newMessageHTML);
                             $('#message').val('');
                         }
                     });
@@ -203,7 +223,7 @@
 
             $(document).on('click', '.delete_btn' ,  function () {
                 const messageId = $(this).data('id');
-                const row = $(this).closest('.oneMessage');
+                const row = $(this).closest('.one-message');
                 $.ajax({
                     url: '/chats/' + messageId,
                     type: 'DELETE',
