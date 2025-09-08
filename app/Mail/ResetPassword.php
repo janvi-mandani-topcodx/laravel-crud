@@ -15,9 +15,7 @@ class ResetPassword extends Mailable
     public $mailMessage;
     public $subject;
     public $url;
-    /**
-     * Create a new message instance.
-     */
+
     public function __construct($message , $subject , $url)
     {
         $this->mailMessage = $message;
@@ -25,9 +23,7 @@ class ResetPassword extends Mailable
         $this->url = $url;
     }
 
-    /**
-     * Get the message envelope.
-     */
+
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -35,9 +31,7 @@ class ResetPassword extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
+
     public function content(): Content
     {
         return new Content(
@@ -45,11 +39,7 @@ class ResetPassword extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
+
     public function attachments(): array
     {
         return [];

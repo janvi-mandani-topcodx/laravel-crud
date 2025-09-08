@@ -38,11 +38,12 @@ class CommentController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $input = $request->all();
         $user = Auth::user();
         $role = $user->roles->first();
         if ($role->permissions->where('name', 'update comment')->isNotEmpty()) {
             $comment = Comment::findOrFail($id);
-            $comment->comment = $request->comment;
+            $comment->comment = $input['comment'];
             $comment->save();
             if($role->permissions->where('name', 'create comment')->isNotEmpty()){
                 $addComment = 'true';

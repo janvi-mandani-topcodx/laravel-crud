@@ -10,7 +10,12 @@ class Message extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class , 'admin_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function messageReplies()

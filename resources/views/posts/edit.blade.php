@@ -12,7 +12,7 @@
                             <form method="POST" enctype="multipart/form-data"  action="{{ route('posts.update', $post->id) }}">
                                 @csrf
                                 @method('PUT')
-                                <input type="hidden" id="editUserId" data-id="{{$post->id}}">
+                                <input type="hidden" id="edit-user-id" data-id="{{$post->id}}">
                                 <div class="row mb-4 ">
                                     <div class="col">
                                         <div  class="form-group">
@@ -43,8 +43,8 @@
                                     </div>
                                 </div>
                                 <div class="form-group mb-4">
-                                    <label class="form-label fw-bold" for="customFilepost">Image</label>
-                                    <input type="file" class="form-control" id="customFilepost" name="image"/>
+                                    <label class="form-label fw-bold" for="custom-file-post">Image</label>
+                                    <input type="file" class="form-control" id="custom-file-post" name="image"/>
                                     @if ($post->image)
                                         <img src="{{$post->postImageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
                                     @else
@@ -52,7 +52,7 @@
                                     @endif
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block mb-4 updatePost">Update</button>
+                                <button type="submit" class="btn btn-primary btn-block mb-4 update-post">Update</button>
                             </form>
                         </div>
                     </div>
@@ -67,15 +67,15 @@
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 text-center">Comments</h3>
-                                <form method="POST" enctype="multipart/form-data" action="{{ route('comments.store') }}" id="commentForm">
+                                <form method="POST" enctype="multipart/form-data" action="{{ route('comments.store') }}" id="comment-form">
                                     @csrf
-                                    <input type="hidden" id="post_id" name="post_id" data-id="{{$post->id}}" value="{{$post->id}}">
-                                    <input type="hidden" id="editCommentId" name="editCommentId" value="">
+                                    <input type="hidden" id="post-id" name="post_id" data-id="{{$post->id}}" value="{{$post->id}}">
+                                    <input type="hidden" id="edit-comment-id" name="editCommentId" value="">
                                     @php
                                         $user = Auth::user();
                                         $role = $user->roles->first();
                                     @endphp
-                                    <div class="row mb-4 updateCommentInput">
+                                    <div class="row mb-4 update-comment-input">
                                         @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
                                             <div class="col-8">
                                                 <div class="form-group">
@@ -86,14 +86,14 @@
                                         @endif
                                         @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
                                             <div class="col-4">
-                                                <button type="submit" class="btn btn-primary btn-block mb-4 createComment" id="commentSubmitBtn">Add Comment</button>
+                                                <button type="submit" class="btn btn-primary btn-block mb-4 create-comment" id="comment-submit-btn">Add Comment</button>
                                             </div>
                                         @endif
                                     </div>
                                 </form>
-                            <div class="comment_data">
+                            <div class="comment-data">
                                 @foreach($post->comments as $comment)
-                                <div class='my-5 dots rounded p-2 oneComment' id="commentData-{{$comment->id}}">
+                                <div class='my-5 dots rounded p-2 one-comment' id="comment-data-{{$comment->id}}">
                                     <div class='d-flex align-items-center justify-content-between'>
                                         <div class='d-flex align-items-center'>
                                             <div class='full_name d-flex justify-content-center align-items-center'>
@@ -116,12 +116,12 @@
                                                         <li class='mb-2'>
                                                             <input type='hidden' name='edit_comment' value="{{$comment->id}}">
                                                             <input type='hidden' name='postId' value="{{$comment->post->id}}">
-                                                            <span  class='edit_btn dropdown-item' data-comment = "{{$comment->comment}}" data-action="{{$comment->id}}" > Edit </span>
+                                                            <span  class='edit-btn dropdown-item' data-comment = "{{$comment->comment}}" data-action="{{$comment->id}}" > Edit </span>
                                                         </li>
                                                     @endif
                                                     @if ($role->permissions->where('name', 'delete comment')->isNotEmpty())
                                                         <li>
-                                                            <span class='delete_btn dropdown-item' data-comment="{{$comment->id}}">Delete</span>
+                                                            <span class='delete-btn dropdown-item' data-comment="{{$comment->id}}">Delete</span>
                                                         </li>
                                                     @endif
                                                 </ul>
@@ -151,9 +151,9 @@
                 }
             });
 
-            $(document).on('click', '.delete_btn' ,  function () {
+            $(document).on('click', '.delete-btn' ,  function () {
                 const commentId = $(this).data('comment');
-                const row = $(this).closest('.oneComment');
+                const row = $(this).closest('.one-comment');
                 $.ajax({
                     url: '/comments/' + commentId,
                     type: 'DELETE',
@@ -165,7 +165,7 @@
                     }
                 });
             });
-            $(document).on('click', '.updatePost', function (e) {
+            $(document).on('click', '.update-post', function (e) {
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
@@ -194,12 +194,12 @@
                     }
                 });
             });
-            $(document).on('click', '.edit_btn', function () {
+            $(document).on('click', '.edit-btn', function () {
                 const commentId = $(this).data('action');
-                const commentText = $(`#commentData-${commentId}`).find('.comment-text').text();
+                const commentText = $(`#comment-data-${commentId}`).find('.comment-text').text();
 
                 const editComment = `
-                    <div class='row updateCommentInput'>
+                    <div class='row update-comment-input'>
                         <div class="col-8">
                             <div  class="form-group">
                                 <input type="text" id="comment" class="form-control"  value="${commentText}" name="comment" placeholder="Enter Comment"/>
@@ -207,19 +207,19 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block mb-4 createComment" id="commentSubmitBtn">Update Comment</button>
+                            <button type="submit" class="btn btn-primary btn-block mb-4 create-comment" id="comment-submit-btn">Update Comment</button>
                         </div>
                     </div>`;
-                $('.updateCommentInput').replaceWith(editComment);
+                $('.update-comment-input').replaceWith(editComment);
                 $('#comment').val(commentText);
-                $('#editCommentId').val(commentId);
+                $('#edit-comment-id').val(commentId);
             });
-            $('#commentForm').on('submit', function (e) {
+            $('#comment-form').on('submit', function (e) {
                 e.preventDefault();
 
                 const commentText = $('#comment').val();
-                const postId = $('#post_id').val();
-                const commentId = $('#editCommentId').val();
+                const postId = $('#post-id').val();
+                const commentId = $('#edit-comment-id').val();
 
                 if (commentId) {
                     $.ajax({
@@ -229,16 +229,16 @@
                             comment: commentText,
                         },
                         success: function (response) {
-                            $('#commentData-' + commentId).find('.comment-text').text(response.comment);
+                            $('#comment-data-' + commentId).find('.comment-text').text(response.comment);
                             if(response.addComment === true){
                                 $('#comment').val('');
-                                $('#editCommentId').val('');
-                                $('#commentSubmitBtn').text('Add Comment');
+                                $('#edit-comment-id').val('');
+                                $('#comment-submit-btn').text('Add Comment');
                             }
                             else{
                                 $('#comment').val('');
-                                $('#editCommentId').val('');
-                                $('.updateCommentInput').hide();
+                                $('#edit-comment-id').val('');
+                                $('.update-comment-input').hide();
                             }
                         }
                     });
@@ -253,7 +253,7 @@
                         },
                         success: function (response) {
                             const newCommentHTML = `
-                            <div class='my-5 dots rounded p-2 oneComment' id="commentData-${response.id}">
+                            <div class='my-5 dots rounded p-2 one-comment' id="comment-data-${response.id}">
                                 <div class='d-flex align-items-center justify-content-between'>
                                     <div class='d-flex align-items-center'>
                                         <div class='full_name d-flex justify-content-center align-items-center'>
@@ -272,11 +272,11 @@
                                         <ul class='dropdown-menu'>
                                             <li class='mb-2'>
                                                 <input type='hidden' name='edit_comment' value="${response.id}">
-                                                <input type='hidden' name='postId' value="${response.post_id}">
-                                                <span class='edit_btn dropdown-item' data-comment="${response.comment}" data-action="${response.id}">Edit</span>
+                                                <input type='hidden' name='postId' value="${response.post-id}">
+                                                <span class='edit-btn dropdown-item' data-comment="${response.comment}" data-action="${response.id}">Edit</span>
                                             </li>
                                             <li>
-                                                <span class='delete_btn dropdown-item' data-comment="${response.id}">Delete</span>
+                                                <span class='delete-btn dropdown-item' data-comment="${response.id}">Delete</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -286,10 +286,10 @@
                                     <span>${response.created_at}</span>
                                 </div>
                             </div>`;
-                            $('.comment_data').append(newCommentHTML);
+                            $('.comment-data').append(newCommentHTML);
                             $('#comment').val('');
-                            $('#editCommentId').val('');
-                            $('#commentSubmitBtn').text('Add Comment');
+                            $('#edit-comment-id').val('');
+                            $('#comment-submit-btn').text('Add Comment');
                         }
                     });
                 }

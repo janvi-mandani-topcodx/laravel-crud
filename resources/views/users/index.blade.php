@@ -29,7 +29,7 @@
                             @endphp
                             @if ($role->permissions->where('name', 'create user')->isNotEmpty())
                                 <div class="col-xs-8 text-right w-66 p-0">
-                                    <a href="/users/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
+                                    <a href="/users/create" class="btn btn-sm btn-primary" id="create-user">Create New</a>
                                 </div>
                             @endif
                             <div class="">
@@ -49,28 +49,30 @@
                                 <th>Email</th>
                                 <th>Hobbies</th>
                                 <th>Gender</th>
+                                <th>Role</th>
                                 <th>Image</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($users as $user)
-                                <tr id="oneUser" data-id="{{$user->id}}">
+                                <tr id="one-user" data-id="{{$user->id}}">
                                     <td>{{$user->id}}</td>
                                     <td>{{$user->first_name}}</td>
                                     <td>{{$user->last_name}}</td>
                                     <td>{{$user->email}}</td>
                                     <td>{{ implode(',', json_decode($user->hobbies)) }}</td>
                                     <td>{{$user->gender}}</td>
+                                    <td>{{$user->roles->pluck('name')->first()}}</td>
                                     <td>
                                         <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
-                                    <td style="" class="editDelete">
+                                    <td style="" class="edit-delete">
                                         @if ($role->permissions->where('name', 'delete user')->isNotEmpty())
-                                            <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
+                                            <button type="button" id="delete-users" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
                                         @endif
                                         @if ($role->permissions->where('name', 'update user')->isNotEmpty())
-                                            <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
+                                            <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning edit-btn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -108,9 +110,9 @@
                         }
                     });
             });
-            $(document).on('submit', '#editbtn', function () {
+            $(document).on('submit', '#edit-btn', function () {
                 e.preventDefault();
-                let $row = $(this).closest('#oneUser');
+                let $row = $(this).closest('#one-user');
                 let userId = $row.data('id');
                 let formData = $(this).serialize();
                 console.log(userId);
@@ -128,10 +130,8 @@
                 });
             });
 
-            $(document).on('click', '#deleteUsers', function () {
-
-                console.log('asdasdad');
-                let $row = $(this).closest('#oneUser');
+            $(document).on('click', '#delete-users',function () {
+                let $row = $(this).closest('#one-user');
                 let userId = $row.data('id');
                 console.log(userId)
                 $.ajax({

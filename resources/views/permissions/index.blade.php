@@ -13,7 +13,7 @@
                         <div class="row mb-3">
                             <div class="d-flex justify-content-between p-0">
                                 <div class="search-box">
-                                    <input type="text" class="form-control" id="searchPost" name="searchPost"
+                                    <input type="text" class="form-control" id="search-post" name="searchPost"
                                            placeholder="Search...">
                                 </div>
                                 <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#permissionCreate">
@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="panel-body table-responsive">
-                        <table class="table table-hover" id="postDataContainer">
+                        <table class="table table-hover" id="post-data-container">
                             <thead>
                             <tr>
                                 <th>Id</th>
@@ -31,15 +31,15 @@
                                 <th class="text-center">Actions</th>
                             </tr>
                             </thead>
-                            <tbody id="allPermission">
+                            <tbody id="all-permission">
                                     @foreach($permissions as $permission)
-                                        <tr class="onePermission" id="onePermission-{{$permission->id}}" data-id="{{$permission->id}}">
+                                        <tr class="one-permission" id="one-permission-{{$permission->id}}" data-id="{{$permission->id}}">
                                             <td>{{$permission->id}}</td>
-                                            <td class='permissionName'>{{$permission->name}}</td>
+                                            <td class='permission-name'>{{$permission->name}}</td>
 
-                                            <td  class="editDelete d-flex justify-content-center align-items-center gap-2" >
-                                                <button type="button" id="deletePermission" class="btn btn-danger btn-sm my-3" data-id="{{$permission->id}}">DELETE</button>
-                                                <span class="btn btn-warning editPermission d-flex justify-content-center align-items-center col-6" data-permission="{{$permission->name}}" data-id="{{$permission->id}}" style="    width: 70px;">Edit</span>
+                                            <td  class="edit-delete d-flex justify-content-center align-items-center gap-2" >
+                                                <button type="button" id="delete-permission" class="btn btn-danger btn-sm my-3" data-id="{{$permission->id}}">DELETE</button>
+                                                <span class="btn btn-warning edit-permission d-flex justify-content-center align-items-center col-6" data-permission="{{$permission->name}}" data-id="{{$permission->id}}" style="    width: 70px;">Edit</span>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -47,7 +47,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="modal fade" id="permissionCreate" tabindex="-1" role="dialog" aria-labelledby="permissionCreateLabel" aria-hidden="true">
+                <div class="modal fade" id="permission-create" tabindex="-1" role="dialog" aria-labelledby="permissionCreateLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -58,7 +58,7 @@
                             </div>
                             <div class="modal-body">
                                 <form method="POST">
-                                    <input type="hidden" id="editPermissionId" name="editPermissionId" value="">
+                                    <input type="hidden" id="edit-permission-id" name="editPermissionId" value="">
                                     <div class="row mb-4">
                                         <div  class="form-group">
                                             <label class=" fw-bold" for="permission">Name</label>
@@ -68,7 +68,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary createPermission">Submit</button>
+                                        <button type="button" class="btn btn-primary create-permission">Submit</button>
                                     </div>
                                 </form>
                             </div>
@@ -87,10 +87,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '.createPermission', function (e) {
+            $(document).on('click', '.create-permission', function (e) {
                 e.preventDefault()
                 let permission = $('#permission').val();
-                let PermissionId = $('#editPermissionId').val();
+                let PermissionId = $('#edit-permission-id').val();
                 if (PermissionId) {
                     $.ajax({
                         url: '/permissions/' + PermissionId,
@@ -99,11 +99,11 @@
                             permission: permission,
                         },
                         success: function (response) {
-                            $('#onePermission-' + PermissionId).find('.permissionName').text(response.permission);
-                            $('#permissionCreate').modal('hide')
+                            $('#one-permission-' + PermissionId).find('.permissionName').text(response.permission);
+                            $('#permission-create').modal('hide')
                             $('#permission').val('')
-                            $('#onePermission-' + PermissionId).find('.editPermission').data('permission', response.permission);
-                            $('#editPermissionId').val('')
+                            $('#one-permission-' + PermissionId).find('.edit-permission').data('permission', response.permission);
+                            $('#edit-permission-id').val('')
                         }
                     });
                 }
@@ -118,18 +118,18 @@
                         success: function (response) {
                             console.log(response.name)
                             const newCommentHTML = `
-                                <tr class="onePermission" id="onePermission-${response.id}" data-id="${response.id}">
+                                <tr class="one-permission" id="one-permission-${response.id}" data-id="${response.id}">
                                         <td>${response.id}</td>
-                                        <td class='permissionName'>${response.name}</td>
+                                        <td class='permission-name'>${response.name}</td>
 
-                                        <td  class="editDelete d-flex justify-content-center align-items-center gap-2" >
-                                            <button type="button" id="deletePermission" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>
-                                            <span class="btn btn-warning editPermission d-flex justify-content-center align-items-center col-6" data-permission="${response.name}"  data-id="${response.id}" style="width: 70px;">Edit</span>
+                                        <td  class="edit-delete d-flex justify-content-center align-items-center gap-2" >
+                                            <button type="button" id="delete-permission" class="btn btn-danger btn-sm my-3" data-id="${response.id}">DELETE</button>
+                                            <span class="btn btn-warning edit-permission d-flex justify-content-center align-items-center col-6" data-permission="${response.name}"  data-id="${response.id}" style="width: 70px;">Edit</span>
                                         </td>
                                     </tr>
                                     `;
-                            $('#permissionCreate').modal('hide')
-                            $('#allPermission').append(newCommentHTML)
+                            $('#permission-create').modal('hide')
+                            $('#all-permission').append(newCommentHTML)
                             $('#permission').val('')
 
                         }
@@ -137,19 +137,19 @@
                 }
             });
 
-            $(document).on('click' , '.editPermission' , function (){
+            $(document).on('click' , '.edit-permission' , function (){
                     const permissionId = $(this).data('id');
                     const permissionName = $(this).data('permission');
 
                     $('#permission').val(permissionName);
-                    $('#editPermissionId').val(permissionId);
-                    $('#permissionCreate').modal('show')
-                    $('.createPermission').text('Update Permission');
+                    $('#edit-permission-id').val(permissionId);
+                    $('#permission-create').modal('show')
+                    $('.create-permission').text('Update Permission');
             });
 
-            $(document).on('click', '#deletePermission' ,  function () {
+            $(document).on('click', '#delete-permission' ,  function () {
                 const permissionId = $(this).data('id');
-                const row = $(this).closest('.onePermission');
+                const row = $(this).closest('.one-permission');
                 $.ajax({
                     url: '/permissions/' + permissionId,
                     type: 'DELETE',

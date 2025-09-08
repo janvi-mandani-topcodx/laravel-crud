@@ -14,23 +14,23 @@
                                 <div  class="form-group">
                                     <label class="form-label fw-bold " for="role">Name</label>
                                     <input type="text" id="role" class="form-control"  value="{{old('role')}}"  name="role" placeholder="Enter First name"/>
-                                    <span style="color: darkred" class="roleError">@error('role') {{$message}} @enderror</span>
+                                    <span style="color: darkred" class="role-error">@error('role') {{$message}} @enderror</span>
                                 </div>
 
                                 <div class="form-group mb-4 ">
                                     <label class="form-label fw-bold">Permissions</label>
                                     @foreach($permissions as $permission)
-                                        <div class="form-check ms-4 onePermission" data-id="{{$permission->id}}">
+                                        <div class="form-check ms-4 one-permission" data-id="{{$permission->id}}">
                                             <input class="form-check-input" type="checkbox" name="permission[]" value="{{$permission->id}}" id="{{$permission->name}}" {{ in_array($permission->name, old('permission', [])) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="{{$permission->name}}">
                                                 {{$permission->name}}
                                             </label>
                                         </div>
                                     @endforeach
-                                    <span style="color: darkred" class="PermissionError">@error('permission') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="Permission-error">@error('permission') {{ $message }} @enderror</span>
 
                                 </div>
-                                <button type="button" class="btn btn-primary btn-block mb-4 addRole">Submit</button>
+                                <button type="button" class="btn btn-primary btn-block mb-4 add-role">Submit</button>
                             </form>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '.addRole', function (e) {
+            $(document).on('click', '.add-role', function (e) {
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
@@ -61,11 +61,9 @@
                         window.location.href = '{{ route('roles.index') }}';
                     },
                     error: function (response) {
-                        console.log(response.responseJSON);
                         let errors = response.responseJSON.errors;
                         if (errors.role) {
-                            console.log('role')
-                            $('.roleError').text(errors.role[0]);
+                            $('.role-error').text(errors.role[0]);
                         }
                     }
                 });

@@ -18,8 +18,6 @@ class RoleController extends Controller
         return view('roles.index' ,compact('roles'));
     }
 
-
-
     public function create()
     {
         $permissions = Permission::all();
@@ -38,10 +36,6 @@ class RoleController extends Controller
         return response()->json(['success'=>'Role create successfully.']);
     }
 
-    public function show(string $id)
-    {
-
-    }
 
 
     public function edit(string $id)

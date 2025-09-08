@@ -19,7 +19,7 @@
                         <div class="row my-3">
                             <div class="col-sm-4 col-xs-12 p-0">
                                 <div class="search-box">
-                                    <input type="text" class="form-control" id="searchPost" name="searchPost"
+                                    <input type="text" class="form-control" id="search-post" name="searchPost"
                                            placeholder="Search...">
                                 </div>
                             </div>
@@ -29,13 +29,13 @@
                             @endphp
                             @if ($role->permissions->contains('name', 'create post'))
                                 <div class="col-xs-8 text-right w-66 p-0">
-                                    <a href="/posts/create" class="btn btn-sm btn-primary" id="createUser">Create New</a>
+                                    <a href="/posts/create" class="btn btn-sm btn-primary" id="create-post">Create New</a>
                                 </div>
                             @endif
                         </div>
                     </div>
                     <div class="panel-body table-responsive">
-                        <table class="table table-hover" id="postDataContainer">
+                        <table class="table table-hover" id="post-data-container">
                             <thead>
                             <tr>
                                 <th>Id</th>
@@ -49,7 +49,7 @@
                             </thead>
                             <tbody>
                             @foreach($posts as $post)
-                                <tr id="onePost" data-id="{{$post->id}}">
+                                <tr id="one-post" data-id="{{$post->id}}">
                                     <td>{{$post->id}}</td>
                                     <td>{{$post->fullName}}</td>
                                     <td>{{$post->title}}</td>
@@ -58,12 +58,12 @@
                                     <td>
                                             <img class="img-fluid img-thumbnail" src="{{$post->postImageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
                                     </td>
-                                    <td style="height: 176px;" class="editDelete d-flex justify-content-center align-items-center gap-2" >
+                                    <td style="height: 176px;" class="edit-delete d-flex justify-content-center align-items-center gap-2" >
                                         @if ($role->permissions->where('name', 'delete post')->isNotEmpty())
-                                            <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="{{$post->id}}">DELETE</button>
+                                            <button type="button" id="delete-post" class="btn btn-danger btn-sm my-3" data-id="{{$post->id}}">DELETE</button>
                                         @endif
                                         @if($role->permissions->where('name', 'update post')->isNotEmpty())
-                                            <a href="{{route('posts.edit', $post->id)}}" class="btn btn-warning editpost d-flex justify-content-center align-items-center col-6" data-id="{{$post->id}}">Edit</a>
+                                            <a href="{{route('posts.edit', $post->id)}}" class="btn btn-warning edit-post d-flex justify-content-center align-items-center col-6" data-id="{{$post->id}}">Edit</a>
                                         @endif
                                     </td>
                                 </tr>
@@ -84,7 +84,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('keyup', '#searchPost', function () {
+            $(document).on('keyup', '#search-post', function () {
                 let query = $(this).val();
                 $.ajax({
                     url: "{{ route('posts.index') }}",
@@ -93,16 +93,16 @@
                         search: query
                     },
                     success: function (response) {
-                        $('#postDataContainer tbody').html(response.html);
+                        $('#post-data-container tbody').html(response.html);
                     },
                     error: function (response){
-                        $('#postDataContainer tbody').html(response.html);
+                        $('#post-data-container tbody').html(response.html);
                     }
                 });
             });
-            $(document).on('submit', '.editpost', function () {
+            $(document).on('submit', '.edit-post', function () {
                 e.preventDefault();
-                let $row = $(this).closest('#onePost');
+                let $row = $(this).closest('#one-post');
                 let postId = $row.data('id');
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
@@ -122,10 +122,9 @@
                     }
                 });
             });
-            $(document).on('click', '#deletePost', function () {
+            $(document).on('click', '#delete-post', function () {
 
-                console.log('asdasdad');
-                let $row = $(this).closest('#onePost');
+                let $row = $(this).closest('#one-post');
                 let postId = $row.data('id');
                 console.log(postId)
                 $.ajax({

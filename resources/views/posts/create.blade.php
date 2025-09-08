@@ -47,7 +47,7 @@
                                     <input type="file" class="form-control" id="customFiles" name="image"/>
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block mb-4 submitpost">Submit</button>
+                                <button type="submit" class="btn btn-primary btn-block mb-4 submit-post">Submit</button>
                             </form>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '.submitpost', function (e) {
+            $(document).on('click', '.submit-post', function (e) {
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);

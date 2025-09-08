@@ -13,9 +13,7 @@ class EmailUserData extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
+
     public  $mailMessage;
     public  $subject;
     public function __construct($message , $subject)
@@ -24,9 +22,7 @@ class EmailUserData extends Mailable
         $this->subject = $subject;
     }
 
-    /**
-     * Get the message envelope.
-     */
+
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -34,9 +30,7 @@ class EmailUserData extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
+
     public function content(): Content
     {
         return new Content(
@@ -44,11 +38,7 @@ class EmailUserData extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
+
     public function attachments(): array
     {
         return [];

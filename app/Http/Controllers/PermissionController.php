@@ -20,8 +20,9 @@ class PermissionController extends Controller
 
     public function store(Request $request)
     {
+        $input = $request->all();
         $permission = Permission::create([
-            'name' => $request->permission
+            'name' => $input['permission']
         ]);
 
         return response()->json([
@@ -31,21 +32,12 @@ class PermissionController extends Controller
     }
 
 
-    public function show(string $id)
-    {
-
-    }
-
-    public function edit(string $id)
-    {
-
-    }
-
 
     public function update(Request $request, string $id)
     {
+        $input = $request->all();
         $permission = Permission::findOrFail($id);
-        $permission->name = $request->permission;
+        $permission->name = $input['permission'];
         $permission->save();
         return response()->json([
             'id' => $permission->id,

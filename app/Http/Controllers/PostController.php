@@ -40,7 +40,7 @@ class PostController extends Controller
                     </td>
                     <td class="d-flex justify-content-center align-items-center" style="height:176px;">
 
-                            <button type="button" id="deletePost" class="btn btn-danger btn-sm my-3" data-id="' . $post->id . '">DELETE</button>
+                            <button type="button" id="delete-post" class="btn btn-danger btn-sm my-3" data-id="' . $post->id . '">DELETE</button>
 
                         <a href="' . route('posts.edit', $post->id) . '" class="btn btn-warning d-flex justify-content-center align-items-center col-6">Edit</a>
                     </td>
@@ -122,8 +122,8 @@ class PostController extends Controller
     }
     public function destroy(string $id)
     {
-        $AuthUser = Auth::user();
-        foreach ($AuthUser->roles as $role) {
+        $authUser = Auth::user();
+        foreach ($authUser->roles as $role) {
             if ($role->permissions->contains('name', 'delete post')) {
                 $post = Post::find($id);
                 $post->delete();

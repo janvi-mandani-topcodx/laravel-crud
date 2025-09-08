@@ -95,18 +95,18 @@
 .w-66 {
     width: 66% !important;
 }
-.editDelete{
+.edit-delete{
     display: flex;
     height: 143px;
     justify-content: center;
     align-items: center;
 }
-.editbtn{
+.edit-btn{
     width: 65px;
     margin-left: 10px;
     height: 30px;
 }
-.editpost{
+.edit-post{
     height: 32px;
 }
 .dropdown-toggle::after

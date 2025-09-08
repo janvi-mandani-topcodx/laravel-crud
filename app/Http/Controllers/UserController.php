@@ -36,7 +36,7 @@ class UserController extends Controller
         if ($request->ajax()) {
             $html = '';
             foreach ($users as $user) {
-                $html .= '<tr id="oneUser" data-id="'. $user->id .'">
+                $html .= '<tr id="one-user" data-id="'. $user->id .'">
                                     <td>'. $user->id .'</td>
                                     <td>'. $user->first_name.'</td>
                                     <td>'. $user->last_name .'</td>
@@ -46,9 +46,9 @@ class UserController extends Controller
                                     <td>
                                         <img class="img-fluid img-thumbnail" src="'. $user->imageUrl .'" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
-                                    <td style="" class="editDelete">
-                                        <button type="button" id="deleteUsers" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
-                                        <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning editbtn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
+                                    <td style="" class="edit-delete">
+                                        <button type="button" id="delete-users" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
+                                        <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning edit-btn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
                                     </td>
                                 </tr>
                             ';

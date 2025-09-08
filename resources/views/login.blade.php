@@ -32,7 +32,7 @@
                                         </div>
 
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <input  type="button" class="btn btn-primary btn-lg loginUSer" name="loginbutton" value="Login">
+                                            <input  type="button" class="btn btn-primary btn-lg login-user" name="loginbutton" value="Login">
                                         </div>
                                         <div class="text-end">
                                             <a href="{{route('forgot.password')}}">Go to Forget Password</a>
@@ -59,7 +59,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '.loginUSer', function (e) {
+            $(document).on('click', '.login-user', function (e) {
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 console.log(form)

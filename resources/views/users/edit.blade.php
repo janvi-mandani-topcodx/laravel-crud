@@ -8,22 +8,22 @@
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Edit User</h3>
-                            <form method="POST" enctype="multipart/form-data" id="editUserForm" action="{{ route('users.update', $user->id) }}">
+                            <form method="POST" enctype="multipart/form-data" id="edit-user-form" action="{{ route('users.update', $user->id) }}">
                                 @csrf
                                 @method('PUT')
-                                <input type="hidden" id="editUserId" data-id="{{$user->id}}">
+                                <input type="hidden" id="edit-user-id" data-id="{{$user->id}}">
                                 <div class="row mb-4">
                                     <div class="col">
                                         <div  class="form-group">
-                                            <label class="form-label fw-bold" for="firstName">First name</label>
-                                            <input type="text" id="firstName" class="form-control"  value="{{$user->first_name}}"  name="firstName" placeholder="Enter First name"/>
+                                            <label class="form-label fw-bold" for="first-name">First name</label>
+                                            <input type="text" id="first-name" class="form-control"  value="{{$user->first_name}}"  name="firstName" placeholder="Enter First name"/>
                                             <span style="color: darkred">@error('firstName') {{$message}} @enderror</span>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div  class="form-group">
-                                            <label class="form-label fw-bold" for="lastName">Last name</label>
-                                            <input type="text" id="lastName" class="form-control" value="{{$user->last_name}}" name="lastName" placeholder="Enter Last name"/>
+                                            <label class="form-label fw-bold" for="last-name">Last name</label>
+                                            <input type="text" id="last-name" class="form-control" value="{{$user->last_name}}" name="lastName" placeholder="Enter Last name"/>
                                             <span style="color: darkred">@error('lastName') {{$message}} @enderror</span>
                                         </div>
                                     </div>
@@ -41,8 +41,8 @@
                                     <span style="color: darkred">@error('password') {{$message}} @enderror</span>
                                 </div>
                                 <div  class="form-group mb-4">
-                                    <label class="form-label fw-bold" for="confirmPassword">Confirm password</label>
-                                    <input type="password" id="confirmPassword" class="form-control"  value="" name="confirmPassword" placeholder="Enter confirm password"/>
+                                    <label class="form-label fw-bold" for="confirm-password">Confirm password</label>
+                                    <input type="password" id="confirm-password" class="form-control"  value="" name="confirmPassword" placeholder="Enter confirm password"/>
                                     <span style="color: darkred">@error('confirmPassword') {{$message}} @enderror</span>
                                 </div>
                                 @php
@@ -74,7 +74,7 @@
                                             cooking
                                         </label>
                                     </div>
-                                    <span style="color: darkred" class="hobbieError">@error('gender') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="hobbies-error">@error('hobbies') {{ $message }} @enderror</span>
 
                                 </div>
 
@@ -89,7 +89,7 @@
                                         <label class="form-check-label" for="female">Female</label>
                                     </div>
 
-                                    <span style="color: darkred" class="genderError">@error('gender') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="gender-error">@error('gender') {{ $message }} @enderror</span>
                                 </div>
 
                                 <div class="form-group mb-4">
@@ -103,8 +103,8 @@
                                 </div>
 
                                 <div class="form-group mb-4">
-                                    <label class="form-label fw-bold" for="customFile">Image</label>
-                                    <input type="file" class="form-control" id="customFile" name="image"/>
+                                    <label class="form-label fw-bold" for="custom-file">Image</label>
+                                    <input type="file" class="form-control" id="custom-file" name="image"/>
                                     @if ($user->image)
                                         <img src="{{$user->imageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
                                     @else
@@ -112,7 +112,7 @@
                                     @endif
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="button" class="btn btn-primary btn-block mb-4" id="editbutton">Update</button>
+                                <button type="button" class="btn btn-primary btn-block mb-4" id="edit-button">Update</button>
                             </form>
                         </div>
                     </div>
@@ -131,11 +131,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '#editbutton', function (e) {
+            $(document).on('click', '#edit-button', function (e) {
                 e.preventDefault();
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
-                console.log("heloo")
                 $.ajax({
                     url: "{{route('users.update', $user->id)}}",
                     method: "POST",
@@ -149,10 +148,10 @@
                         console.log(response.responseJSON);
                         let errors = response.responseJSON.errors;
                         if (errors.firstName) {
-                            $('#firstName').siblings('span').text(errors.firstName[0]);
+                            $('#first-name').siblings('span').text(errors.firstName[0]);
                         }
                         if (errors.lastName) {
-                            $('#lastName').siblings('span').text(errors.lastName[0]);
+                            $('#last-name').siblings('span').text(errors.lastName[0]);
                         }
                         if (errors.email) {
                             $('#email').siblings('span').text(errors.email[0]);
@@ -161,16 +160,16 @@
                             $('#password').siblings('span').text(errors.password[0]);
                         }
                         if (errors.confirmPassword) {
-                            $('#confirmPassword').siblings('span').text(errors.confirmPassword[0]);
+                            $('#confirm-password').siblings('span').text(errors.confirmPassword[0]);
                         }
                         if (errors.hobbie) {
-                            $('.hobbieError').text(errors.hobbie[0]);
+                            $('.hobbies-error').text(errors.hobbie[0]);
                         }
                         if (errors.gender) {
-                            $('.genderError').text(errors.gender[0]);
+                            $('.gender-error').text(errors.gender[0]);
                         }
                         if (errors.image) {
-                            $('#customFile').siblings('span').text(errors.image[0]);
+                            $('#custom-file').siblings('span').text(errors.image[0]);
                         }
                     }
                 });

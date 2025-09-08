@@ -22,14 +22,14 @@
                                     <label class="form-label fw-bold">Permissions</label>
                                     @foreach($permissions as $permission)
 
-                                        <div class="form-check ms-4 onePermission" data-id="{{$permission->id}}">
+                                        <div class="form-check ms-4 one-permission" data-id="{{$permission->id}}">
                                                 <input class="form-check-input" type="checkbox" name="permission[]" value="{{$permission->id}}" id="{{$permission->name}}"  {{ $role->permissions->contains('id', $permission->id) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="{{$permission->name}}">
                                                 {{$permission->name}}
                                             </label>
                                         </div>
                                     @endforeach
-                                    <span style="color: darkred" class="PermissionError">@error('permission') {{ $message }} @enderror</span>
+                                    <span style="color: darkred" class="Permission-error">@error('permission') {{ $message }} @enderror</span>
                                 </div>
                                 <button type="button" class="btn btn-primary btn-block mb-4 editRole">Update</button>
                             </form>
@@ -49,7 +49,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $(document).on('click', '.editRole', function (e) {
+            $(document).on('click', '.edit-role', function (e) {
                 e.preventDefault();
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);

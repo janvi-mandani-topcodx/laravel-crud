@@ -12,18 +12,13 @@ class SendEmailUserData implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
   public  $subject;
   public $message;
     public function __construct()
     {
     }
 
-    /**
-     * Execute the job.
-     */
+
     public function handle(): void
     {
         $users = User::all();

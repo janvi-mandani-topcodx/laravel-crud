@@ -60,7 +60,6 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        {{--window.location.href = '{{ route('reset.password') }}';--}}
                     },
                     error: function (response) {
                         console.log(response.responseJSON);

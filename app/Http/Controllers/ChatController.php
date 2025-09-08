@@ -12,16 +12,15 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $users = [];
         $role = Auth::user()->roles->pluck('name')->first();
-        if($role == 'user'){
-            $messages = Message::where('user_id' , Auth::id())->get();
-
+        if($role == 'admin'){
+           $messages = Message::where('admin_id', Auth::id())->get();
         }
         else{
-            $messages = Message::where('admin_id' , Auth::id())->get();
+            $messages = Message::where('user_id' , Auth::id())->get();
         }
-        return view('chat' , compact('users' , 'messages'));
+
+            return view('chat' , compact('messages'));
     }
     public function store(Request $request)
     {
@@ -43,9 +42,10 @@ class ChatController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $input = $request->all();
         $message = MessageReply::findOrFail($id);
         $message->update([
-            'message' => $request->message,
+            'message' => $input['message'],
         ]);
         return response()->json(['success' => true, 'message' => $message->message]);
     }
@@ -90,20 +90,20 @@ class ChatController extends Controller
         if ($request->ajax()) {
             $html = '';
             if(count($users) > 0){
-                foreach ($users as $user) {
 
-                    $html .= '<div id="oneUser" style="display:flex;" data-id="'. $user->id .'" data-image="'.$user->imageUrl.'" data-fullname="'.$user->fullName.'">
+                foreach ($users as $user) {
+                        $html .= '<div id="one-user" style="display:flex;"  data-id="' . $user->id . '" data-image="' . $user->imageUrl . '" data-fullname="' . $user->fullName . '">
                                       <div class="col-4 p-0" style="width: 100px">
-                                            <img style="height: 48px;  width: 46px;" class="img-fluid rounded-circle" src="' . $user->imageUrl .'" alt="Uploaded Image" >
+                                            <img style="height: 48px;  width: 46px;" class="img-fluid rounded-circle" src="' . $user->imageUrl . '" alt="Uploaded Image" >
                                         </div>
                                         <div class="col-8 d-flex justify-content-end align-items-end px-0" style="padding-top: 20px;">
-                                            <p>'. $user->fullName.'</p>
+                                            <p>' . $user->fullName . '</p>
                                          </div>
                                     </div>';
                 }
             }
             else{
-//                $html .='<p>No admin found</p>';
+                $html .='<p>No admin found</p>';
             }
             return response()->json(['html' => $html]);
         }
@@ -113,19 +113,35 @@ class ChatController extends Controller
 
     public function message(Request $request)
     {
-        $adminId = $request->id;
-        $message = Message::updateOrCreate(['admin_id' => $adminId],[
-            'user_id' => Auth::user()->id,
-            'admin_id' => $adminId
-        ]);
-        $html = '<div id="user" style="display:flex;" data-user-id="'.$message->user->id.'" data-id="'. $message->id .'" data-image="'.$message->user->imageUrl.'" data-fullname="'.$message->user->fullName.'">
-        <div class="col-4 p-0" style="width: 100px">
-            <img style="height: 48px;  width: 46px;" class="img-fluid rounded-circle" src="'.$message->user->imageUrl.'" alt="Uploaded Image" >
-        </div>
-        <div class="col-8 d-flex justify-content-end align-items-end px-0" style="padding-top: 20px;">
-            <p>'.$message->user->fullName.'</p>
-        </div>
-    </div>';
+        $input = $request->all();
+        $adminId = $input['id'];
+        $authId = Auth::id();
+        $role = Auth::user()->roles->pluck('name')->first();
+        if($role == 'admin'){
+            $message = Message::updateOrCreate(['admin_id' => $adminId],[
+                'user_id' => $adminId,
+                'admin_id' => $authId
+            ]);
+        }
+        else{
+            $message = Message::updateOrCreate(['admin_id' => $adminId],[
+                'user_id' => $authId,
+                'admin_id' => $adminId
+            ]);
+        }
+        $otherUser = ($message->admin_id == $authId) ? $message->user : $message->admin;
+
+            $html = '<div id="user" style="display:flex;" data-user-id="' . $otherUser->id . '" data-id="' . $message->id . '" data-image="' . $otherUser->imageUrl . '" data-fullname="' . $otherUser->fullName . '">
+                    <div class="col-4 p-0" style="width: 100px">
+                        <img style="height: 48px;  width: 46px;" class="img-fluid rounded-circle" src="' . $otherUser->imageUrl . '" alt="Uploaded Image">
+                    </div>
+                    <div class="col-8 d-flex justify-content-end align-items-end px-0" style="padding-top: 20px;">
+                        <p>' . $otherUser->fullName . '</p>
+                    </div>
+                </div>';
+
+
+
 
         return response()->json([
             'html' => $html,
@@ -135,14 +151,19 @@ class ChatController extends Controller
     public function getMessages(Request $request)
     {
         $input = $request->all();
-        $message = Message::find($input['id']);
-        dd($message);
         $message = Message::with('messageReplies')->find($input['id']);
         $html = '';
             foreach ($message->messageReplies as $messageReply){
                 $sendByAdmin = $messageReply->sent_by_admin == 1 ? 'text-end' : 'text-start' ;
                 $sendMessage = $sendByAdmin == 'text-end' ? 'justify-content-end' : 'justify-content-start';
-                $display  = auth()->user()->id == $message->user_id ? '' : 'd-none';
+                if ($messageReply->sent_by_admin == 1 && auth()->user()->id == $message->admin_id ||
+                    $messageReply->sent_by_admin == 0 && auth()->user()->id == $message->user_id)
+                {
+                    $display = '';
+                }
+                else {
+                    $display = 'd-none';
+                }
                     $html .= '<div data-id="' . $messageReply->id . '" data-send="' . $messageReply->sent_by_admin . '" class="one-message '.$sendByAdmin.' message-data-'.$messageReply->id .'">
                         <small>'.$messageReply->created_at.'</small><br>
                            <div class="d-flex '.$sendMessage.'">
@@ -157,16 +178,19 @@ class ChatController extends Controller
                                         <li class="mb-2">
                                             <input type="hidden" name="edit_message" value="'. $messageReply->id .'">
                                             <input type="hidden" name="messageId" value="'.$message->id.'">
-                                            <span  class="edit_btn dropdown-item" data-message = "'.$messageReply->message.'" data-action="'.$messageReply->id.'" > Edit </span>
+                                            <span  class="edit-btn dropdown-item m-0" data-message = "'.$messageReply->message.'" data-action="'.$messageReply->id.'" > Edit </span>
                                         </li>
                                         <li>
-                                            <span class="delete_btn dropdown-item" data-id="'.$messageReply->id.'">Delete</span>
+                                            <span class="delete-btn dropdown-item" data-id="'.$messageReply->id.'">Delete</span>
                                         </li>
                                     </ul>
                                 </span>
                            </div>
                     </div>';
             }
-        return response()->json(['html' => $html]);
+        return response()->json([
+            'html' => $html ,
+            'message_id' => $message->id,
+            ]);
     }
 }

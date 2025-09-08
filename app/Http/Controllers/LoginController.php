@@ -68,13 +68,14 @@ class LoginController extends Controller
 
     public function forgot(Request $request)
     {
-        $email = $request->email;
+        $input = $request->all();
+        $email = $input['email'];
         $user = User::where('email',$email)->first();
         if($user){
                 $to = $user;
                 $message = "hello Welcome";
                 $subject = "Mail send";
-                $url = route('reset.password') ."?email=".$request->email;
+                $url = route('reset.password') ."?email=".$input['email'];
                 Mail::to($to)->send(new ResetPassword($message , $subject , $url));
         }
         else{
@@ -87,7 +88,8 @@ class LoginController extends Controller
     }
     public function viewReset(Request $request)
     {
-        $email = $request->email;
+        $input = $request->all();
+        $email = $input['email'];
         return view('reset-password'  , compact('email'));
     }
 
@@ -97,7 +99,6 @@ class LoginController extends Controller
         $email = $input['email'];
         $oldPassword = $input['oldPassword'];
         $newPassword = $input['newPassword'];
-        $confirmpassword = $input['confirmPassword'];
         $user = User::where('email',$email)->first();
         if($user){
             if(Hash::check($oldPassword , $user->password)){
