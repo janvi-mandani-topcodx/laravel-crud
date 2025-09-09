@@ -44,10 +44,14 @@
                             <div class="search-box w-100">
                                 @if($messages)
                                     <div id="message-input">
-                                        <form action="" id="message-form" method="post" class="d-flex justify-content-around gap-3" >
+                                        <form action="" id="message-form" method="post" enctype="multipart/form-data" class="d-flex justify-content-around gap-3" >
                                             @csrf
                                             <input type="hidden" id="edit-chat-id"  value="">
-                                            <input type="text" class="form-control" id="message" placeholder="Enter your chat...">
+                                            <input type="text" class="form-control" id="message" name="message" placeholder="Enter your chat...">
+                                            <label for="file-upload-input">
+                                                <i class="fa fa-paper-plane-o"></i>
+                                                <input type="file" id="file-upload-input" style="display: none;" name="image">
+                                            </label>
                                             <input type="submit" class="btn btn-primary" value="Send" id="message-send">
                                         </form>
                                     </div>
@@ -143,41 +147,31 @@
                     $('#message-input').show();
                     $('.all-messages').text('');
 
-                $.ajax({
-                    url: "{{ route('chat.message') }}",
-                    method: "GET",
-                    data: {
-                        id: messageId
-                    },
-                    success: function (response) {
-                        $('#all-messages').html(response.html);
-                        console.log(response.message_id)
-                        $('.messages-name').attr('data-id' , response.message_id)
-                    }
-                });
+                function ajaxFunction(){
+                    $.ajax({
+                        url: "{{ route('chat.message') }}",
+                        method: "GET",
+                        data: {
+                            id: messageId
+                        },
+                        success: function (response) {
+                            $('#all-messages').html(response.html);
+                            $('.messages-name').attr('data-id' , response.message_id)
+                        }
+                    });
+                }
+                ajaxFunction();
                 if(refreshInterval){
                     console.log("clear")
                     clearInterval(refreshInterval);
                 }
-                refreshInterval = setInterval(function () {
-                   $.ajax({
-                       url: "{{ route('chat.message') }}",
-                       method: "GET",
-                       data: {
-                           id: messageId
-                       },
-                       success: function (response) {
-                           $('#all-messages').html(response.html);
-                           console.log(response.message_id)
-                           $('.messages-name').attr('data-id' , response.message_id)
-                       }
-                   });
-               } , 5000);
+                refreshInterval = setInterval(ajaxFunction, 5000);
             });
 
             $(document).on('click', '.edit-btn', function () {
                 const chatId = $(this).data('action');
                 const message = $(this).data('message');
+                console.log(message)
                 $('#message').val(message);
                 $('#edit-chat-id').val(chatId);
                 $('#message-send').val('Update');
@@ -185,45 +179,47 @@
 
             $('#message-form').on('submit', function (e) {
                 e.preventDefault();
-                const message = $('#message').val();
+                let formData = new FormData(this);
                 const messageId = $('.messages-name').data('id');
-                console.log("id" + messageId)
+                formData.append('message_id', messageId);
                 const editChatId = $('#edit-chat-id').val();
                 if (editChatId) {
+                    formData.append('_method', 'PUT');
                     $.ajax({
                         url: '/chats/' + editChatId,
-                        type: 'PUT',
-                        data: {
-                            message: message,
-                        },
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
                         success: function (response) {
+                            console.log(response)
                             $('.message-data-' + editChatId).find('.message-text').text(response.message);
-                            console.log(response.message)
-                            $('#message').val('');
-                            $('#edit-chat-id').val('');
-                            $('#message-send').text('Send');
+                            $('.message-data-' + editChatId).find('.message-image').attr('src' , response.message);
+                            $('.message-data-' + editChatId).find('.edit-btn').attr('data-message', response.message);
                         }
                     });
+                    $('#message').val('');
+                    $('#edit-chat-id').val('');
+                    $('#message-send').val('Send');
+
                 }else{
-                  if(message != ''){
                       $.ajax({
                           url: '{{ route('chats.store') }}',
                           type: 'POST',
-                          data: {
-                              message_id: messageId,
-                              message: message,
-                              _token: '{{ csrf_token() }}'
-                          },
-
+                          data:formData,
+                          contentType: false,
+                          processData: false,
                           success: function (response) {
-                              console.log(response.send_by_admin)
+                              console.log(response)
                               const sendByAdmin = response.send_by_admin == 1 ? 'text-end' : 'text-start';
                               const sendMessage = sendByAdmin == 'text-end' ? 'justify-content-end' : 'justify-content-start';
+                              const display = response.image == "http://127.0.0.1:8000/storage" ? 'd-none' : '';
                               const newMessage = `
                                     <div data-id="${response.id}" data-send="${response.send_by_admin}" class="one-message ${sendByAdmin} message-data-${response.id}">
                                         <small>${response.created_at}</small>
                                         <div class="d-flex ${sendMessage} ">
                                             <div class="message-text">${response.message}</div>
+                                                <img class="message-image img-fluid img-thumbnail ${display}" src="${response.image}" alt="Uploaded Image" width="200" style="height: 126px;">
                                                 <div class="dropdown">
                                                         <button type="button" class="border-0 dropdown-toggle"  data-bs-toggle="dropdown">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
@@ -234,7 +230,7 @@
                                                                 <li class="mb-2">
                                                                     <input type="hidden" name="edit_message" value=" ${response.message}">
                                                                     <input type="hidden" name="messageId" value=" ${response.id}">
-                                                                    <span  class="edit-btn dropdown-item m-0" data-message = " ${response.message}" data-action="${response.id}" > Edit </span>
+                                                                    <span  class="edit-btn dropdown-item m-0" data-message = " ${response.message}" data-action="${response.id}" data-image = "${response.image}" > Edit </span>
                                                                 </li>
                                                                 <li>
                                                                     <span class="delete-btn dropdown-item" data-id=" ${response.id}">Delete</span>
@@ -249,7 +245,6 @@
                           }
                       });
                   }
-                }
             });
 
             $(document).on('click', '.delete-btn' ,  function () {

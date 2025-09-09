@@ -102,7 +102,7 @@
 
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold" for="custom-file">Image</label>
-                                    <input type="file" class="form-control" id="custom-file" name="image"  />
+                                    <input type="file" class="form-control" id="custom-file" name="image"/>
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
                                 <button type="button" class="btn btn-primary btn-block mb-4 submit-btn">Submit</button>

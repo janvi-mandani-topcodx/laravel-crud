@@ -20,8 +20,8 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
 });
 
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout.view');
-Route::get('/login', [LoginController::class, 'viewLogin'])->name('login.view');
-Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+//Route::get('/login', [LoginController::class, 'viewLogin'])->name('login.view');
+//Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::get('/forgot', [LoginController::class, 'viewForgot'])->name('forgot.password');
 Route::post('/forgot', [LoginController::class, 'forgot'])->name('forgot.submit');
 Route::get('/reset', [LoginController::class, 'viewReset'])->name('reset.password');

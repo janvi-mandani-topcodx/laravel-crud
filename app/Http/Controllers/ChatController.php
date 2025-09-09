@@ -7,6 +7,7 @@ use App\Models\MessageReply;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -25,16 +26,19 @@ class ChatController extends Controller
     public function store(Request $request)
     {
             $input = $request->all();
+            $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
             $role = Auth::user()->roles->pluck('name')->first();
             $sendByAdmin = $role == 'admin' ? true : false;
             $message = MessageReply::create([
                 'message_id' => $input['message_id'],
-                'message' => $input['message'],
-                'sent_by_admin' => $sendByAdmin
+                'message' => isset($input['message']) ? $input['message'] : null,
+                'sent_by_admin' => $sendByAdmin,
+                'image' => $path,
             ]);
             return response()->json([
                 'id' => $message->id,
-                'message' => $message->message,
+                'message' => $message->message ?? '',
+                'image' => asset('storage/' . $message->image),
                 'send_by_admin' => $message->sent_by_admin,
                 'created_at' => $message->created_at
             ]);
@@ -44,16 +48,35 @@ class ChatController extends Controller
     {
         $input = $request->all();
         $message = MessageReply::findOrFail($id);
+        if($request->hasFile('image')){
+            $path = $input['image']->store('images', 'public');
+            if($message->image){
+                Storage::disk('public')->delete($message->image);
+            }
+        } else{
+            $path = $message->image;
+        }
+        $messageText  =  isset($input['message']) ? $input['message'] : null;
         $message->update([
-            'message' => $input['message'],
+            'message' =>$messageText,
+            'image' => $path,
         ]);
-        return response()->json(['success' => true, 'message' => $message->message]);
+        return response()->json(
+            [
+                'success' => true,
+                'message' => $message->message,
+                'image' => $path,
+            ]
+        );
     }
 
     public function destroy(string $id)
     {
         $message = MessageReply::find($id);
         $message->delete();
+        if ($message->image != null) {
+            Storage::disk('public')->delete($message->image);
+        }
         return response()->json(['success' => true]);
 
     }
@@ -164,10 +187,14 @@ class ChatController extends Controller
                 else {
                     $display = 'd-none';
                 }
+
+                $image = $messageReply->image == null ? '': asset('storage/' . $messageReply->image) ;
+                $dNone = $image == '' ? 'd-none' : '';
                     $html .= '<div data-id="' . $messageReply->id . '" data-send="' . $messageReply->sent_by_admin . '" class="one-message '.$sendByAdmin.' message-data-'.$messageReply->id .'">
                         <small>'.$messageReply->created_at.'</small><br>
                            <div class="d-flex '.$sendMessage.'">
                                 <p class="message-text">'. $messageReply->message . '</p>
+                                <img class="message-image img-fluid img-thumbnail  '.$dNone.'" src="'. $image .'" alt="Uploaded Image" width="200" style="height: 126px;">
                                 <span class="dropdown '.$display.'">
                                     <button type="button" class="border-0 dropdown-toggle"  data-bs-toggle="dropdown">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
@@ -178,7 +205,7 @@ class ChatController extends Controller
                                         <li class="mb-2">
                                             <input type="hidden" name="edit_message" value="'. $messageReply->id .'">
                                             <input type="hidden" name="messageId" value="'.$message->id.'">
-                                            <span  class="edit-btn dropdown-item m-0" data-message = "'.$messageReply->message.'" data-action="'.$messageReply->id.'" > Edit </span>
+                                            <span  class="edit-btn dropdown-item m-0" data-message = "'.$messageReply->message.'" data-action="'.$messageReply->id.'" data-image="'. $image .'"> Edit </span>
                                         </li>
                                         <li>
                                             <span class="delete-btn dropdown-item" data-id="'.$messageReply->id.'">Delete</span>
