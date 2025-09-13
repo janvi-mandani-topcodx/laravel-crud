@@ -13,7 +13,7 @@ class ChatController extends Controller
 {
     public function index()
     {
-        $role = Auth::user()->roles->pluck('name')->first();
+        $role = Auth::user()->getRoleNames()->first();
         if($role == 'admin'){
            $messages = Message::where('admin_id', Auth::id())->get();
         }
@@ -26,19 +26,23 @@ class ChatController extends Controller
     public function store(Request $request)
     {
             $input = $request->all();
-            $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
-            $role = Auth::user()->roles->pluck('name')->first();
+//            $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
+        $role = Auth::user()->getRoleNames()->first();
             $sendByAdmin = $role == 'admin' ? true : false;
             $message = MessageReply::create([
                 'message_id' => $input['message_id'],
                 'message' => isset($input['message']) ? $input['message'] : null,
                 'sent_by_admin' => $sendByAdmin,
-                'image' => $path,
+                'image' => null,
             ]);
+
+        if ($request->hasFile('image')) {
+            $message->addMedia($request->file('image'))->toMediaCollection('chats');
+        }
             return response()->json([
                 'id' => $message->id,
                 'message' => $message->message ?? '',
-                'image' => asset('storage/' . $message->image),
+                'image' => null,
                 'send_by_admin' => $message->sent_by_admin,
                 'created_at' => $message->created_at
             ]);
@@ -49,23 +53,22 @@ class ChatController extends Controller
         $input = $request->all();
         $message = MessageReply::findOrFail($id);
         if($request->hasFile('image')){
-            $path = $input['image']->store('images', 'public');
-            if($message->image){
-                Storage::disk('public')->delete($message->image);
+            $message->addMedia($input['image'])->toMediaCollection('chats');
+            $deleteImg = $message->getFirstMedia('chats');
+            if($deleteImg){
+                $deleteImg->delete();
             }
-        } else{
-            $path = $message->image;
         }
         $messageText  =  isset($input['message']) ? $input['message'] : null;
         $message->update([
             'message' =>$messageText,
-            'image' => $path,
+            'image' => null,
         ]);
         return response()->json(
             [
                 'success' => true,
                 'message' => $message->message,
-                'image' => $path,
+                'image' => null,
             ]
         );
     }
@@ -74,8 +77,9 @@ class ChatController extends Controller
     {
         $message = MessageReply::find($id);
         $message->delete();
-        if ($message->image != null) {
-            Storage::disk('public')->delete($message->image);
+        $deleteImg = $message->getFirstMedia('chats');
+        if($deleteImg){
+            $deleteImg->delete();
         }
         return response()->json(['success' => true]);
 
@@ -86,7 +90,7 @@ class ChatController extends Controller
         $searchTerm = $request->input('search');
 
         if ($searchTerm) {
-            $findRole = auth()->user()->roles->pluck('name')->first();
+            $findRole = Auth::user()->getRoleNames()->first();
             if($findRole == 'admin'){
                 $users = User::whereHas('roles', function ($query) {
                     $query->where('name', 'user');
@@ -139,7 +143,7 @@ class ChatController extends Controller
         $input = $request->all();
         $adminId = $input['id'];
         $authId = Auth::id();
-        $role = Auth::user()->roles->pluck('name')->first();
+        $role = Auth::user()->getRoleNames()->first();
         if($role == 'admin'){
             $message = Message::updateOrCreate(['admin_id' => $adminId],[
                 'user_id' => $adminId,
@@ -187,8 +191,10 @@ class ChatController extends Controller
                 else {
                     $display = 'd-none';
                 }
-
-                $image = $messageReply->image == null ? '': asset('storage/' . $messageReply->image) ;
+                $chatImage = $messageReply->getFirstMedia('chats');
+                if($chatImage){
+                    $image = $chatImage->getUrl();
+                }
                 $dNone = $image == '' ? 'd-none' : '';
                     $html .= '<div data-id="' . $messageReply->id . '" data-send="' . $messageReply->sent_by_admin . '" class="one-message '.$sendByAdmin.' message-data-'.$messageReply->id .'">
                         <small>'.$messageReply->created_at.'</small><br>

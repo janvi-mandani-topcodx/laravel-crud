@@ -47,7 +47,7 @@
                                             <button  type="button" class="btn btn-primary btn-lg reset" name="">Password Reset</button>
                                         </div>
                                         <div class="text-end">
-                                            <a href="{{route('login.view')}}">Back to login</a>
+{{--                                            <a href="{{route('login.view')}}">Back to login</a>--}}
                                         </div>
                                     </form>
                                 </div>
@@ -84,7 +84,7 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        window.location.href = '{{ route('login.view') }}';
+                        {{--window.location.href = '{{ route('login.view') }}';--}}
                     },
                     error: function (response) {
                         console.log(response.responseJSON.errors.email);

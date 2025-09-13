@@ -21,9 +21,9 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         @if(Auth::check())
-                            <a class="nav-link"  href="{{route('logout.view')}}">Logout</a>
+{{--                            <a class="nav-link"  href="{{route('logout.view')}}">Logout</a>--}}
                         @else
-                            <a href="{{route('login.view')}}" class="nav-link">Login</a>
+{{--                            <a href="{{route('login.view')}}" class="nav-link">Login</a>--}}
                         @endif
                     </li>
                     @if(Auth::check())

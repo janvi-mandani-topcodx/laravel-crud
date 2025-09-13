@@ -12,7 +12,7 @@ class LoginMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if(!auth()->check()){
-            return redirect()->route('login.view');
+            return redirect('/login');
         }
         return $next($request);
     }

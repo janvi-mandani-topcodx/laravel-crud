@@ -47,7 +47,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="modal fade" id="permission-create" tabindex="-1" role="dialog" aria-labelledby="permissionCreateLabel" aria-hidden="true">
+                <div class="modal fade" id="permissionCreate" tabindex="-1" role="dialog" aria-labelledby="permissionCreateLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">

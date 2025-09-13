@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
+//use App\Models\Permission;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
@@ -13,16 +14,18 @@ class PermissionController extends Controller
         return view('permissions.index' ,compact('permissions'));
     }
 
-    public function create()
-    {
-        return view('permissions.create');
-    }
+//    public function create()
+//    {
+//        return view('permissions.create');
+//    }
 
     public function store(Request $request)
     {
         $input = $request->all();
+
         $permission = Permission::create([
-            'name' => $input['permission']
+            'name' => $input['permission'],
+            'guard_name' => 'web',
         ]);
 
         return response()->json([

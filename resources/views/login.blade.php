@@ -72,12 +72,12 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        if (response.verify){
-                            window.location.href = '{{ route('email.verify') }}';
-                        }
-                        else{
-                            window.location.href = '{{ route('posts.index') }}';
-                        }
+                        {{--if (response.verify){--}}
+                        {{--    window.location.href = '{{ route('email.verify') }}';--}}
+                        {{--}--}}
+                        {{--else{--}}
+                        {{--    window.location.href = '{{ route('posts.index') }}';--}}
+                        {{--}--}}
                     },
                     error: function (response) {
                         console.log(response.responseJSON);

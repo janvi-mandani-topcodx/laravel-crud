@@ -13,7 +13,7 @@ class EmailVerify
     {
         $user = auth()->user();
         if($user && $user->email_verified_at == null){
-            return redirect()->route('email.verify');
+//            return redirect()->route('email.verify');
         }
         return $next($request);
     }

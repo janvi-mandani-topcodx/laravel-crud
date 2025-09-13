@@ -23,11 +23,7 @@
                                            placeholder="Search...">
                                 </div>
                             </div>
-                            @php
-                                $user = Auth::user();
-                                $role = $user->roles->first();
-                            @endphp
-                            @if ($role->permissions->where('name', 'create user')->isNotEmpty())
+                            @if ($role->hasPermissionTo('create user'))
                                 <div class="col-xs-8 text-right w-66 p-0">
                                     <a href="/users/create" class="btn btn-sm btn-primary" id="create-user">Create New</a>
                                 </div>
@@ -68,10 +64,10 @@
                                         <img class="img-fluid img-thumbnail" src="{{ $user->imageUrl }}" alt="Uploaded Image" width="200" style="height: 126px;">
                                     </td>
                                     <td style="" class="edit-delete">
-                                        @if ($role->permissions->where('name', 'delete user')->isNotEmpty())
+                                        @if ($role->hasPermissionTo('delete user'))
                                             <button type="button" id="delete-users" class="btn btn-danger btn-sm my-3" data-id="{{$user->id}}">DELETE</button>
                                         @endif
-                                        @if ($role->permissions->where('name', 'update user')->isNotEmpty())
+                                        @if ($role->hasPermissionTo('edit user'))
                                             <a href="{{route('users.edit', $user->id)}}" class="btn btn-warning edit-btn d-flex justify-content-center align-items-center" data-id="{{$user->id}}">Edit</a>
                                         @endif
                                     </td>

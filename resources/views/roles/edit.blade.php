@@ -21,7 +21,6 @@
                                 <div class="form-group mb-4 ">
                                     <label class="form-label fw-bold">Permissions</label>
                                     @foreach($permissions as $permission)
-
                                         <div class="form-check ms-4 one-permission" data-id="{{$permission->id}}">
                                                 <input class="form-check-input" type="checkbox" name="permission[]" value="{{$permission->id}}" id="{{$permission->name}}"  {{ $role->permissions->contains('id', $permission->id) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="{{$permission->name}}">
@@ -31,7 +30,7 @@
                                     @endforeach
                                     <span style="color: darkred" class="Permission-error">@error('permission') {{ $message }} @enderror</span>
                                 </div>
-                                <button type="button" class="btn btn-primary btn-block mb-4 editRole">Update</button>
+                                <button type="button" class="btn btn-primary btn-block mb-4 edit-role">Update</button>
                             </form>
                         </div>
                     </div>

@@ -23,11 +23,7 @@
                                            placeholder="Search...">
                                 </div>
                             </div>
-                            @php
-                                $user = Auth::user();
-                                $role = $user->roles->first();
-                            @endphp
-                            @if ($role->permissions->contains('name', 'create post'))
+                            @if ($role->hasPermissionTo('create post'))
                                 <div class="col-xs-8 text-right w-66 p-0">
                                     <a href="/posts/create" class="btn btn-sm btn-primary" id="create-post">Create New</a>
                                 </div>
@@ -48,6 +44,7 @@
                             </tr>
                             </thead>
                             <tbody>
+
                             @foreach($posts as $post)
                                 <tr id="one-post" data-id="{{$post->id}}">
                                     <td>{{$post->id}}</td>
@@ -56,13 +53,13 @@
                                     <td>{{$post->description}}</td>
                                     <td>{{$post->status}}</td>
                                     <td>
-                                            <img class="img-fluid img-thumbnail" src="{{$post->postImageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
+                                            <img class="img-fluid img-thumbnail" src="{{$post->imageUrl}}" alt="Uploaded Image" width="200" height="100" style="height: 126px;">
                                     </td>
                                     <td style="height: 176px;" class="edit-delete d-flex justify-content-center align-items-center gap-2" >
-                                        @if ($role->permissions->where('name', 'delete post')->isNotEmpty())
+                                        @if ($role->hasPermissionTo('delete post'))
                                             <button type="button" id="delete-post" class="btn btn-danger btn-sm my-3" data-id="{{$post->id}}">DELETE</button>
                                         @endif
-                                        @if($role->permissions->where('name', 'update post')->isNotEmpty())
+                                        @if($role->hasPermissionTo('edit post'))
                                             <a href="{{route('posts.edit', $post->id)}}" class="btn btn-warning edit-post d-flex justify-content-center align-items-center col-6" data-id="{{$post->id}}">Edit</a>
                                         @endif
                                     </td>

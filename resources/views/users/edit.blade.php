@@ -105,7 +105,7 @@
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold" for="custom-file">Image</label>
                                     <input type="file" class="form-control" id="custom-file" name="image"/>
-                                    @if ($user->image)
+                                    @if ($user->imageUrl)
                                         <img src="{{$user->imageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
                                     @else
                                         <p class="text-muted">No image uploaded.</p>

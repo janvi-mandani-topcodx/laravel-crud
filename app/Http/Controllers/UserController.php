@@ -8,7 +8,7 @@ use App\Jobs\SendEmailUserData;
 use App\Mail\EmailVarification;
 use App\Mail\ResetPassword;
 use App\Models\Message;
-use App\Models\Role;
+//use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -55,13 +57,15 @@ class UserController extends Controller
             }
             return response()->json(['html' => $html]);
         }
-        return view('users.index', compact('users'));
+        $loginUser = Auth::user();
+        $role = $loginUser->roles->first();
+        return view('users.index', compact('users' , 'role'));
     }
     public function create()
     {
-            $user = Auth::user();
-            $role = $user->roles->first();
-            if ($role->permissions->where('name', 'create user')->isNotEmpty()) {
+        $user = Auth::user();
+        $role = $user->roles->first();
+            if ($role->hasPermissionTo('create user')) {
                 $roles = Role::all();
                 return view('users.create' , compact('roles'));
             }
@@ -72,7 +76,7 @@ class UserController extends Controller
     public function store(CreateUserRequest  $request)
     {
         $input = $request->all();
-        $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
+        $role = Role::find($input['role']);
         $user = User::create([
             'first_name' => $input['firstName'],
             'last_name' => $input['lastName'],
@@ -80,16 +84,20 @@ class UserController extends Controller
             'password' => Hash::make($input['password']),
             'hobbies' => json_encode($input['hobbie']),
             'gender' => $input['gender'],
-            'image' => $path,
+            'image' => null,
         ]);
-        $user->roles()->sync($input['role']);
+        if ($request->hasFile('image')) {
+            $user->addMedia($input['image'])->toMediaCollection('users');
+        }
+        $user->syncRoles($role);
+        $user->syncPermissions(Permission::pluck('name'));
         return response()->json(['success'=>'User create successfully.']);
     }
     public function edit(string $id)
     {
         $user = Auth::user();
         $role = $user->roles->first();
-        if ($role->permissions->where('name', 'update user')->isNotEmpty()) {
+        if ($role->hasPermissionTo('edit user')) {
                 $user = User::find($id);
                 $roles = Role::all();
                 return view('users.edit', compact('user', 'roles'));
@@ -103,15 +111,14 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $input = $request->all();
+        $deleteImg = $user->getFirstMedia('users');
         if($request->hasFile('image')){
-            $path = $input['image']->store('images', 'public');
-            if($user->image){
-                Storage::disk('public')->delete($user->image);
+            $user->addMedia($input['image'])->toMediaCollection('users');
+            if($deleteImg){
+                $deleteImg->delete();
             }
-        } else{
-            $path = $user->image;
         }
-
+        $role = Role::find($input['role']);
         $user->update([
             'first_name' => $input['firstName'],
             'last_name' => $input['lastName'],
@@ -119,20 +126,23 @@ class UserController extends Controller
             'password' => $input['password'] == null ? $user->password : hash::make($input['password']),
             'hobbies' => json_encode($input['hobbie']),
             'gender' => $input['gender'],
-            'image' => $path,
+            'image' => null,
         ]);
-        $user->roles()->sync($input['role']);
+        $user->syncRoles($role);
+        $user->syncPermissions(Permission::pluck('name'));
         return response()->json(['success'=>'User update successfully.']);
     }
     public function destroy(string $id)
     {
         $user = Auth::user();
         $role = $user->roles->first();
-        if ($role->permissions->where('name', 'create user')->isNotEmpty()) {
+        if ($role->hasPermissionTo('delete user')) {
                 $user = User::find($id);
                 $user->delete();
-                if ($user->image != null) {
-                    Storage::disk('public')->delete($user->image);
+                $deleteImg = $user->getFirstMedia('users');
+                if($deleteImg)
+                {
+                    $deleteImg->delete();
                 }
                 return response()->json(['success' => 'User delete successfully.']);
         }

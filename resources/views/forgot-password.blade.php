@@ -23,7 +23,7 @@
                                             <button  type="button" class="btn btn-primary btn-lg forgot" name="">Password Reset</button>
                                         </div>
                                         <div class="text-end">
-                                            <a href="{{route('login.view')}}">Back to login</a>
+{{--                                            <a href="{{route('login.view')}}">Back to login</a>--}}
                                         </div>
                                     </form>
                                 </div>

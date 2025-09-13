@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Post extends Model
+class Post extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $guarded = [];
     public function user()
     {
@@ -16,12 +19,16 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
-    protected function postImageUrl() : Attribute
+    protected function imageUrl() : Attribute
     {
         return Attribute::make(
             get: function (){
-                return asset('storage/' . $this->image);
-            }
+                    $postImage = $this->getFirstMedia('posts');
+                    if($postImage){
+                        return $postImage->getUrl();
+                    }
+                    return null;
+                }
         );
     }
     protected function fullName() : Attribute

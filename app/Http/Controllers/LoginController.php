@@ -31,12 +31,12 @@ class LoginController extends Controller
         if($user){
             if(Hash::check($password , $user->password)){
                 Auth::login($user);
-                if($user->email_verified_at == null) {
-                    return response()->json(['verify'=>'email.verify']);
-                }
-                else{
-                    return response()->json(['posts'=>'posts.index']);
-                }
+//                if($user->email_verified_at == null) {
+//                    return response()->json(['verify'=>'email.verify']);
+//                }
+//                else{
+//                    return response()->json(['posts'=>'posts.index']);
+//                }
             }
             else{
                 if ($request->ajax()) {
@@ -58,7 +58,7 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('login.view');
+//        return redirect()->route('login.view');
     }
 
     public function viewForgot()

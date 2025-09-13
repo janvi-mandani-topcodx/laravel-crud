@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateRoleRequest;
-use App\Models\Permission;
-use App\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,16 +28,15 @@ class RoleController extends Controller
     public function store(CreateRoleRequest $request)
     {
         $input = $request->all();
-        $permissions = $input['permission'];
+        $permissions = Permission::find($input['permission']);
         $role = Role::create([
             'name' => $input['role'],
+            'guard_name' => 'web',
         ]);
-        $role->permissions()->sync($permissions);
+        $role->syncPermissions($permissions);
 
         return response()->json(['success'=>'Role create successfully.']);
     }
-
-
 
     public function edit(string $id)
     {
@@ -49,11 +49,11 @@ class RoleController extends Controller
     {
         $role = Role::find($id);
         $input = $request->all();
-        $permissions = $input['permission'];
+        $permissions = Permission::find($input['permission']);
         $role->update([
             'name' => $input['role'],
         ]);
-        $role->permissions()->sync($permissions);
+        $role->syncPermissions($permissions);
         return response()->json(['success'=>'Role update successfully.']);
     }
 

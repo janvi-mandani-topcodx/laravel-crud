@@ -6,9 +6,11 @@ use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Comment;
 use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class PostController extends Controller
 {
@@ -36,7 +38,7 @@ class PostController extends Controller
                     <td>' . $post->description . '</td>
                     <td>' . $post->status . '</td>
                     <td>
-                        <img class="img-fluid img-thumbnail" src="' . $post->postImageUrl . '" width="200" height="100" style="height:126px;">
+                        <img class="img-fluid img-thumbnail" src="' . $post->getFirstMedia('posts') . '" width="200" height="100" style="height:126px;">
                     </td>
                     <td class="d-flex justify-content-center align-items-center" style="height:176px;">
 
@@ -48,8 +50,9 @@ class PostController extends Controller
                 }
                 return response()->json(['html' => $html]);
             }
-
-            return view('posts.index', compact('posts'));
+            $loginUser = Auth::user();
+            $role = $loginUser->roles->first();
+            return view('posts.index', compact('posts' , 'role'));
         }
 
         return view('posts.index', ['posts' => collect()]);
@@ -59,7 +62,8 @@ class PostController extends Controller
     {
         $user = Auth::user();
         $role = $user->roles->first();
-        if ($role->permissions->where('name', 'create post')->isNotEmpty()) {
+        if ($role->hasPermissionTo('create post')) {
+
                 return view('posts.create');
         }
         else{
@@ -70,29 +74,29 @@ class PostController extends Controller
     public function store(CreatePostRequest $request)
     {
         $input = $request->all();
-        $path = isset($input['image']) ? $input['image']->store('images', 'public') : null;
-
         $user = Auth::user();
-        $user->posts()->create([
+        $post = $user->posts()->create([
             'title' => $input['title'],
             'description' => $input['description'],
             'status' => $input['status'],
-            'image' => $path,
+            'image' => null,
         ]);
+        if ($request->hasFile('image')) {
+            $post->addMedia($input['image'])->toMediaCollection('posts');
+        }
         return response()->json(['success'=>'Post create successfully.']);
     }
     public function edit(string $id)
     {
         $user = Auth::user();
         $role = $user->roles->first();
-        if ($role->permissions->where('name', 'update post')->isNotEmpty()) {
+        if ($role->hasPermissionTo('edit post')) {
                 $post = Post::find($id);
                 return view('posts.edit', compact('post'));
         }
         else{
             return redirect()->route('posts.index')->with(['error' => "You don't have permission to update post."]);
         }
-
     }
 
     public function update(UpdatePostRequest $request, string $id)
@@ -102,20 +106,21 @@ class PostController extends Controller
         $input = $request->all();
 
         if($request->hasFile('image')){
-            $path = $input['image']->store('images', 'public');
-            if($post->image){
-                Storage::disk('public')->delete($post->image);
+            $post->addMedia($input['image'])->toMediaCollection('posts');
+            $deleteImg = $post->getFirstMedia('posts');
+            if($deleteImg){
+                $deleteImg->delete();
             }
         }
         else{
-            $path = $post->image;
+
         }
 
         $post->update([
             'title' => $input['title'],
             'description' => $input['description'],
             'status' => $input['status'],
-            'image' => $path,
+            'image' => null,
         ]);
 
         return response()->json(['success'=>'Post update successfully.']);
@@ -123,18 +128,17 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         $authUser = Auth::user();
-        foreach ($authUser->roles as $role) {
-            if ($role->permissions->contains('name', 'delete post')) {
+        $role = $authUser->roles->first();
+            if ($role->hasPermissionTo('delete post')) {
                 $post = Post::find($id);
                 $post->delete();
-                if ($post->image != null) {
-                    Storage::disk('public')->delete($post->image);
+                $deleteImg = $post->getFirstMedia('posts');
+                if($deleteImg){
+                    $deleteImg->delete();
                 }
                 return response()->json(['success' => 'Post delete successfully.']);
-
             } else {
                 return redirect()->route('posts.index')->with(['error' => "You don't have permission to delete post."]);
             }
-        }
     }
 }

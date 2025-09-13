@@ -45,8 +45,8 @@
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold" for="custom-file-post">Image</label>
                                     <input type="file" class="form-control" id="custom-file-post" name="image"/>
-                                    @if ($post->image)
-                                        <img src="{{$post->postImageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
+                                    @if ($post->ImageUrl)
+                                        <img src="{{$post->ImageUrl}}" alt="User Image" class="img-thumbnail mt-2" style="max-width: 150px;">
                                     @else
                                         <p class="text-muted">No image uploaded.</p>
                                     @endif
@@ -76,7 +76,7 @@
                                         $role = $user->roles->first();
                                     @endphp
                                     <div class="row mb-4 update-comment-input">
-                                        @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
+                                        @if ($role->hasPermissionTo('create comment'))
                                             <div class="col-8">
                                                 <div class="form-group">
                                                     <input type="text" id="comment" class="form-control"  value="" name="comment" placeholder="Enter Comment"/>
@@ -84,7 +84,7 @@
                                                 </div>
                                             </div>
                                         @endif
-                                        @if ($role->permissions->where('name', 'create comment')->isNotEmpty())
+                                        @if ($role->hasPermissionTo('create comment'))
                                             <div class="col-4">
                                                 <button type="submit" class="btn btn-primary btn-block mb-4 create-comment" id="comment-submit-btn">Add Comment</button>
                                             </div>
@@ -112,14 +112,14 @@
                                                     </svg>
                                                 </button>
                                                 <ul class='dropdown-menu'>
-                                                    @if ($role->permissions->where('name', 'update comment')->isNotEmpty())
+                                                    @if ($role->hasPermissionTo('edit comment'))
                                                         <li class='mb-2'>
                                                             <input type='hidden' name='edit_comment' value="{{$comment->id}}">
                                                             <input type='hidden' name='postId' value="{{$comment->post->id}}">
                                                             <span  class='edit-btn dropdown-item' data-comment = "{{$comment->comment}}" data-action="{{$comment->id}}" > Edit </span>
                                                         </li>
                                                     @endif
-                                                    @if ($role->permissions->where('name', 'delete comment')->isNotEmpty())
+                                                    @if ($role->hasPermissionTo('delete comment'))
                                                         <li>
                                                             <span class='delete-btn dropdown-item' data-comment="{{$comment->id}}">Delete</span>
                                                         </li>
