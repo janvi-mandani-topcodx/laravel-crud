@@ -7,6 +7,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserDemoController;
 use App\Http\Middleware\LoginMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('chats', ChatController::class);
+    Route::resource('user-demo', UserDemoController::class);
 });
 
 //Route::get('/logout', [LoginController::class, 'logout'])->name('logout.view');

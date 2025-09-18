@@ -9,8 +9,10 @@ use App\Mail\EmailVarification;
 use App\Mail\ResetPassword;
 use App\Models\Message;
 //use App\Models\Role;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,48 +20,58 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $searchTerm = $request->input('search');
-        if ($searchTerm) {
-            $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('hobbies', 'LIKE', '%' . $searchTerm . '%')
-                ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%')
-                ->get();
-        }
-        else{
-            $users = User::all();
-        }
-        if ($request->ajax()) {
-            $html = '';
-            foreach ($users as $user) {
-                $html .= '<tr id="one-user" data-id="'. $user->id .'">
-                                    <td>'. $user->id .'</td>
-                                    <td>'. $user->first_name.'</td>
-                                    <td>'. $user->last_name .'</td>
-                                    <td>'. $user->email .'</td>
-                                    <td>'. implode(',', json_decode($user->hobbies)).'</td>
-                                    <td>'. $user->gender.'</td>
-                                    <td>
-                                        <img class="img-fluid img-thumbnail" src="'. $user->imageUrl .'" alt="Uploaded Image" width="200" style="height: 126px;">
-                                    </td>
-                                    <td style="" class="edit-delete">
-                                        <button type="button" id="delete-users" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
-                                        <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning edit-btn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
-                                    </td>
-                                </tr>
-                            ';
-            }
-            return response()->json(['html' => $html]);
-        }
+//        $searchTerm = $request->input('search');
+//        if ($searchTerm) {
+//            $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
+//                ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
+//                ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+//                ->orWhere('hobbies', 'LIKE', '%' . $searchTerm . '%')
+//                ->orWhere('gender', 'LIKE', '%' . $searchTerm . '%')
+//                ->get();
+//        }
+//        else{
+        $users = User::all();
+//        }
+//        if ($request->ajax()) {
+//            $html = '';
+//            foreach ($users as $user) {
+//                $html .= '<tr id="one-user" data-id="'. $user->id .'">
+//                                    <td>'. $user->id .'</td>
+//                                    <td>'. $user->first_name.'</td>
+//                                    <td>'. $user->last_name .'</td>
+//                                    <td>'. $user->email .'</td>
+//                                    <td>'. implode(',', json_decode($user->hobbies)).'</td>
+//                                    <td>'. $user->gender.'</td>
+//                                    <td>
+//                                        <img class="img-fluid img-thumbnail" src="'. $user->imageUrl .'" alt="Uploaded Image" width="200" style="height: 126px;">
+//                                    </td>
+//                                    <td style="" class="edit-delete">
+//                                        <button type="button" id="delete-users" class="btn btn-danger btn-sm my-3" data-id="'. $user->id .'">DELETE</button>
+//                                        <a href="'. route('users.edit', $user->id) .'" class="btn btn-warning edit-btn d-flex justify-content-center align-items-center" data-id="'. $user->id .'">Edit</a>
+//                                    </td>
+//                                </tr>
+//                            ';
+//            }
+//            return response()->json(['html' => $html]);
+//        }
         $loginUser = Auth::user();
         $role = $loginUser->roles->first();
-        return view('users.index', compact('users' , 'role'));
+        if ($request->ajax()) {
+            return DataTables::of(User::with('roles')->get())
+                ->addColumn('image', function ($user) {
+                return $user->imageUrl;})
+                ->editColumn('hobbies' , function ($user) {
+                    return json_decode($user->hobbies);
+                })
+                ->make(true);
+        }
+        return view('users.index', compact('users', 'role'));
     }
     public function create()
     {
@@ -100,6 +112,7 @@ class UserController extends Controller
         if ($role->hasPermissionTo('edit user')) {
                 $user = User::find($id);
                 $roles = Role::all();
+
                 return view('users.edit', compact('user', 'roles'));
         }
         else{
@@ -128,6 +141,10 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => null,
         ]);
+        $user->tags()->delete();
+        foreach ($input['tag'] as $tag) {
+            $user->tags()->create(['tag' => $tag]);
+        }
         $user->syncRoles($role);
         $user->syncPermissions(Permission::pluck('name'));
         return response()->json(['success'=>'User update successfully.']);

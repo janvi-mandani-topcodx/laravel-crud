@@ -52,6 +52,11 @@ class User extends Authenticatable implements MustVerifyEmail , HasMedia
         return $this->hasMany(Message::class);
     }
 
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
+    }
+
 //    public function roles()
 //    {
 //        return $this->belongsToMany(CustomRole::class , 'user_roles')->withTimestamps();

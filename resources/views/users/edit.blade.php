@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <section class="vh-100 gradient-custom">
+    <section class="gradient-custom">
         <div class="container py-5 h-100">
             <div class="row justify-content-center align-items-center h-100">
                 <div class="col-12 col-lg-9 col-xl-7">
@@ -51,25 +51,25 @@
                                 <div class="form-group mb-4 ">
                                     <label class="form-label fw-bold">Hobbies</label>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="checkbox" name="hobbie[]" value="singing" id="singing" {{ in_array('singing', $userHobbies) ? 'checked' : '' }} >
+                                        <input class="form-check-input" type="checkbox" name="hobbie[]" value="singing" id="singing"  {{ in_array('singing', $userHobbies) ? 'checked' : '' }} >
                                         <label class="form-check-label" for="singing">
                                             singing
                                         </label>
                                     </div>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="checkbox" value="dancing" name="hobbie[]" id="dancing" {{ in_array('dancing', $userHobbies) ? 'checked' : '' }} >
+                                        <input class="form-check-input" type="checkbox" value="dancing" name="hobbie[]" id="dancing" {{ in_array('dancing', $userHobbies) ? 'checked' : '' }}  >
                                         <label class="form-check-label" for="dancing">
                                             dancing
                                         </label>
                                     </div>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="checkbox" value="acting" name="hobbie[]" id="acting" {{ in_array('acting', $userHobbies) ? 'checked' : '' }} >
+                                        <input class="form-check-input" type="checkbox" value="acting" name="hobbie[]" id="acting"{{ in_array('acting', $userHobbies) ? 'checked' : '' }}  >
                                         <label class="form-check-label" for="acting">
                                             acting
                                         </label>
                                     </div>
                                     <div class="form-check ms-4">
-                                        <input class="form-check-input" type="checkbox" value="cooking" name="hobbie[]" id="cooking" {{ in_array('cooking', $userHobbies) ? 'checked' : '' }} >
+                                        <input class="form-check-input" type="checkbox" value="cooking" name="hobbie[]" id="cooking"  {{ in_array('cooking', $userHobbies) ? 'checked' : '' }} >
                                         <label class="form-check-label" for="cooking">
                                             cooking
                                         </label>
@@ -112,6 +112,25 @@
                                     @endif
                                     <span style="color: darkred">@error('image') {{ $message }} @enderror</span>
                                 </div>
+
+                                <div class="form-group">
+
+                                    <div class="d-flex justify-content-end">
+                                        <div class="btn btn-primary" id="add-tags">Add</div>
+                                    </div>
+                                    <div id="one-tag">
+                                       @foreach($user->tags as $tags)
+                                            <div class="row p-2">
+                                                <div class="col-10">
+                                                    <input type="text" id="tag" class="form-control" value="{{$tags->tag}}" name="tag[]" placeholder="Enter tag"/>
+                                                </div>
+                                                <div class="col-2 d-flex justify-content-end p-0">
+                                                    <span class="btn btn-danger delete-tag">Delete</span>
+                                                </div>
+                                            </div>
+                                       @endforeach
+                                    </div>
+                                </div>
                                 <button type="button" class="btn btn-primary btn-block mb-4" id="edit-button">Update</button>
                             </form>
                         </div>
@@ -120,7 +139,6 @@
             </div>
         </div>
     </section>
-
 @endsection
 
 @section('scripts')
@@ -131,6 +149,25 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+            $(document).on('click' , '#add-tags' , function (){
+                const newTag = `
+                <div class="row p-2">
+                                   <div class="col-10">
+                                        <input type="text" id="tag" class="form-control"   name="tag[]" placeholder="Enter tag"/>
+                                   </div>
+                                   <div class="col-2 d-flex justify-content-end p-0">
+                                       <span class="btn btn-danger delete-tag">Delete</span>
+                                   </div>
+                               </div>
+                               `;
+                $('#one-tag').append(newTag)
+            });
+
+            $(document).on('click' , '.delete-tag' , function (){
+                $(this).closest('.row').remove()
+            })
+
             $(document).on('click', '#edit-button', function (e) {
                 e.preventDefault();
                 let form = $(this).closest('form')[0];

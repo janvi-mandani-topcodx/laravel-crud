@@ -19,6 +19,11 @@
     },
     "dependencies": {
         "bootstrap": "^5.3.7",
-        "datatables.net-dt": "^2.3.4"
+        "datatables.net": "^2.3.4",
+        "datatables.net-dt": "^2.3.4",
+        "jquery": "^3.7.1",
+        "jsrender": "^1.0.16",
+        "summernote": "^0.9.1",
+        "sweetalert2": "^11.23.0"
     }
 }
