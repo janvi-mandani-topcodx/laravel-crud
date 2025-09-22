@@ -170,6 +170,7 @@
 
             $(document).on('click', '#edit-button', function (e) {
                 e.preventDefault();
+
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
                 $.ajax({
@@ -211,6 +212,7 @@
                     }
                 });
             });
+
         });
     </script>
 @endsection

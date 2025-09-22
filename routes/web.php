@@ -5,6 +5,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserDemoController;
@@ -19,6 +20,7 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('permissions', PermissionController::class);
     Route::resource('chats', ChatController::class);
     Route::resource('user-demo', UserDemoController::class);
+    Route::resource('product', ProductController::class);
 });
 
 //Route::get('/logout', [LoginController::class, 'logout'])->name('logout.view');
@@ -34,6 +36,7 @@ Route::post('/usersData', [UserController::class, 'exports'])->name('exports.use
 Route::get('/chat/search', [ChatController::class, 'chat'])->name('chat.admin.user');
 Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.messages');
 Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');
+Route::get('delete/variant', [ProductController::class, 'variantDelete'])->name('variants.delete');
 
 Auth::routes(['verify' => true]);
 

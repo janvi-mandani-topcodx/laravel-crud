@@ -17,3 +17,79 @@
         </div>
     </section>
 @endsection
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $(document).on('click', '.submit-btn', function (e) {
+                e.preventDefault()
+                let form = $(this).closest('form')[0];
+                let formData = new FormData(form);
+
+                $.ajax({
+                    url: "/user-demo",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = '{{ route('user-demo.index') }}';
+                    },
+                    error: function (response) {
+                        console.log(response.responseJSON);
+                        let errors = response.responseJSON.errors;
+                        if (errors.firstName) {
+                            $('#first-name').siblings('span').text(errors.firstName[0]);
+                        }
+                        if (errors.lastName) {
+                            $('#last-name').siblings('span').text(errors.lastName[0]);
+                        }
+                        if (errors.email) {
+                            $('#email').siblings('span').text(errors.email[0]);
+                        }
+                        if (errors.password) {
+                            $('#password').siblings('span').text(errors.password[0]);
+                        }
+                        if (errors.confirmPassword) {
+                            $('#confirm-password').siblings('span').text(errors.confirmPassword[0]);
+                        }
+                        if (errors.hobbie) {
+                            $('.hobbies-error').text(errors.hobbie[0]);
+                        }
+                        if (errors.gender) {
+                            $('.gender-error').text(errors.gender[0]);
+                        }
+                        if (errors.image) {
+                            $('#custom-file').siblings('span').text(errors.image[0]);
+                        }
+                    }
+                });
+            });
+
+            $('#custom-file').on('change', function(e) {
+                const files = e.target.files;
+                const preview = $('#image-preview');
+                preview.innerHTML = '';
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.startsWith('image')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.style.maxWidth = '150px';
+                            img.style.margin = '5px';
+                            preview.append(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+        });
+    </script>
+@endsection

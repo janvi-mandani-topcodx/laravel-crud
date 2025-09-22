@@ -19,7 +19,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
-
+    @routes
 </head>
 <body>
 <div class="bg-light">
@@ -49,6 +49,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('chats.index')}}">Chats</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('user-demo.index')}}">Users Demo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('product.index')}}">Products</a>
                         </li>
                     @endif
                 </ul>

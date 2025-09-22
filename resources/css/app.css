@@ -113,3 +113,6 @@
 {
     content: none !important;
 }
+.overflow-auto{
+    height: 400px;
+}
