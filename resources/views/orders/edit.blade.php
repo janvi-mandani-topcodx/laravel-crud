@@ -1,69 +1,71 @@
 @extends('layout')
 
 @section('content')
-<div class="container py-5 h-100">
-    <div class="row  h-100">
-        <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Shipping Details</h3>
-        <div class="col-6">
-            <section class="vh-100 gradient-custom my-5">
-                <div class="" style="border-radius: 15px;">
-                    <div class="card-body p-4 p-md-5">
-                       <form method="post">
-                           @include('checkout.fields')
-                       </form>
+    <div class="container py-5 h-100">
+        <div class="row  h-100">
+            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Shipping Details</h3>
+            <div class="col-6">
+                <section class="vh-100 gradient-custom my-5">
+                    <div class="" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <form method="post">
+                                @csrf
+                                @method('PUT')
+                                @include('orders.edit-fields')
+                            </form>
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
-        <div class="col-6 h-100">
-            <section class="vh-100 gradient-custom my-5">
-                <div class="card shadow-2-strong card-registration h-75" style="border-radius: 15px;">
-                    <div class="card-body p-4 p-md-5 checkoutAllItems" id="checkoutAllItems">
-                        @foreach($carts as $cart)
-                            <div class="row my-3 bg-light cart-{{$cart->id}} cartData" data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" data-cart="{{$cart->id}}">
-                                <div class="col">
-                                    <img class="card-img-top rounded" src="{{$cart->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
-                                </div>
-                                <div class="col">
-                                    <div class="row mb-2">
-                                        <span class="col text-muted">{{$cart->product->title}}</span>
+                </section>
+            </div>
+            <div class="col-6 h-100">
+                <section class="vh-100 gradient-custom my-5">
+                    <div class="card shadow-2-strong card-registration h-75" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5 checkoutAllItems" id="checkoutAllItems">
+                            @foreach($order->orderItems as $item)
+                                <div class="row my-3 bg-light cart-{{$item->id}} cartData" data-product="{{$item->product->id}}" data-variant="{{$item->variant->id}}" data-cart="{{$item->id}}">
+                                    <div class="col">
+                                        <img class="card-img-top rounded" src="{{$item->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
                                     </div>
-                                    <div class="row">
-                                        <span class="col">Size : {{$cart->variant->title}}</span>
+                                    <div class="col">
+                                        <div class="row mb-2">
+                                            <span class="col text-muted">{{$item->product->title}}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="col">Size : {{$item->variant->title}}</span>
+                                        </div>
+                                        <div class=" d-flex align-items-end justify-content-around pt-2 " data-product="{{$item->product->id}}" data-variant="{{$item->variant->id}}" >
+                                            <span class="fs-4 decrement-checkout decrement-checkout-{{$item->product->id}}-{{$item->variant->id}}">-</span>
+                                            <span class="fs-5 quantity-checkout">{{$item->quantity}}</span>
+                                            <span class="fs-4 increment-checkout increment-checkout-{{$item->product->id}}-{{$item->variant->id}}">+</span>
+                                        </div>
                                     </div>
-                                    <div class=" d-flex align-items-end justify-content-around pt-2 " data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" >
-                                        <span class="fs-4 decrement-checkout decrement-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">-</span>
-                                        <span class="fs-5 quantity-checkout">{{$cart->quantity}}</span>
-                                        <span class="fs-4 increment-checkout increment-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">+</span>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="row">
-                                        <button type="button" class="btn-close close-product-checkout dlt-{{$cart->id}}" aria-label="Close" data-product="{{$cart->product->id}}" data-id="{{$cart->id}}"></button>
-                                    </div>
-                                    <div class="pt-5 d-flex">
-                                        <p>$</p>
-                                        <p class="cart-price">{{$cart->variant->price}}</p>
-                                    </div>
-                                </div>
-                            </div>
-{{--                            <hr class="my-3">--}}
-                            <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
-                                <div class="d-flex justify-content-around">
-                                    <label>Total</label>
-                                    <div class="d-flex">
-                                        <span>$</span>
-                                        <span class="total" id="totalAmount"></span>
+                                    <div class="col-2">
+                                        <div class="row">
+                                            <button type="button" class="btn-close close-product-checkout dlt-{{$item->id}}" aria-label="Close" data-product="{{$item->product->id}}" data-id="{{$item->id}}"></button>
+                                        </div>
+                                        <div class="pt-5 d-flex">
+                                            <p>$</p>
+                                            <p class="cart-price-edit-checkout">{{$item->variant->price}}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                                                            <hr class="my-3">
+                                <div class="position-absolute w-100 " style="bottom: 20px; left:20px;">
+                                    <div class="d-flex justify-content-around">
+                                        <label>Total</label>
+                                        <div class="d-flex">
+                                            <span>$</span>
+                                            <span class="total" id="totalAmount"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </div>
-</div>
 
 @endsection
 @section('scripts')
@@ -77,7 +79,7 @@
 
             function count() {
                 let totalCount = 0;
-                $('.quantity-cart').each(function() {
+                $('.quantity-checkout').each(function() {
                     let qty = parseInt($(this).text());
                     totalCount += qty;
                 });
@@ -86,10 +88,11 @@
 
             function updateTotal(){
                 let totalPrice = 0;
-                $('.quantity-cart').each(function () {
+                $('.quantity-checkout').each(function () {
                     let quantity = parseFloat($(this).text());
-                    let price = $(this).parents('.row').find('.cart-price').text();
-                    console.log("price" + price)
+                    console.log(quantity)
+                    let price = $(this).parents('.cartData').find('.cart-price-edit-checkout').text();
+                    console.log(price)
                     let total = quantity * price;
                     totalPrice += total;
                 });
@@ -182,7 +185,7 @@
                 });
             }
 
-            $(document).on('click' , '.checkoutAction' , function (e){
+            $(document).on('click' , '.updateCheckoutAction' , function (e){
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
@@ -191,7 +194,7 @@
                     let productId = $(this).data('product');
                     let variantId = $(this).data('variant');
                     let quantity = $(this).find('.quantity-checkout').text();
-                    let price = $(this).find('.cart-price').text();
+                    let price = $(this).find('.cart-price-edit-checkout').text();
                     formData.append('price[]' , price )
                     formData.append('productId[]' , productId )
                     formData.append('variantId[]' , variantId )
@@ -199,7 +202,7 @@
                 });
                 formData.append('total', total);
                 $.ajax({
-                    url: "{{route('order.store')}}",
+                    url: "{{route('order.update', $order->id)}}",
                     method: "POST",
                     data: formData,
                     contentType: false,
@@ -209,11 +212,11 @@
                     },
                     error: function (response){
                         let errors = response.responseJSON.errors;
-                        if (errors.first_name) {
-                            $('.first_name-error').text(errors.first_name[0]);
+                        if (errors.firstName) {
+                            $('.first_name-error').text(errors.firstName[0]);
                         }
-                        if (errors.last_name) {
-                            $('.last_name-error').text(errors.last_name[0]);
+                        if (errors.lastName) {
+                            $('.last_name-error').text(errors.lastName[0]);
                         }
                         if (errors.delivery) {
                             $('.delivery-error').text(errors.delivery[0]);

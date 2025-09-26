@@ -5,18 +5,18 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col col-12 text-center">
-                        <h2 class="">Order</h2>
+                        <h2 class="">Orders</h2>
                         <div class="row">
                             <div class="panel-body table-responsive">
                                 <table class="table table-hover" id="order-container">
                                     <thead>
                                     <tr>
                                         <th>Id</th>
-                                        <th>order id</th>
-                                        <th>delivery</th>
-                                        <th>Date</th>
-                                        <th>Total</th>
-                                        <th>Actions</th>
+                                        <th class="text-center">Name</th>
+                                        <th class="text-center">Delivery</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center" id="totalAmountOrder">Total</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -35,7 +35,7 @@
     </div>
 @endsection
 @section('scripts')
-    @include('product.templates');
+    @include('orders.templates');
 
     <script>
         $(document).ready(function () {
@@ -56,27 +56,13 @@
                 },
                 columns: [
                     { data: 'id', name: 'id' },
-                    {
-                        data: function (row){
-                            return '<a href="'+ route('order.show' , row.id) +'" data-id=' + row.id + '>'+ row.id +'</a>';
-                        },
-                        name: 'order id'
-                    },
-                    {
-                        data: 'delivery',
-                        name: 'delivery'
-                    },
-                    {
-                        data: 'created_at',
-                        name: 'created_at',
-                    },
-                    {
-                        data: 'total',
-                        name: 'total',
-                    },
+                    { data : 'name',name: 'name'},
+                    { data: 'delivery', name: 'delivery'},
+                    { data: 'created_at', name: 'created_at'},
+                    { data: 'total', name: 'total' , type : 'string'},
                     {
                         data: function (row) {
-                            let url = route('product.edit' , row.id);
+                            let url = route('order.edit' , row.id);
                             let data = [{
                                 'id': row.id,
                                 'url': url,
@@ -91,6 +77,20 @@
                         searchable: false
                     }
                 ]
+            });
+            $(document).on('click', '#delete-order', function () {
+                let orderId = $(this).data('id');
+
+                $.ajax({
+                    url: route('order.destroy' , orderId),
+                    type: "DELETE",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function () {
+                        table.ajax.reload(null, false);
+                    },
+                });
             });
         });
     </script>

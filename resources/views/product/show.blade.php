@@ -40,7 +40,7 @@
                                 </div>
                             </div>
                             <div class="text-muted fw-bold fs-4 my-4 text-center">Product Variants</div>
-                            @foreach($product->productVarients as $variant)
+                            @foreach($product->productVariants as $variant)
                                 <div class="row">
                                     <div class="col">
                                         <label class="text-muted fw-bold">Title</label>

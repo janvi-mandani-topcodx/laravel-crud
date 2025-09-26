@@ -27,7 +27,12 @@ class OrderRepository extends BaseRepository
             'delivery' => $data['delivery'],
             'total' => $data['total'],
         ]);
-        $items = [];
+        $this->orderItemStore($order , $data);
+        return redirect()->route('order.index');
+    }
+
+    public function orderItemStore($order , $data)
+    {
         foreach ($data['productId'] as $key => $value) {
             $item = [
                 'product_id' => $data['productId'][$key],
@@ -35,15 +40,29 @@ class OrderRepository extends BaseRepository
                 'quantity' => $data['quantity'][$key],
                 'price' => $data['price'][$key],
             ];
-            $items[] = $item;
-        }
-        foreach ($items as $item) {
-            $order->orderItems()->create($item);
+            $existingItem = $order->orderItems()->where('product_id', $item['product_id'])->where('variant_id' , $item['variant_id'])->first();
+
+            if ($existingItem) {
+                $existingItem->update([
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                ]);
+            } else {
+                $order->orderItems()->create($item);
+            }
         }
         $cart = Cart::all();
         foreach ($cart as $item) {
             $item->delete();
         }
-        return redirect()->route('order.index');
+    }
+
+    public function update($data, $order){
+        $shippingDetails = Arr::only($data, ['first_name' , 'last_name', 'address' , 'state' , 'country']);
+        $jsonData = json_encode($shippingDetails);
+        $orderUpdate = Arr::only($data , [ 'delivery' , 'total']);
+        $orderUpdate['shipping_details'] = $jsonData;
+        $order->update($orderUpdate);
+        $this->orderItemStore($order , $data);
     }
 }

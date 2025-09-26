@@ -4,7 +4,7 @@
         <div  class="form-group">
             <label class="form-label fw-bold " for="title">Title</label>
             <input type="text" id="title" class="form-control"  value="{{$product->title}}"  name="title" placeholder="Enter your title"/>
-            <span style="color: darkred">@error('title') {{$message}} @enderror</span>
+            <span style="color: darkred"></span>
         </div>
     </div>
 </div>
@@ -12,7 +12,7 @@
 <div  class="form-group mb-4">
     <label class="form-label fw-bold" for="email">Description</label>
     <textarea id="description" name="description" class="form-control">{{$product->description}}</textarea>
-    <span style="color: darkred" class="description-error">@error('description') {{$message}} @enderror</span>
+    <span style="color: darkred" class="description-error"></span>
 </div>
 
 <div class="form-group mb-4">

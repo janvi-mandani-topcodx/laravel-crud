@@ -33,7 +33,7 @@ class Product extends Model implements HasMedia
         return null;
     }
 
-    public function productVarients()
+    public function productVariants()
     {
         return $this->hasMany(ProductVariant::class);
     }

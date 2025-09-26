@@ -98,7 +98,7 @@ class ProductController extends Controller
         $product = Product::find($id);
         $product->delete();
         $deleteImg = $product->getMedia('product');
-        $product->productVarients()->delete();
+        $product->productVariants()->delete();
         if($deleteImg)
         {
             foreach ($deleteImg as $img) {

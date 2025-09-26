@@ -12,47 +12,46 @@
                                 <div class="row">
                                     @foreach($products as $product)
                                       <div class="col-3">
-                                          <div class="card product-{{$product->id}}" id="product" style="width: 18rem;">
+                                          <div class="card product-{{$product->id}}" id="product" style="width: 18rem;" data-product="{{$product->id}}">
                                               <img class="card-img-top" src="{{$product->image_url[0]}}" alt="Card image cap" style="height: 200px;" data-url="{{$product->image_url[0]}}">
                                               <div class="card-body">
                                                   <h5 class="card-title">{{$product->title}}</h5>
                                                   <div class="d-flex">
-                                                      @foreach($product->productVarients as $productVariants)
+                                                      @foreach($product->productVariants as $variant)
                                                           @php
-                                                              $size = collect(explode(' ', $productVariants->title))
+                                                              $size = collect(explode(' ', $variant->title))
                                                                 ->map(function ($word) {
                                                                   return Str::charAt(ucfirst($word), 0);
                                                                 })->implode('');
 
-//                                                              $checkVariant = Cart::where('variant_id' , $productVariants->id)->first();
+                                                              $variantExist = $carts->where('variant_id' , $variant->id)->first();
 
+                                                              $variantQuantity =  $carts->where('product_id', $product->id)->where('variant_id', $variant->id)->first()->quantity ?? 1;
                                                          @endphp
                                                           <div>
-                                                              <button class="btn btn-outline-info m-2 size" data-id="{{$productVariants->id}}" data-price="{{$productVariants->price}}" data-title="{{$productVariants->title}}" data-product="{{$product->id}}">{{$size}}</button>
+                                                              <button class="btn btn-outline-info m-2 size" data-id="{{$variant->id}}" data-price="{{$variant->price}}" data-title="{{$variant->title}}" data-product="{{$product->id}}" data-item-exists="{{$variantExist ? 'true' : 'false'}}" data-quantity="{{$variantQuantity}}">{{$size}}</button>
                                                           </div>
                                                       @endforeach
                                                   </div>
+                                                  @php
+
+                                                  @endphp
                                                   <div class="d-flex justify-content-between my-2">
                                                       <div class="">
                                                           <span class="fs-5 fw-bold">$</span>
-                                                          <span class="fs-5 fw-bold price" data-title="{{$productVariants->title}}" data-variant="{{$productVariants->id}}">{{$productVariants->price}}</span>
+                                                          <span class="fs-5 fw-bold price"></span>
                                                       </div>
-{{--                                                      @if($checkVariant == null)--}}
                                                           <div class="">
-                                                              <a href="#" class="btn btn-success addToCart" id="addToCart" data-id="{{$productVariants->id}}" data-product="{{$product->id}}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Add</a>
+                                                              <a href="#" class="btn btn-success addToCart" id="addToCart" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Add</a>
                                                           </div>
-{{--                                                      @else--}}
-{{--                                                          <div class="d-block" id="incrementDecrement">--}}
+
                                                           <div class="" id="incrementDecrement">
-                                                              <div class=" d-flex align-items-end justify-content-around pt-2" data-variant="{{$productVariants->id}}" data-product="{{$product->id}}">
-                                                                  <span class="fs-4 decrease decrement-card-{{$product->id}}-{{$productVariants->id}}" data-variant="{{$productVariants->id}}">-</span>
-                                                                  <span class="fs-5 quantity" data-id="{{$productVariants->id}}" data-product="{{$product->id}}">
-                                                                      {{ $carts->where('product_id', $product->id)->where('variant_id', $productVariants->id)->first()->quantity ?? 1 }}
-                                                                  </span>
-                                                                  <span class="fs-4 increase increment-card-{{$product->id}}-{{$productVariants->id}}" data-variant="{{$productVariants->id}}">+</span>
+                                                              <div class=" d-flex align-items-end justify-content-around pt-2" >
+                                                                  <span class="fs-4 decrease">-</span>
+                                                                  <span class="fs-5 quantity"></span>
+                                                                  <span class="fs-4 increase">+</span>
                                                               </div>
                                                           </div>
-{{--                                                      @endif--}}
                                                   </div>
                                               </div>
                                           </div>
@@ -80,16 +79,66 @@
 
 
             function buttons() {
-                $('.card').each(function() {
-                    if ($(this).find('#addToCart').show()) {
-                        $(this).find('#addToCart').show();
-                        $(this).find('#incrementDecrement').hide();
+            //     $('.card').each(function() {
+            //         // if ($(this).find('#addToCart').show()) {
+            //         //     $(this).find('#addToCart').show();
+            //         //     $(this).find('#incrementDecrement').hide();
+            //         // } else {
+            //         //     $(this).find('#addToCart').hide();
+            //         //     $(this).find('#incrementDecrement').show();
+            //         // }
+            //         // if($('.size').data('item-exists') == true){
+            //         //     $('.card').find('#addToCart').hide();
+            //         //     $('.card').find('#incrementDecrement').show();
+            //         // }
+            //         // else{
+            //         //     $('.card').find('#addToCart').show();
+            //         //     $('.card').find('#incrementDecrement').hide();
+            //         // }
+            //     });
+            }
+
+            function accessVariant(){
+                $('.size').each(function() {
+                    let sizeClass = $(this);
+                    let variantId = sizeClass.data('id');
+                    let productId = sizeClass.data('product');
+                    let title = sizeClass.data('title');
+                    let price = sizeClass.data('price');
+                    let quantity = sizeClass.data('quantity');
+
+                    sizeClass.closest('.card').find('.price').text(price);
+                    sizeClass.closest('.card').find('.price').data('title', title);
+                    sizeClass.closest('.card').find('.price').data('variant', variantId);
+
+                   sizeClass.closest('.card').find('.quantity').text(quantity);
+
+                    sizeClass.closest('.card').find('.addToCart').data('variant', variantId);
+                    sizeClass.closest('.card').find('.addToCart').data('product', productId);
+
+                    sizeClass.closest('.card').find('#incrementDecrement').find('.d-flex').data('variant', variantId);
+                    sizeClass.closest('.card').find('#incrementDecrement').find('.d-flex').data('product', productId);
+
+                    sizeClass.closest('.card').find('#incrementDecrement').find('.quantity').data('id', variantId);
+                    sizeClass.closest('.card').find('#incrementDecrement').find('.quantity').data('product', productId);
+
+                    sizeClass.closest('.card').find('.decrease').addClass('decrement-card-' + productId + '-' + variantId);
+                    sizeClass.closest('.card').find('.increase').addClass('increment-card-' + productId + '-' + variantId);
+
+                    sizeClass.closest('.card').find('.decrease').data('variant', variantId);
+                    sizeClass.closest('.card').find('.increase').data('variant', variantId);
+
+                    if (quantity > 0 && sizeClass.data('item-exists')) {
+                        sizeClass.closest('.card').find('#addToCart').hide();
+                        sizeClass.closest('.card').find('#incrementDecrement').show();
                     } else {
-                        $(this).find('#addToCart').hide();
-                        $(this).find('#incrementDecrement').show();
+                        sizeClass.closest('.card').find('#addToCart').show();
+                        sizeClass.closest('.card').find('#incrementDecrement').hide();
                     }
                 });
+
             }
+            accessVariant();
 
             function count() {
                 let totalCount = 0;
@@ -156,7 +205,7 @@
                 let price = product.find('.price').text();
                 let title = product.find('.card-title').text();
                 let image = product.find('.card-img-top').data('url');
-                let productId = $(this).data('product');
+                let productId = product.data('product');
                 let variantId = product.find('.price').data('variant');
                 $.ajax({
                     url: route('cart'),
@@ -193,6 +242,10 @@
                 // console.log("aaa" + $('.increase').data('variant'))
                 // $('.increase').data('variant' , variantId).siblings('.quantity').text(newQuantity);
                 if(price == $('.product-' + productId).find('.price').text()){
+
+                    console.log("productId = " + productId);
+                    console.log("varianr = " + variantId);
+
                     $('.increment-card-'+ productId + '-' + variantId).siblings('.quantity').text(newQuantity);
                 }
                 $('.increment-cart-'+ productId + '-' + variantId).siblings('.quantity-cart').text(newQuantity);
@@ -261,29 +314,6 @@
                 });
             }
 
-
-            $(document).on('click' , '.close-product' , function (){
-                let deleteId = $(this).data('id');
-                let productId = $(this).data('product');
-                let row = $(this).parents('.row');
-                console.log($('.product-'+productId))
-                $.ajax({
-                    url: route('delete.cart'),
-                    type: "GET",
-                    data: {
-                        delete_id : deleteId
-                    },
-                    success: function (response) {
-                        if(response.success){
-                            row.remove();
-                            count();
-                            updateTotal();
-                            $('.product-'+productId).find('#addToCart').show()
-                            $('.product-'+productId).find('#incrementDecrement').hide()
-                        }
-                    },
-                });
-            });
 
             $(document).on('click' , '.checkoutBtn' , function (){
                 window.location.href = route('checkout.show');

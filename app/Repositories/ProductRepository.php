@@ -59,7 +59,7 @@ class ProductRepository extends BaseRepository
                 $productDetails->update($variantData);
             }
             elseif (!isset($variantData['editId']) || $variant['editId'] == 'undefined') {
-                $product->productVarients()->create($variantData);
+                $product->productVariants()->create($variantData);
             }
         }
     }

@@ -28,6 +28,17 @@ class OrderController extends Controller
                 ->editColumn('created_at' , function ($order) {
                     return $order->created_at->format('d-m-Y');
                 })
+                ->editColumn('name' , function ($order) {
+                    $name = '';
+                    $name .= '<a href="'. route('order.show' , $order->id) .'" data-id=' . $order->id .'>'.$order->user->full_name.' </a>';
+                    return $name;
+                })
+                ->editColumn('total'  ,function ($order) {
+                    $total = '';
+                    $total .= '$'.$order->total;
+                    return $total;
+                })
+                ->rawColumns(['name'])
                 ->make(true);
         }
         return view('orders.index');
@@ -60,16 +71,22 @@ class OrderController extends Controller
 
     public function edit(string $id)
     {
-        //
+        $order = Order::with('orderItems')->find($id);
+        $shippingDetails = json_decode($order['shipping_details']);
+        return view('orders.edit', compact('order', 'shippingDetails'));
     }
 
     public function update(Request $request, string $id)
     {
-        //
+        $input = $request->all();
+        $order =  Order::find($id);
+        $this->OrderRepo->update($input,$order);
+
     }
 
     public function destroy(string $id)
     {
-        //
+        $order = Order::find($id);
+        $order->delete();
     }
 }

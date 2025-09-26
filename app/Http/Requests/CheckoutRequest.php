@@ -34,7 +34,7 @@ class CheckoutRequest extends FormRequest
     public  function messages() : array
     {
         return [
-            'firstName.required' =>  'Enter first name.',
+            'first_name.required' =>  'Enter first name.',
             'lastName.required' =>  'Enter last name.',
             'address.required' =>  'Enter address.',
             'state.required' =>  'Enter state.',

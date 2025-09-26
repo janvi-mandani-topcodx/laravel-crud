@@ -47,7 +47,7 @@ class CartController extends Controller
                         </div>
                         <div class="col-2">
                             <div class="row">
-                                <button type="button" class="btn-close close-product" aria-label="Close" data-id="'.$cart->id.'"></button>
+                                <button type="button" class="btn-close close-product dlt-'.$cart->id.'" aria-label="Close" data-id="'.$cart->id.'" data-product="'.$input['product_id'].'"></button>
                             </div>
                               <div class="pt-5 d-flex">
                                <p>$</p>
@@ -55,7 +55,18 @@ class CartController extends Controller
                             </div>
                         </div>
                     </div>
-
+                    <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
+                        <div class="d-flex justify-content-around">
+                            <label>Total</label>
+                            <div class="d-flex">
+                                <span>$</span>
+                                <span class="total"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div class="btn btn-success w-75 checkoutBtn">Checkout</div>
+                        </div>
+                    </div>
                 ';
             return response()->json(['html' => $html , 'variant' => $input['variant_id']]);
         }
@@ -90,7 +101,7 @@ class CartController extends Controller
         $input = $request->all();
         $variantId = $input['variant'];
         $cart = Cart::where('variant_id' , $variantId)->first();
-        if($cart != null){
+        if($cart){
            return response()->json([
                'status' => true,
                'quantity' => $cart['quantity']

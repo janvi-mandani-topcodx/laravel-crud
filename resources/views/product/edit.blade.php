@@ -2,7 +2,7 @@
 @section('content')
 
 
-    <form method="POST" enctype="multipart/form-data" id="editUserForm" action="{{ route('product.update', $product->id) }}">
+    <form method="POST" enctype="multipart/form-data" id="editUserForm" data-order="{{$order->id}}" action="{{ route('product.update', $product->id) }}">
         <section class="vh-100 gradient-custom">
             <div class="container py-5 h-100">
                 <div class="row justify-content-center align-items-center h-100">
@@ -30,7 +30,7 @@
                                     <span class="btn btn-info" id="add-variant">Add Product Variant</span>
                                 </div>
                                 <div class="variant my-2">
-                                    @foreach($product->productVarients as $variants)
+                                    @foreach($product->productVariants as $variants)
                                         <div class="row pt-4 one-variant" data-id="{{$variants['id']}}">
                                             <input type="hidden" id="variantEditId" name="variantEditId[]" value="{{$variants['id']}}">
                                             <div class="col">

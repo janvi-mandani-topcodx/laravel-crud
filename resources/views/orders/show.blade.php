@@ -39,14 +39,16 @@
                                     <label class="text-muted fw-bold">Delivery</label>
                                     <p>{{$order->delivery}}</p>
                                 </div>
-                                <div class="col">
-                                    <label class="text-muted fw-bold">Total</label>
-                                    <p>{{$order->total}}</p>
-                                </div>
                             </div>
+                    </div>
+                </div>
+
+
+                    <div class="card shadow-2-strong card-registration my-4" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
                             <div class="text-muted fw-bold fs-4 my-4 text-center">Order Items</div>
                             @foreach ($orderItems as $orderItem)
-                                <div class="row my-3">
+                                <div class="row my-3 bg-light">
                                     <div class="col">
                                         <img src="{{ $orderItem->product->image_url[0]}}" width="100px" height="100px">
                                     </div>
@@ -66,6 +68,15 @@
                                     </div>
                                 </div>
                             @endforeach
+                            <hr>
+                            <div class="row">
+                                <div class="col">
+                                    <p>Total</p>
+                                </div>
+                                <div class="col text-end me-5">
+                                    <p>${{$order->total}}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
