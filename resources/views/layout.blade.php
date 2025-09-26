@@ -7,8 +7,8 @@
     {{--    <link rel="stylesheet" href="{{ mix('css/app.css') }}">--}}
     {{--    <link rel="stylesheet" href="{{ mix('css/dataTables.css') }}">--}}
     {{--    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />--}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -56,6 +56,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('product.index')}}">Products</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('cart.product')}}">Products Cart</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('order.index')}}">Orders</a>
+                        </li>
                     @endif
                 </ul>
             </div>
@@ -65,8 +71,66 @@
                     <div class="px-2">Email : <span class="text-muted">{{auth()->user()->email}} </span></div>
                     <div class="px-2">Role : <span class="text-muted">{{auth()->user()->roles->pluck('name')->first()}} </span>  </div>
                 </div>
+                <div class=""  data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                    </svg>
+                    <div class="count rounded-circle position-absolute d-flex justify-content-center align-items-center text-light" style="background-color: red; width: 20px; height: 20px; top: 9px; right: -13px;">0</div>
+                </div>
             @endif
         </nav>
+    </div>
+    <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Cart</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            @if(isset($carts))
+                @foreach($carts as $cart)
+                    <div class="row my-3 bg-light cart-{{$cart->id}} cart-product-{{$cart->product->id}}" data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" data-cart="{{$cart->id}}">
+                        <div class="col">
+                            <img class="card-img-top rounded" src="{{$cart->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
+                        </div>
+                        <div class="col">
+                            <div class="row mb-2">
+                                <span class="col text-muted">{{$cart->product->title}}</span>
+                            </div>
+                            <div class="row">
+                                <span class="col">Size : {{$cart->variant->title}}</span>
+                            </div>
+                            <div class=" d-flex align-items-end justify-content-around pt-2 " data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" >
+                                <span class="fs-4 decrement decrement-cart-{{$cart->product->id}}-{{$cart->variant->id}}">-</span>
+                                <span class="fs-5 quantity-cart">{{$cart->quantity}}</span>
+                                <span class="fs-4 increment increment-cart-{{$cart->product->id}}-{{$cart->variant->id}}">+</span>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="row">
+                                <button type="button" class="btn-close close-product" aria-label="Close" data-product="{{$cart->product->id}}" data-id="{{$cart->id}}"></button>
+                            </div>
+                            <div class="pt-5 d-flex">
+                                <p>$</p>
+                                <p class="cart-price">{{$cart->variant->price}}</p>
+                            </div>
+                        </div>
+{{--                        <hr class="my-3">--}}
+                    </div>
+                    <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
+                        <div class="d-flex justify-content-around">
+                            <label>Total</label>
+                            <div class="d-flex">
+                                <span>$</span>
+                                <span class="total"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <div class="btn btn-success w-75 checkoutBtn">Checkout</div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
     </div>
 </div>
 @yield('content')

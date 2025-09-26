@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
@@ -21,6 +25,15 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('chats', ChatController::class);
     Route::resource('user-demo', UserDemoController::class);
     Route::resource('product', ProductController::class);
+    Route::resource('order', OrderController::class);
+    Route::get('products/cart', [ProductController::class, 'proCart'])->name('cart.product');
+    Route::get('cart', [CartController::class, 'cart'])->name('cart');
+    Route::post('/cart/update', [CartController::class, 'updateCart'])->name('update.cart');
+    Route::get('/cart/add', [CartController::class, 'cartAddButton'])->name('cart.add');
+    Route::get('checkout', [CheckoutController::class, 'checkout'])->name('checkout.show');
+//    Route::post('order/create', [CheckoutController::class, 'orderCreate'])->name('create.order');
+//    Route::get('order/index', [CheckoutController::class, 'orderIndex'])->name('orders.index');
+//    Route::get('order/show', [CheckoutController::class, 'orderShow'])->name('orders.show');
 });
 
 //Route::get('/logout', [LoginController::class, 'logout'])->name('logout.view');
@@ -37,7 +50,9 @@ Route::get('/chat/search', [ChatController::class, 'chat'])->name('chat.admin.us
 Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.messages');
 Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');
 Route::get('delete/variant', [ProductController::class, 'variantDelete'])->name('variants.delete');
+Route::get('delete/cart', [CartController::class, 'CartDelete'])->name('delete.cart');
+
 
 Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->middleware('verified')->name('home');
+Route::get('/home', [HomeController::class, 'index'])->middleware('verified')->name('home');
