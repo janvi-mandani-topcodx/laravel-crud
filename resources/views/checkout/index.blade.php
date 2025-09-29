@@ -19,36 +19,47 @@
             <section class="vh-100 gradient-custom my-5">
                 <div class="card shadow-2-strong card-registration h-75" style="border-radius: 15px;">
                     <div class="card-body p-4 p-md-5 checkoutAllItems" id="checkoutAllItems">
-                        @foreach($carts as $cart)
-                            <div class="row my-3 bg-light cart-{{$cart->id}} cartData" data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" data-cart="{{$cart->id}}">
-                                <div class="col">
-                                    <img class="card-img-top rounded" src="{{$cart->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
+                        <div id="allCheckoutDiv" style="overflow: auto; height: 88%; overflow-x: hidden">
+                            @foreach($carts as $cart)
+                                <div class="row my-3 bg-light cart-{{$cart->id}} cartData" data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" data-cart="{{$cart->id}}">
+                                    <div class="col">
+                                        <img class="card-img-top rounded" src="{{$cart->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
+                                    </div>
+                                    <div class="col">
+                                        <div class="row mb-2">
+                                            <span class="col text-muted">{{$cart->product->title}}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="col">Size : {{$cart->variant->title}}</span>
+                                        </div>
+                                        <div class=" d-flex align-items-end justify-content-around pt-2 " data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" >
+                                            <span class="fs-4 decrement-checkout decrement-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">-</span>
+                                            <span class="fs-5 quantity-checkout">{{$cart->quantity}}</span>
+                                            <span class="fs-4 increment-checkout increment-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">+</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="row">
+                                            <button type="button" class="btn-close close-product-checkout dlt-{{$cart->id}}" aria-label="Close" data-product="{{$cart->product->id}}" data-id="{{$cart->id}}"></button>
+                                        </div>
+                                        <div class="pt-5 d-flex">
+                                            <p>$</p>
+                                            <p class="cart-price">{{$cart->variant->price}}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <div class="row mb-2">
-                                        <span class="col text-muted">{{$cart->product->title}}</span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="col">Size : {{$cart->variant->title}}</span>
-                                    </div>
-                                    <div class=" d-flex align-items-end justify-content-around pt-2 " data-product="{{$cart->product->id}}" data-variant="{{$cart->variant->id}}" >
-                                        <span class="fs-4 decrement-checkout decrement-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">-</span>
-                                        <span class="fs-5 quantity-checkout">{{$cart->quantity}}</span>
-                                        <span class="fs-4 increment-checkout increment-checkout-{{$cart->product->id}}-{{$cart->variant->id}}">+</span>
-                                    </div>
-                                </div>
-                                <div class="col-2">
-                                    <div class="row">
-                                        <button type="button" class="btn-close close-product-checkout dlt-{{$cart->id}}" aria-label="Close" data-product="{{$cart->product->id}}" data-id="{{$cart->id}}"></button>
-                                    </div>
-                                    <div class="pt-5 d-flex">
-                                        <p>$</p>
-                                        <p class="cart-price">{{$cart->variant->price}}</p>
-                                    </div>
-                                </div>
-                            </div>
-{{--                            <hr class="my-3">--}}
+                                {{--                            <hr class="my-3">--}}
+                            @endforeach
+                        </div>
                             <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
+                                <div class="d-flex justify-content-around">
+                                    <label>Sub Total</label>
+                                    <div class="d-flex">
+                                        <span>$</span>
+                                        <span class="total" id="totalAmount"></span>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div class="d-flex justify-content-around">
                                     <label>Total</label>
                                     <div class="d-flex">
@@ -57,7 +68,6 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
                     </div>
                 </div>
             </section>

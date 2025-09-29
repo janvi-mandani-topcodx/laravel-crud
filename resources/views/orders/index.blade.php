@@ -55,7 +55,13 @@
                     url: "{{ route('order.index') }}",
                 },
                 columns: [
-                    { data: 'id', name: 'id' },
+                    {
+                        data: function(row) {
+                            let url = route('order.show' , row.id);
+                            return `<a href="${url}" data-id="${row.id}">${row.id}</a>`;
+                        },
+                        name: 'id'
+                    },
                     { data : 'name',name: 'name'},
                     { data: 'delivery', name: 'delivery'},
                     { data: 'created_at', name: 'created_at'},

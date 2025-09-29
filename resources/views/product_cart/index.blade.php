@@ -1,4 +1,3 @@
-@php use App\Models\Cart; @endphp
 @extends('layout')
 @section('content')
     <div class="container">
@@ -47,9 +46,9 @@
 
                                                           <div class="" id="incrementDecrement">
                                                               <div class=" d-flex align-items-end justify-content-around pt-2" >
-                                                                  <span class="fs-4 decrease">-</span>
+                                                                  <span class="fs-4 decrease bg-light mx-3 rounded-circle d-flex justify-content-center align-items-center" style="width: 34px; height: 34px;">-</span>
                                                                   <span class="fs-5 quantity"></span>
-                                                                  <span class="fs-4 increase">+</span>
+                                                                  <span class="fs-4 increase bg-light mx-3 rounded-circle d-flex justify-content-center align-items-center" style="width: 34px; height: 34px;">+</span>
                                                               </div>
                                                           </div>
                                                   </div>
@@ -207,6 +206,7 @@
                 let image = product.find('.card-img-top').data('url');
                 let productId = product.data('product');
                 let variantId = product.find('.price').data('variant');
+                let newQuantity = product.find('.size').data('quantity');
                 $.ajax({
                     url: route('cart'),
                     type: "GET",
@@ -224,6 +224,7 @@
                             let row = $('.offcanvas-body').find('.cart-' + response.cartId);
                             row.find('.quantity').text(response.quantity)
                         }
+                        product.find('.quantity').text(newQuantity)
                         if(response.variant == variantId){
                             $('.product-'+productId).find('#addToCart').hide()
                             $('.product-'+productId).find('#incrementDecrement').show()

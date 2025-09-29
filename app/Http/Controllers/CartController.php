@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -27,6 +28,9 @@ class CartController extends Controller
                 'variant_id' => $input['variant_id'],
                 'quantity' => $input['quantity'],
             ]);
+
+            $existingCartCount = Cart::where('user_id' , $userId)->count();
+
             $html .= '
                     <div class="row my-3 bg-light cart-'.$cart->id.' cart-product-'.$input['product_id'].'" data-product="'.$input['product_id'].'" data-variant="'.$input['variant_id'].'" data-cart="'.$cart->id.'">
                         <div class="col">
@@ -55,7 +59,18 @@ class CartController extends Controller
                             </div>
                         </div>
                     </div>
-                    <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
+                ';
+            if ($existingCartCount <= 1) {
+                $html .= '
+                    <div class="position-absolute  w-100" style="bottom: 20px; left:0;">
+                          <div class="d-flex justify-content-around">
+                            <label>Sub Total</label>
+                            <div class="d-flex">
+                                <span>$</span>
+                                <span class="total"></span>
+                            </div>
+                        </div>
+                        <hr>
                         <div class="d-flex justify-content-around">
                             <label>Total</label>
                             <div class="d-flex">
@@ -64,10 +79,12 @@ class CartController extends Controller
                             </div>
                         </div>
                         <div class="d-flex justify-content-center">
-                            <div class="btn btn-success w-75 checkoutBtn">Checkout</div>
+                            <div class="btn btn-danger w-75 checkoutBtn">Checkout</div>
                         </div>
                     </div>
-                ';
+            ';
+            }
+
             return response()->json(['html' => $html , 'variant' => $input['variant_id']]);
         }
     }
@@ -88,7 +105,7 @@ class CartController extends Controller
         return response()->json(['message' => 'Item not found'], 404);
     }
 
-    public function CartDelete(Request $request)
+    public function cartDelete(Request $request)
     {
         $id = $request->delete_id;
         $cart = Cart::find($id);
@@ -114,4 +131,20 @@ class CartController extends Controller
             ]);
         }
     }
+
+//    public function updateItems(Request $request)
+//    {
+//
+//        $input = $request->all();
+//        $orderItem = OrderItem::where('order_id', $input['order_id'])
+//            ->where('product_id', $input['product_id'])
+//            ->where('variant_id', $input['variant_id'])
+//            ->first();
+//        if ($orderItem) {
+//            $orderItem->quantity = $request->quantity;
+//            $orderItem->save();
+//            return response()->json(['message' => 'Quantity updated']);
+//        }
+//        return response()->json(['message' => 'Item not found'], 404);
+//    }
 }

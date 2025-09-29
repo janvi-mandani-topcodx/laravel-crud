@@ -39,6 +39,3 @@
     <span style="color: darkred" class="delivery-error">@error('delivery') {{$message}} @enderror</span>
 </div>
 
-<div>
-    <button class="btn btn-success w-100 updateCheckoutAction">Update</button>
-</div>

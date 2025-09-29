@@ -62,6 +62,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('order.index')}}">Orders</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('discounts.index')}}">Discounts</a>
+                        </li>
                     @endif
                 </ul>
             </div>

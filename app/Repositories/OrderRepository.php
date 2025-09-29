@@ -63,6 +63,5 @@ class OrderRepository extends BaseRepository
         $orderUpdate = Arr::only($data , [ 'delivery' , 'total']);
         $orderUpdate['shipping_details'] = $jsonData;
         $order->update($orderUpdate);
-        $this->orderItemStore($order , $data);
     }
 }

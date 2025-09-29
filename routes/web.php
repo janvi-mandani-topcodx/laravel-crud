@@ -4,6 +4,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrderController;
@@ -26,11 +27,19 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('user-demo', UserDemoController::class);
     Route::resource('product', ProductController::class);
     Route::resource('order', OrderController::class);
+    Route::resource('discounts', DiscountController::class);
     Route::get('products/cart', [ProductController::class, 'proCart'])->name('cart.product');
     Route::get('cart', [CartController::class, 'cart'])->name('cart');
     Route::post('/cart/update', [CartController::class, 'updateCart'])->name('update.cart');
     Route::get('/cart/add', [CartController::class, 'cartAddButton'])->name('cart.add');
     Route::get('checkout', [CheckoutController::class, 'checkout'])->name('checkout.show');
+    Route::get('items/search', [OrderController::class, 'orderSearch'])->name('order.item.search');
+    Route::get('discount/product/search', [DiscountController::class, 'productSearch'])->name('discount.product.search');
+    Route::get('discount/user/search', [DiscountController::class, 'userSearch'])->name('discount.user.search');
+    Route::get('discount/check', [DiscountController::class, 'discountCodeCheck'])->name('discount.code.check');
+    Route::post('items/update/{items}', [OrderController::class, 'orderItemUpdate'])->name('order.items.update');
+//    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
+
 //    Route::post('order/create', [CheckoutController::class, 'orderCreate'])->name('create.order');
 //    Route::get('order/index', [CheckoutController::class, 'orderIndex'])->name('orders.index');
 //    Route::get('order/show', [CheckoutController::class, 'orderShow'])->name('orders.show');
@@ -50,7 +59,8 @@ Route::get('/chat/search', [ChatController::class, 'chat'])->name('chat.admin.us
 Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.messages');
 Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');
 Route::get('delete/variant', [ProductController::class, 'variantDelete'])->name('variants.delete');
-Route::get('delete/cart', [CartController::class, 'CartDelete'])->name('delete.cart');
+Route::get('delete/cart', [CartController::class, 'cartDelete'])->name('delete.cart');
+Route::get('delete/order/item', [OrderController::class, 'orderItemDelete'])->name('delete.order.item');
 
 
 Auth::routes(['verify' => true]);

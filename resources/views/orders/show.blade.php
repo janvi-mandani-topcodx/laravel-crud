@@ -11,7 +11,12 @@
                     </div>
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Orders Details</h3>
+                           <div class=" d-flex justify-content-between">
+                               <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 ">Orders Details</h3>
+                                <div>
+                                    <span class="btn btn-success" data-toggle="modal" data-target="#exampleModal">Edit Order Details</span>
+                                </div>
+                           </div>
                             <div class="row">
                                 <div class="col">
                                     <label class="text-muted fw-bold">First Name</label>
@@ -82,5 +87,82 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form method="post">
+                        <div class="modal-body">
+                                @csrf
+                                @method('PUT')
+                                @include('orders.edit-fields')
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button class="btn btn-success  updateCheckoutAction">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
+@endsection
+@section('scripts')
+    <script>
+        $(document).on('click' , '.updateCheckoutAction' , function (e){
+            e.preventDefault()
+            let form = $(this).closest('form')[0];
+            let formData = new FormData(form);
+            // let total = $('#totalAmount').text();
+            // $('.cartData').each(function () {
+            //     let productId = $(this).data('product');
+            //     let variantId = $(this).data('variant');
+            //     let quantity = $(this).find('.quantity-checkout').text();
+            //     let price = $(this).find('.cart-price-edit-checkout').text();
+            //     formData.append('price[]' , price )
+            //     formData.append('productId[]' , productId )
+            //     formData.append('variantId[]' , variantId )
+            //     formData.append('quantity[]' , quantity )
+            // });
+            // formData.append('total', total);
+            $.ajax({
+                url: "{{route('order.update', $order->id)}}",
+                method: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    window.location.href = '{{route('order.show' , $order->id)}}';
+                },
+                // error: function (response){
+                //     let errors = response.responseJSON.errors;
+                //     if (errors.firstName) {
+                //         $('.first_name-error').text(errors.firstName[0]);
+                //     }
+                //     if (errors.lastName) {
+                //         $('.last_name-error').text(errors.lastName[0]);
+                //     }
+                //     if (errors.delivery) {
+                //         $('.delivery-error').text(errors.delivery[0]);
+                //     }
+                //     if (errors.country) {
+                //         $('.country-error').text(errors.country[0]);
+                //     }
+                //     if (errors.state) {
+                //         $('.state-error').text(errors.state[0]);
+                //     }
+                //     if (errors.address) {
+                //         $('.address-error').text(errors.address[0]);
+                //     }
+                // }
+            });
+        });
+
+
+    </script>
 @endsection
