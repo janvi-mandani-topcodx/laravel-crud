@@ -1,5 +1,4 @@
 @extends('layout')
-
 @section('content')
 <div class="container py-5 h-100">
     <div class="row  h-100">
@@ -51,20 +50,35 @@
                                 {{--                            <hr class="my-3">--}}
                             @endforeach
                         </div>
-                            <div class="position-absolute w-100" style="bottom: 20px; left:20px;">
-                                <div class="d-flex justify-content-around">
-                                    <label>Sub Total</label>
+                            <div class="position-absolute w-100" style="bottom: 20px; left:20px; padding-right: 40px;">
+                                <div class="d-flex justify-content-between dis gap-2 my-2">
+                                    <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
+                                    <button class="btn btn-success" id="discountApply">Dis Apply</button>
+                                </div>
+                                <div class="voucher-error text-danger"></div>
+                                <div class="d-flex justify-content-between">
+                                    <label>Subtotal</label>
                                     <div class="d-flex">
                                         <span>$</span>
-                                        <span class="total" id="totalAmount"></span>
+                                        <span class="subtotal-checkout" id="totalAmount"></span>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="d-flex justify-content-around">
+                                <div class="discountData ">
+                                    @if($discount)
+                                        <div class="d-flex justify-content-between ">
+                                            <label>Discount : {{$discount->code}}</label>
+                                            <div class="d-flex">
+                                                <span>$</span>
+                                                <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="d-flex justify-content-between">
                                     <label>Total</label>
                                     <div class="d-flex">
                                         <span>$</span>
-                                        <span class="total" id="totalAmount"></span>
+                                        <span class="total-checkout totalPrice" id="totalAmount"></span>
                                     </div>
                                 </div>
                             </div>
@@ -85,6 +99,7 @@
                 }
             });
 
+
             function count() {
                 let totalCount = 0;
                 $('.quantity-cart').each(function() {
@@ -103,7 +118,33 @@
                     let total = quantity * price;
                     totalPrice += total;
                 });
+                console.log(totalPrice)
+                console.log( $('.total-checkout'))
+                $('.total-checkout').text(totalPrice)
+                $('.subtotal-checkout').text(totalPrice)
                 $('.total').text(totalPrice)
+                $('.subtotal').text(totalPrice)
+            }
+            function discountAdd() {
+                console.log($('.discountData').text());
+                if ($('.discountData').text() != null) {
+                    let type = $('.discount-show-checkout').data('type');
+                    let amount = $('.discount-show-checkout').text();
+                    let subtotal = $('.subtotal-checkout').text();
+                    console.log("sub = " +subtotal);
+                    if (type == 'percentage') {
+                        let total = subtotal * (amount / 100);
+                        console.log(total)
+                        let mainTotal  = subtotal - total;
+                        $('.total-checkout').text(mainTotal)
+                        $('.total').text(mainTotal)
+                    }
+                    else if(type == 'fixed'){
+                        let totalPrice = subtotal - amount;
+                        $('.total-checkout').text(totalPrice)
+                        $('.total').text(totalPrice)
+                    }
+                }
             }
 
             function allDecrement(quantity ,productId , variantId){
@@ -129,7 +170,7 @@
             }
             updateTotal();
             count();
-
+            discountAdd()
             $(document).on('click' , '.increment' , function (){
                 var quantity = $(this).closest('.d-flex').find('.quantity-cart');
                 var productId = $(this).closest('.d-flex').data('product');
@@ -174,6 +215,7 @@
 
 
             function updateQuantity(productId, variantId, quantity) {
+                discountAdd();
                 console.log(productId , variantId,quantity)
                 updateTotal();
                 count();
@@ -196,7 +238,11 @@
                 e.preventDefault()
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
-                let total = $('#totalAmount').text();
+                let total = $('.total-checkout').text();
+                let amount = $('.discount-show-checkout').text();
+                let code = $('.discount-show-checkout').data('code');
+                let type = $('.discount-show-checkout').data('type');
+                console.log(amount)
                 $('.cartData').each(function () {
                     let productId = $(this).data('product');
                     let variantId = $(this).data('variant');
@@ -207,6 +253,10 @@
                     formData.append('variantId[]' , variantId )
                     formData.append('quantity[]' , quantity )
                 });
+                formData.append('amount' , amount)
+                formData.append('code' , code)
+                formData.append('type' , type)
+
                 formData.append('total', total);
                 $.ajax({
                     url: "{{route('order.store')}}",

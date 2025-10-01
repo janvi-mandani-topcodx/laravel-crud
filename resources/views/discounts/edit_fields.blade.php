@@ -52,20 +52,19 @@
                         <label>APPLIES TO</label>
                         <div class="ps-3">
                             <div>
-                                <input class="form-check-input" type="radio" name="product" value="all products" id="allProducts" {{$discount->product== 'all products' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="radio" name="product" value="all products" id="allProducts" {{$discount->applies_product == 'all products' ? 'checked' : ''}}>
                                 <label class="form-check-label" for="allProducts">
                                     All Products
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="radio" name="product" value="specific product" id="specificProduct" {{$discount->product== 'specific product' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="radio" name="product" value="specific product" id="specificProduct" {{$discount->applies_product == 'specific product' ? 'checked' : ''}}>
                                 <label class="form-check-label" for="specificProduct">
                                     Specific Product
                                 </label>
                             </div>
-                            <input type="text" id="searchProduct" class="form-control" name="" placeholder="search product"/>
-                            <input type="hidden" class="hidden-product-id" name="product_id"/>
-
+                            <input type="text" id="searchProduct" class="form-control {{$discount->applies_product== 'specific product' ? 'd-block' : ''}}" name="" placeholder="search product" value="{{$discount->product->title}}"/>
+                            <input type="hidden" class="hidden-product-id" name="product_id" value="{{$discount->product->id}}"/>
                         </div>
                     </div>
                 </div>
@@ -111,20 +110,19 @@
                         <label class="form-label fw-bold " for="value">Customer Eligibility</label>
                         <div  class="form-group ps-3">
                             <div>
-                                <input class="form-check-input" type="radio" name="customer" value="everyone" id="everyone" {{$discount->customer== 'everyone' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="radio" name="customer" value="everyone" id="everyone" {{$discount->customer_eligibility== 'everyone' ? 'checked' : ''}}>
                                 <label class="form-check-label" for="everyone">
                                     Everyone
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="radio" name="customer" value="specific customer" id="specificCustomer" {{$discount->customer== 'specific customer' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="radio" name="customer" value="specific customer" id="specificCustomer" {{$discount->customer_eligibility== 'specific customer' ? 'checked' : ''}}>
                                 <label class="form-check-label" for="specificCustomer">
                                     Specific Customer
                                 </label>
                             </div>
-                            <input type="text" id="searchCustomer" class="form-control  {{$discount->customer== 'specific customer' ? 'd-block' : ''}}" name="" placeholder="search customer" value="{{$discount->user_id}}"/>
-                            <input type="hidden" class="hidden-user-id" name="customer_id"/>
-
+                            <input type="text" id="searchCustomer" class="form-control  {{$discount->customer_eligibility== 'specific customer' ? 'd-block' : ''}}" name="" placeholder="search customer" value="{{$discount->user->full_name}}"/>
+                            <input type="hidden" class="hidden-user-id" name="customer_id" value="{{$discount->user->id}}"/>
                         </div>
                     </div>
                 </div>
@@ -137,20 +135,20 @@
                         <label class="form-label fw-bold">Usage Limit</label>
                         <div  class="form-group">
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_number" value="how many times use discount" id="limitNumber" {{$discount->discount_apply_type== 'how many times use discount' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="checkbox" name="how_many_times" value="how many times use discount" id="limitNumber" {{$discount->usage_limit_number_of_times_use== 1 ? 'checked' : ''}}>
                                 <label class="form-check-label" for="limitNumber">
                                     Limit Number of times this discount can be used in total
                                 </label>
                             </div>
-                            <input type="text" id="limitDiscount" class="form-control {{$discount->discount_apply_type== 'how many times use discount' ? 'd-block' : ''}}" name="limit_discount" placeholder="Enter number of times use discounts "   value="{{$discount->discount_type_number}}"/>
+                            <input type="text" id="limitDiscount" class="form-control {{$discount->usage_limit_number_of_times_use== 1 ? 'd-block' : ''}}" name="limit_number_discount" placeholder="Enter number of times use discounts "   value="{{$discount->usage_limit_number}}"/>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="one_use" value="limit one use" id="perCustomer"  {{$discount->discount_apply_type== 'limit one use' ? 'checked' : ''}} />
+                                <input class="form-check-input" type="checkbox" name="limit_one_use" value="limit one use" id="perCustomer"  {{$discount->usage_limit_one_user_per_customer == 1 ? 'checked' : ''}} />
                                 <label class="form-check-label" for="perCustomer">
                                     Limit to one use per customer
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="new_only" value="new customer only" id="newCustomer" {{$discount->discount_apply_type== 'new customer only' ? 'checked' : ''}}>
+                                <input class="form-check-input" type="checkbox" name="limit_new_customer" value="new customer only" id="newCustomer" {{$discount->usage_limit_new_customer== 1 ? 'checked' : ''}}>
                                 <label class="form-check-label" for="newCustomer">
                                     New customers only
                                 </label>
@@ -170,17 +168,17 @@
                         <div  class="row form-group">
                             <div class="col-6">
                                 <label class="form-label" for="code">Start Date</label>
-                                <input type="date" id="startDate" class="form-control"  value="{{isset($discount->start_date) ? $discount->start_date : ''}}"  name="start_date"/>
+                                <input type="date" id="startDate" class="form-control"  value="{{$discount->start_date}}"  name="start_date"/>
                                 <span style="color: darkred"></span>
                             </div>
-                            <div class="col-6 end-date">
+                            <div class="col-6 end-date {{$discount->end_date != null ? 'd-block' : ''}}">
                                 <label class="form-label" for="code">End Date</label>
                                 <input type="date" id="endDate" class="form-control"  value="{{isset($discount->end_date) && $discount->end_date != null ? $discount->end_date : ''}}"  name="end_date"/>
                                 <span style="color: darkred"></span>
                             </div>
                         </div>
                         <div class="ps-3">
-                            <input class="form-check-input" type="checkbox" name="end_date" value="end date" id="endDate" {{isset($discount->end_date) && $discount->end_date != null ? 'checked' : ''}}>
+                            <input class="form-check-input" type="checkbox" name="" value="" id="endDate" {{isset($discount->end_date) && $discount->end_date != null ? 'checked' : ''}}>
                             <label class="form-check-label" for="endDate">
                                 Set end date
                             </label>

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateDiscountRequest;
+use App\Models\Cart;
+use App\Models\CartDiscount;
 use App\Models\Discount;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\DiscountRepository;
+use App\Services\VoucherService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -18,21 +22,24 @@ class DiscountController extends Controller
 
     public function __construct(DiscountRepository $discountRepository)
     {
-        $this->DiscountRepo = $discountRepository;
+        $this->discountRepo = $discountRepository;
     }
     public function index(Request $request)
     {
         $discount = Discount::all();
         if ($request->ajax()) {
             return DataTables::of(Discount::get())
-                ->editColumn('user_id', function ($discount) {
-                    return $discount->user_id == null ? 'Null' : $discount->user_id;
+                ->editColumn('customer_id', function ($discount) {
+                    return $discount->customer_id == null ? null : $discount->user->full_name;
                 })
                 ->editColumn('product_id', function ($discount) {
-                    return $discount->product_id == null ? 'Null' : $discount->product_id;
+                    return $discount->product_id == null ? null : $discount->product->title;
                 })
                 ->editColumn('end_date', function ($discount) {
-                    return $discount->end_date == null ? 'Null' : $discount->end_date;
+                    return $discount->end_date == null ? null : $discount->end_date;
+                })
+                ->editColumn('status', function ($discount) {
+                    return $discount->status == 0 ? 'InActive' : 'Active';
                 })
                 ->make(true);
         }
@@ -51,10 +58,11 @@ class DiscountController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateDiscountRequest $request)
     {
+        dd("aaa");
         $input = $request->all();
-        $this->DiscountRepo->store($input);
+        $this->discountRepo->store($input);
     }
 
     /**
@@ -70,7 +78,7 @@ class DiscountController extends Controller
      */
     public function edit(string $id)
     {
-        $discount = Discount::find($id);
+        $discount = Discount::with('product' , 'user')->find($id);
         return view('discounts.edit', compact('discount'));
     }
 
@@ -81,7 +89,7 @@ class DiscountController extends Controller
     {
         $input = $request->all();
         $discountData  = Discount::find($id);
-        $this->DiscountRepo->update($input , $discountData);
+        $this->discountRepo->update($input , $discountData);
     }
 
     /**
@@ -164,8 +172,14 @@ class DiscountController extends Controller
         }
     }
 
-    public function discountCodeCheck()
+    public function discountCodeCheck(Request $request)
     {
+            $input = $request->all();
+            $discount = Discount::where('code' , $input['discount_code'])->first();
+            $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
+
+            $voucherDiscount =  new VoucherService();
+            return $voucherDiscount->discountVoucher($input , $discount , $cartDiscount);
 
     }
 }

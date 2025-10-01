@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderDiscount;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Repositories\OrderRepository;
@@ -63,17 +64,25 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        $order = Order::find($id);
+        $order = Order::with(['orderItems' , 'orderDiscount'])->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        $orderItems = OrderItem::with(['product' , 'variant'])->where('order_id', $id)->get();
-        return view('orders.show', compact('order' , 'shippingDetails' , 'orderItems'));
+        $orderItems = $order->orderItems();
+        $orderDiscount = $order->orderDiscount();
+        dd($orderDiscount , $orderItems);
+        $totalPrice = 0;
+        foreach ($orderItems as $orderItem) {
+            $total = $orderItem->quantity * $orderItem->price;
+            $totalPrice += $total;
+        }
+        return view('orders.show', compact('order' , 'shippingDetails' , 'orderItems' , 'orderDiscount' , 'totalPrice'));
     }
 
     public function edit(string $id)
     {
         $order = Order::with('orderItems')->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        return view('orders.edit', compact('order', 'shippingDetails'));
+        $orderDiscount = OrderDiscount::where('order_id', $id)->first();
+        return view('orders.edit', compact('order', 'shippingDetails' , 'orderDiscount'));
     }
 
     public function update(Request $request, string $id)

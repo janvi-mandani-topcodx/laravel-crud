@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 use App\Models\Cart;
+use App\Models\CartDiscount;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -26,6 +27,11 @@ class OrderRepository extends BaseRepository
             'shipping_details' => $jsonData,
             'delivery' => $data['delivery'],
             'total' => $data['total'],
+        ]);
+        $order->orderDiscount()->create([
+            'code' => $data['code'],
+            'type' => $data['type'],
+            'amount' => $data['amount'],
         ]);
         $this->orderItemStore($order , $data);
         return redirect()->route('order.index');
@@ -55,6 +61,7 @@ class OrderRepository extends BaseRepository
         foreach ($cart as $item) {
             $item->delete();
         }
+//        CartDiscount::delete();
     }
 
     public function update($data, $order){

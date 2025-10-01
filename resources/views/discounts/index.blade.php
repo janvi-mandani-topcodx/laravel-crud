@@ -6,6 +6,9 @@
                 <div class="row">
                     <div class="col col-12 text-center">
                         <h2 class="">Discounts</h2>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-success"><a href="{{route('discounts.create')}}" class="text-decoration-none text-white">Create</a></button>
+                        </div>
                         <div class="row">
                             <div class="panel-body table-responsive">
                                 <table class="table table-hover" id="discount-container">
@@ -77,12 +80,12 @@
                     { data: 'type', name: 'type'},
                     // { data: 'minimum_requirements', name: 'Minimum Requirements'},
                     // { data: 'minimum_amount', name: 'Minimum Amount'},
-                    { data: 'customer', name: 'customer'},
-                    { data: 'user_id', name: 'user Id'},
-                    { data: 'product', name: 'product'},
+                    { data: 'customer_eligibility', name: 'customer'},
+                    { data: 'customer_id', name: 'user Id'},
+                    { data: 'applies_product', name: 'product'},
                     { data: 'product_id', name: 'product Id'},
                     { data: 'start_date', name: 'start date' , type: 'string'},
-                    { data: 'end_date', name: 'end_date'},
+                    { data: 'end_date', name: 'end_date' , type: 'string'},
                     { data: 'status', name: 'status' , type: 'string'},
                     // { data: 'discount_apply_type', name: 'Discount Apply Type'},
                     // { data: 'discount_type_number', name: 'Discount Type Number'},

@@ -8,7 +8,7 @@
                         <div  class="form-group">
                             <label class="form-label fw-bold " for="code">Discount Code</label>
                             <input type="text" id="code" class="form-control"  value="{{old('code')}}"  name="code" placeholder="Enter your code"/>
-                            <span style="color: darkred"></span>
+                            <span style="color: darkred">@error('code') {{$message}} @enderror</span>
                         </div>
                     </div>
                 </div>
@@ -45,8 +45,8 @@
                     <div class="card-body p-4 p-md-5">
                         <div  class="form-group">
                             <label class="form-label fw-bold " for="value">Value</label>
-                            <input type="text" id="value" class="form-control"  value="{{old('value')}}"  name="value" placeholder="Enter your value"/>
-                            <span style="color: darkred"></span>
+                            <input type="text" id="value" class="form-control"  value="{{old('value')}}"  name="value" placeholder="Enter your value" />
+                            <span style="color: darkred">@error('value') {{$message}} @enderror</span>
                         </div>
                         <label>APPLIES TO</label>
                         <div class="ps-3">
@@ -57,12 +57,13 @@
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="radio" name="product" value="specific product" id="specificProduct">
+                                <input class="form-check-input" type="radio" name="product" value="specific_product" id="specificProduct">
                                 <label class="form-check-label" for="specificProduct">
                                     Specific Product
                                 </label>
                             </div>
-                            <input type="text" id="searchProduct" class="form-control" name="" placeholder="search product"/>
+                            <input type="text" id="searchProduct" class="form-control" name="product_name" placeholder="search product" />
+                            <span style="color: darkred" id="product_name_error">@error('product_name') {{$message}} @enderror</span>
                             <input type="hidden" class="hidden-product-id" name="product_id"/>
                         </div>
                     </div>
@@ -82,19 +83,21 @@
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="radio" name="requirement" value="purchase amount" id="purchaseAmount">
+                                <input class="form-check-input" type="radio" name="requirement" value="purchase_amount" id="purchaseAmount" >
                                 <label class="form-check-label" for="purchaseAmount">
                                     Minimum Purchase Amount ($)
                                 </label>
                             </div>
-                            <input type="text" id="minimumPurchase" class="form-control" name="minimum_purchase" placeholder="Enter minimum purchase amount"/>
+                            <input type="text" id="minimumPurchase" class="form-control" name="minimum_purchase" placeholder="Enter minimum purchase amount" />
+                            <span style="color: darkred">@error('minimum_purchase') {{$message}} @enderror</span>
                             <div>
-                                <input class="form-check-input" type="radio" name="requirement" value="quantity amount" id="quantityAmount">
+                                <input class="form-check-input" type="radio" name="requirement" value="quantity_amount" id="quantityAmount">
                                 <label class="form-check-label" for="quantityAmount">
                                     Minimum Quantity Of Items
                                 </label>
                             </div>
                             <input type="text" id="minimumQuantity" class="form-control" name="minimum_quantity" placeholder="Enter minimum quantity amount"/>
+                            <span style="color: darkred">@error('minimum_quantity') {{$message}} @enderror</span>
                         </div>
                     </div>
                 </div>
@@ -115,12 +118,13 @@
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="radio" name="customer" value="specific customer" id="specificCustomer">
+                                <input class="form-check-input" type="radio" name="customer" value="specific_customer" id="specificCustomer">
                                 <label class="form-check-label" for="specificCustomer">
                                     Specific Customer
                                 </label>
                             </div>
-                            <input type="text" id="searchCustomer" class="form-control" name="customer_id" placeholder="search customer"/>
+                            <input type="text" id="searchCustomer" class="form-control" name="customer_name" placeholder="search customer"/>
+                            <span style="color: darkred">@error('customer_name') {{$message}} @enderror</span>
                             <input type="hidden" class="hidden-user-id" name="customer_id">
                         </div>
                     </div>
@@ -134,20 +138,21 @@
                         <label class="form-label fw-bold">Usage Limit</label>
                         <div  class="form-group">
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_number" value="how many times use discount" id="limitNumber">
+                                <input class="form-check-input" type="checkbox" name="how_many_times" value="how_many_times_use_discount" id="limitNumber">
                                 <label class="form-check-label" for="limitNumber">
                                     Limit Number of times this discount can be used in total
                                 </label>
                             </div>
-                            <input type="text" id="limitDiscount" class="form-control" name="limit_discount" placeholder="Enter number of times use discounts "/>
+                            <input type="text" id="limitDiscount" class="form-control" name="limit_number_discount" placeholder="Enter number of times use discounts "/>
+                            <span style="color: darkred">@error('limit_number_discount') {{$message}} @enderror</span>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_number" value="limit one use" id="perCustomer">
+                                <input class="form-check-input" type="checkbox" name="limit_one_use" value="limit one use" id="perCustomer">
                                 <label class="form-check-label" for="perCustomer">
                                     Limit to one use per customer
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_number" value="new customer only" id="newCustomer">
+                                <input class="form-check-input" type="checkbox" name="limit_new_customer" value="new customer only" id="newCustomer">
                                 <label class="form-check-label" for="newCustomer">
                                     New customers only
                                 </label>
@@ -168,17 +173,17 @@
                             <div class="col-6">
                                 <label class="form-label" for="code">Start Date</label>
                                 <input type="date" id="startDate" class="form-control"  value="{{old('startDate')}}"  name="start_date"/>
-                                <span style="color: darkred"></span>
+                                <span style="color: darkred">@error('start_date') {{$message}} @enderror</span>
                             </div>
                             <div class="col-6 end-date">
                                 <label class="form-label" for="code">End Date</label>
                                 <input type="date" id="endDate" class="form-control"  value="{{old('endDate')}}"  name="end_date"/>
-                                <span style="color: darkred"></span>
+                                <span style="color: darkred">@error('end_date') {{$message}} @enderror</span>
                             </div>
                         </div>
                         <div class="ps-3">
-                            <input class="form-check-input" type="checkbox" name="end_date" value="end date" id="endDate">
-                            <label class="form-check-label" for="endDate">
+                            <input class="form-check-input" type="checkbox" name="end_date_checkbox" value="end_date" id="endDateCheckBox">
+                            <label class="form-check-label" for="endDateCheckBox">
                                 Set end date
                             </label>
                         </div>
@@ -189,6 +194,9 @@
         <div id="productSearch" class="position-absolute" style=" bottom: 34px; left: 78px; width: 433px;">
 
         </div>
+        <div id="userSearchData" class="position-absolute" style=" top: -118px; left: 78px; width: 433px;">
+
+        </div>
     </div>
     <div class="row ps-2 position-relative">
         <label class="form-label fw-bold" for="custom-file">Status</label>
@@ -197,10 +205,6 @@
         </div>
     </div>
     <div class="row my-3 position-relative">
-        <button type="button" class="btn btn-success w-50 mx-auto" id="createDiscount">Create</button>
-    </div>
-
-    <div id="userSearchData" class="position-absolute" style=" top: -118px; left: 78px; width: 433px;">
-
+        <button type="submit" class="btn btn-success w-50 mx-auto" id="createDiscount">Create</button>
     </div>
 </div>

@@ -46,12 +46,30 @@
                                     </div>
                                 @endforeach
                             </div>
-                                <div class="position-absolute w-100 " style="bottom: 20px; left:20px;">
-                                    <div class="d-flex justify-content-around">
+                                <div class="position-absolute w-100 pe-5" style="bottom: 20px; left:20px;">
+                                    <div class="d-flex justify-content-between">
+                                        <label>Subtotal</label>
+                                        <div class="d-flex">
+                                            <span>$</span>
+                                            <span class="subtotal-order-edit" id=""></span>
+                                        </div>
+                                    </div>
+                                    @if($orderDiscount)
+                                        <div class="discountData">
+                                            <div class="d-flex justify-content-between ">
+                                                <label>Discount : {{$orderDiscount->code}}</label>
+                                                <div class="d-flex">
+                                                    <span>$</span>
+                                                    <span class="discount-show-checkout" data-type="{{$orderDiscount->type}}" data-code="{{$orderDiscount->code}}">{{$orderDiscount->amount}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <div class="d-flex justify-content-between">
                                         <label>Total</label>
                                         <div class="d-flex">
                                             <span>$</span>
-                                            <span class="total" id="totalAmount"></span>
+                                            <span class="total-order-edit" id="totalAmount"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -104,7 +122,7 @@
                 });
             });
 
-            function updateTotal(){
+            function updateTotalOrder(){
                 let totalPrice = 0;
                 $('.quantity-checkout').each(function () {
                     let quantity = parseInt($(this).text());
@@ -114,9 +132,37 @@
                     let total = quantity * price;
                     totalPrice += total;
                 });
-                $('.total').text(totalPrice)
+                $('.subtotal-order-edit').text(totalPrice)
             }
 
+            function discountAddOrder() {
+                let subtotal = ''
+                // console.log($('.discountData').)
+                if ($('.discountData').length > 0) {
+                    console.log("aaa")
+                    let type = $('.discount-show-checkout').data('type');
+                    let amount = $('.discount-show-checkout').text();
+                    subtotal = $('.subtotal-order-edit').text();
+                    console.log("sub = " +subtotal);
+                    if (type == 'percentage') {
+                        let total = subtotal * (amount / 100);
+                        console.log(total)
+                        let mainTotal  = subtotal - total;
+                        $('.total-order-edit').text(mainTotal)
+                    }
+                    else if(type == 'fixed'){
+                        let totalPrice = subtotal - amount;
+                        $('.total-order-edit').text(totalPrice)
+                    }
+                }
+                else{
+                    subtotal = $('.subtotal-order-edit').text();
+                    $('.total-order-edit').text(subtotal)
+                }
+                // if($('.discountData').text() != ''){
+                //     $('.total-order-edit').text(subtotal)
+                // }
+            }
             // function allDecrement(quantity ,productId , variantId){
             //     var currentQuantity = parseInt(quantity.text());
             //     if(currentQuantity > 1){
@@ -138,7 +184,8 @@
             //     $('.increment-checkout-'+ productId +'-' +variantId ).siblings('.quantity-checkout').text(newQuantity);
             //     updateQuantity(productId, variantId , newQuantity , orderId)
             // }
-            updateTotal();
+            updateTotalOrder();
+            discountAddOrder()
             // $(document).on('click' , '.increment-checkout' , function (){
             //     var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
             //     var productId = $(this).closest('.d-flex').data('product');
@@ -157,7 +204,7 @@
             //
             // function updateQuantity(productId, variantId, quantity , orderId) {
             //     console.log(productId , variantId,quantity)
-            //     updateTotal();
+            //     updateTotalOrder();
             //     $.ajax({
             //         url: route('update.item'),
             //         type: "POST",
@@ -250,13 +297,15 @@
                                 </div>
                 `;
                     $('.order-item-data').append(html);
-                    updateTotal();
+                    updateTotalOrder();
+                    discountAddOrder()
                 }
                 else{
                     let quantity = parseInt(existingProduct.find('.quantity-checkout').text());
                     let newQuantity = quantity + 1;
                     existingProduct.find('.quantity-checkout').text(newQuantity)
-                    updateTotal();
+                    updateTotalOrder();
+                    discountAddOrder()
                 }
                 $('#search').val('');
                 $('#productSearch').text('')
@@ -268,6 +317,8 @@
                 let currentQuantity = parseInt(quantity.text());
                 let newQuantity = currentQuantity + 1;
                 quantity.text(newQuantity);
+                updateTotalOrder()
+                discountAddOrder()
             })
             $(document).on('click' , '.decrement-data' , function (){
                 let quantity = $(this).closest('.itemData').find('.quantity-checkout');
@@ -276,6 +327,8 @@
                     let newQuantity = currentQuantity - 1;
                     quantity.text(newQuantity);
                 }
+                updateTotalOrder()
+                discountAddOrder()
             })
             $(document).on('click' , '.close-product-edit-checkout' , function (){
                 let deleteId = $(this).data('id');
@@ -292,7 +345,8 @@
                     success: function (response) {
                         if(response.success){
                             row.remove();
-                            updateTotal();
+                            updateTotalOrder();
+                            discountAddOrder()
                         }
                     },
                 });

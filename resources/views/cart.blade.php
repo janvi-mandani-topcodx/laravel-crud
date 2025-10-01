@@ -35,21 +35,41 @@
                         </div>
                         {{--                        <hr class="my-3">--}}
                     </div>
-                    <div class="position-absolute w-100" style="bottom: 20px; left:0;">
-                        <div class="d-flex justify-content-center">
-                            <input type="text" name="discount_code" class="discountCard form-control w-75">
-                            <button class="btn btn-success" id="discountApply">Discount Apply</button>
-                        </div>
+                @endforeach
+                    <div class="position-absolute w-100 px-2" style="bottom: 20px; left:0;">
 
-                        <div class="d-flex justify-content-around">
-                            <label>Sub Total</label>
+                        <div class="d-flex justify-content-between dis gap-2">
+                            <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
+                            <button class="btn btn-success" id="discountApply">Dis Apply</button>
+                        </div>
+                        <div class="voucher-error text-danger"></div>
+
+
+                        <div class="d-flex justify-content-between my-2" id="subtotal">
+                            <label>Subtotal</label>
                             <div class="d-flex">
                                 <span>$</span>
-                                <span class="total"></span>
+                                <span class="subtotal"></span>
                             </div>
                         </div>
-                        <hr>
-                        <div class="d-flex justify-content-around">
+                        <div class="discountData my-2">
+                            @php
+                                $discount = \App\Models\CartDiscount::where('user_id' , auth()->id())->first()
+                            @endphp
+                            @if($discount)
+                                <div class="d-flex justify-content-between">
+                                    <label>Discount : {{$discount->code}}</label>
+                                    <div class="d-flex">
+                                        <span>$</span>
+                                        <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn-close close-discount" aria-label="Close" data-id="{{$discount->id}}"></button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="d-flex justify-content-between my-2">
                             <label>Total</label>
                             <div class="d-flex">
                                 <span>$</span>
@@ -57,72 +77,168 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-center">
-                            <div class="btn btn-success w-75 checkoutBtn">Checkout</div>
+                            <div class="btn btn-success w-100 checkoutBtn">Checkout</div>
                         </div>
                     </div>
-                @endforeach
             </div>
         @endif
     </div>
 </div>
 <script>
-    function count() {
-        let totalCount = 0;
-        $('.quantity-cart').each(function() {
-            let qty = parseInt($(this).text());
-            totalCount += qty;
+    $(document).ready(function () {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
         });
-        $('.count').text(totalCount);
-    }
 
-    function updateTotal(){
-        let totalPrice = 0;
-        $('.quantity-cart').each(function () {
-            let quantity = parseFloat($(this).text());
-            console.log(quantity)
-            let price = $(this).parents('.row').find('.cart-price').text();
-            console.log(price)
-            let total = quantity * price;
-            totalPrice += total;
-        });
-        $('.total').text(totalPrice)
-    }
-    $(document).on('click' , '.close-product' , function (){
-        let deleteId = $(this).data('id');
-        let productId = $(this).data('product');
-        let cartId = $(this).data('id');
-        let row = $(this).closest('.cart-'+cartId);
-        let row1 = $('.checkoutAllItems').find('.dlt-'+cartId).parents('.cartData');
+        function count() {
+            let totalCount = 0;
+            $('.quantity-cart').each(function () {
+                let qty = parseInt($(this).text());
+                totalCount += qty;
+            });
+            $('.count').text(totalCount);
+        }
 
-        $.ajax({
-            url: route('delete.cart'),
-            type: "GET",
-            data: {
-                delete_id : deleteId
-            },
-            success: function (response) {
-                if(response.success){
-                    row.remove();
-                    row1.remove()
-                    $('.product-' + productId).find('#addToCart').show();
-                    $('.product-' + productId).find('#incrementDecrement').hide();
-                    count();
-                    updateTotal();
+        function updateTotal() {
+            let totalPrice = 0;
+            $('.quantity-cart').each(function () {
+                let quantity = parseFloat($(this).text());
+                console.log(quantity)
+                let price = $(this).parents('.row').find('.cart-price').text();
+                console.log(price)
+                let total = quantity * price;
+                totalPrice += total;
+            });
+            console.log("aaa" +totalPrice)
+            $('.total').text(totalPrice)
+            $('.subtotal').text(totalPrice)
+            $('.total-checkout').text(totalPrice)
+            $('.subtotal-checkout').text(totalPrice)
+        }
+
+
+        function discountAdd() {
+            console.log($('.discountData').text());
+            if ($('.discountData').text() != null) {
+                let type = $('.discount-show').data('type');
+                let amount = $('.discount-show').text();
+                let subtotal = $('.subtotal').text();
+                console.log($('.subtotal'));
+                if (type == 'percentage') {
+                    let total = subtotal * (amount / 100);
+                    console.log("total" + total)
+                    let mainTotal  = subtotal - total;
+                    $('.total').text(mainTotal)
+                    $('.total-checkout').text(mainTotal)
                 }
-            },
-        });
-    });
-    $(document).on('click' , '#discountApply', function (){
-        let discountCode = $(this).closest('.discountCard').val();
-        $.ajax({
-            url: route('discount.code.check'),
-            type: "GET",
-            data: {
-                discount_code : discountCode
-            },
-            success: function (response) {
-            },
-        });
-    })
+                else if(type == 'fixed'){
+                    let totalPrice = subtotal - amount;
+                    $('.total').text(totalPrice)
+                    $('.total-checkout').text(totalPrice)
+                }
+            }
+        }
 
+        updateTotal()
+        discountAdd();
+        $(document).on('click', '.close-product', function () {
+            let deleteId = $(this).data('id');
+            let productId = $(this).data('product');
+            let cartId = $(this).data('id');
+            let row = $(this).closest('.cart-' + cartId);
+            let row1 = $('.checkoutAllItems').find('.dlt-' + cartId).parents('.cartData');
+
+            $.ajax({
+                url: route('delete.cart'),
+                type: "GET",
+                data: {
+                    delete_id: deleteId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        row.remove();
+                        row1.remove()
+                        $('.product-' + productId).find('#addToCart').show();
+                        $('.product-' + productId).find('#incrementDecrement').hide();
+                        count();
+                        updateTotal();
+                    }
+                },
+            });
+        });
+        $(document).on('click', '#discountApply', function () {
+            let discountCode = $(this).parents('.dis').find('#discountCode').val();
+            let count = $('.count').text();
+            let subTotal = $('#subtotal').find('.subtotal').text();
+            $.ajax({
+                url: "{{route('discount.code.check')}}",
+                type: "POST",
+                dataType: 'json',
+                data: {
+                    discount_code: discountCode,
+                    count: count,
+                    subTotal: subTotal,
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function (response) {
+                    console.log("aaaa");
+                    $('.discountData').text(null);
+                    if (response.status == 'error') {
+                        $('.voucher-error').text(response.message)
+                        updateTotal()
+                    }
+                    else if(response.status == 'success'){
+                        const discount = `
+                            <div class="d-flex justify-content-between">
+                                <label>Discount : ${response.code}</label>
+                                <div class="d-flex">
+                                    <span>$</span>
+                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                </div>
+                            </div>
+                        `;
+                        if ($('.discountData').text('')) {
+                            $('.voucher-error').text('')
+                            $('.discountData').append(discount)
+                            discountAdd();
+                        }
+                    }
+
+                    if(response.status == 'warning'){
+                        $('.voucher-error').text(response.message)
+                        const discount = `
+                            <div class="d-flex justify-content-between">
+                                <label>Discount : ${response.code}</label>
+                                <div class="d-flex">
+                                    <span>$</span>
+                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                </div>
+                            </div>
+                        `;
+                        $('.discountData').append(discount)
+                    }
+                },
+            });
+        });
+
+        $(document).on('click' , '.close-discount' , function (){
+            let deleteId = $(this).data('id');
+            $.ajax({
+                url: route('delete.cart.discount'),
+                type: "GET",
+                data: {
+                    delete_id: deleteId
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('.discountData').remove();
+                        count();
+                        updateTotal();
+                    }
+                },
+            });
+        })
+    });
 </script>

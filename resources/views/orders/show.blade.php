@@ -76,6 +76,26 @@
                             <hr>
                             <div class="row">
                                 <div class="col">
+                                    <p>Subtotal</p>
+                                </div>
+                                <div class="col text-end me-5">
+                                    <p>${{$totalPrice}}</p>
+                                </div>
+                            </div>
+
+                            @if($orderDiscount)
+                                <div class="row">
+                                    <div class="col">
+                                        <p>Discount : {{$orderDiscount->code}}</p>
+                                    </div>
+                                    <div class="col text-end me-5">
+                                        <p>${{$orderDiscount->amount}}</p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="row">
+                                <div class="col">
                                     <p>Total</p>
                                 </div>
                                 <div class="col text-end me-5">

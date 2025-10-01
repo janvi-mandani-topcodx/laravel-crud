@@ -1,4 +1,5 @@
 @extends('layout')
+
 @section('content')
     <div class="container">
         <div class="row">
@@ -159,6 +160,7 @@
                         totalPrice += total;
                     });
                     $('.total').text(totalPrice)
+                    $('.subtotal').text(totalPrice)
             }
             updateTotal();
             buttons();
@@ -229,7 +231,7 @@
                             $('.product-'+productId).find('#addToCart').hide()
                             $('.product-'+productId).find('#incrementDecrement').show()
                         }
-                        $('.offcanvas-body').append(response.html)
+                        $('.offcanvas-body').find('#allCartData').append(response.html)
                         updateTotal();
                         count();
                     },

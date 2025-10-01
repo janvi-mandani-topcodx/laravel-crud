@@ -2,7 +2,7 @@
 @section('content')
     <div>
         <h3 class="d-flex justify-content-center my-3">Create discount</h3>
-        <form method="POST" id="discountForm" enctype="multipart/form-data" action="{{ route('discounts.index') }}">
+        <form method="POST" id="discountForm" enctype="multipart/form-data" action="{{ route('discounts.store') }}">
             @include('discounts.fields')
         </form>
     </div>
@@ -21,11 +21,8 @@
             $('#minimumPurchase').hide()
             $('#minimumQuantity').hide()
             $('#limitDiscount').hide()
-            $(document).on('change' , '#specificProduct' , function (){
-                if($(this).prop('checked')){
-                   $('#searchProduct').show();
-                }
-            })
+
+
             $(document).on('change' , '#allProducts' , function (){
                 if($(this).prop('checked')){
                     $('#searchProduct').hide();
@@ -47,12 +44,13 @@
                     $('#amounts').hide();
                 }
             })
-            $(document).on('change' , '#endDate' , function (){
+            $(document).on('change' , '#endDateCheckBox' , function (){
                 if($(this).prop('checked')){
                     $('.end-date').show();
                 }
                 else{
                     $('.end-date').hide();
+                    $('#endDate').val('');
                 }
             })
             $(document).on('change' , '#purchaseAmount' , function (){
@@ -77,24 +75,27 @@
                 if($(this).prop('checked')){
                     $('#limitDiscount').show();
                 }
+                else{
+                    $('#limitDiscount').hide();
+                }
             })
 
-            $(document).on('click' , '#createDiscount' ,  function (e){
-                e.preventDefault()
-                let form = $(this).closest('form')[0];
-                let formData = new FormData(form);
+            {{--$(document).on('click' , '#createDiscount' ,  function (e){--}}
+            {{--    e.preventDefault()--}}
+            {{--    let form = $(this).closest('form')[0];--}}
+            {{--    let formData = new FormData(form);--}}
 
-                $.ajax({
-                    url: "{{route('discounts.store')}}",
-                    method: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        window.location.href = '{{ route('discounts.index') }}';
-                    }
-                });
-            })
+            {{--    --}}{{--$.ajax({--}}
+            {{--    --}}{{--    url: "{{route('discounts.store')}}",--}}
+            {{--    --}}{{--    method: "POST",--}}
+            {{--    --}}{{--    data: formData,--}}
+            {{--    --}}{{--    contentType: false,--}}
+            {{--    --}}{{--    processData: false,--}}
+            {{--    --}}{{--    success: function (response) {--}}
+            {{--    --}}{{--        window.location.href = '{{ route('discounts.index') }}';--}}
+            {{--    --}}{{--    }--}}
+            {{--    --}}{{--});--}}
+            {{--})--}}
 
             $(document).on('keyup', '#searchProduct' ,  function () {
                 let query = $(this).val();

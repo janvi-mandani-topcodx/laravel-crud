@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartDiscount;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
@@ -67,7 +68,7 @@ class CartController extends Controller
                             <label>Sub Total</label>
                             <div class="d-flex">
                                 <span>$</span>
-                                <span class="total"></span>
+                                <span class="subtotal"></span>
                             </div>
                         </div>
                         <hr>
@@ -130,6 +131,14 @@ class CartController extends Controller
 //                'quantity' => $cart['quantity']
             ]);
         }
+    }
+
+    public function cartDiscountDelete(Request $request)
+    {
+        $id = $request->delete_id;
+        $cartDiscount = CartDiscount::find($id);
+        $cartDiscount->delete();
+        return response()->json(['success' => 'discount deleted']);
     }
 
 //    public function updateItems(Request $request)

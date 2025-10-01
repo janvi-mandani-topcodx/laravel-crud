@@ -88,4 +88,8 @@ class User extends Authenticatable implements MustVerifyEmail , HasMedia
         return $this->hasMany(Cart::class);
     }
 
+    public function cartDiscounts(){
+        return $this->hasMany(CartDiscount::class);
+    }
+
 }

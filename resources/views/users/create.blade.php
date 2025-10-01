@@ -1,6 +1,4 @@
 @extends('layout')
-
-
 @section('content')
     <section class="vh-100 gradient-custom">
         <div class="container py-5 h-100">

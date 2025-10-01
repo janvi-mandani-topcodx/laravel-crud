@@ -36,7 +36,7 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::get('items/search', [OrderController::class, 'orderSearch'])->name('order.item.search');
     Route::get('discount/product/search', [DiscountController::class, 'productSearch'])->name('discount.product.search');
     Route::get('discount/user/search', [DiscountController::class, 'userSearch'])->name('discount.user.search');
-    Route::get('discount/check', [DiscountController::class, 'discountCodeCheck'])->name('discount.code.check');
+    Route::post('discount/check', [DiscountController::class, 'discountCodeCheck'])->name('discount.code.check');
     Route::post('items/update/{items}', [OrderController::class, 'orderItemUpdate'])->name('order.items.update');
 //    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
 
@@ -60,6 +60,7 @@ Route::get('/chat/message', [ChatController::class, 'message'])->name('chat.mess
 Route::get('/admin/chat/messages', [ChatController::class, 'getMessages'])->name('chat.message');
 Route::get('delete/variant', [ProductController::class, 'variantDelete'])->name('variants.delete');
 Route::get('delete/cart', [CartController::class, 'cartDelete'])->name('delete.cart');
+Route::get('delete/cart/discount', [CartController::class, 'cartDiscountDelete'])->name('delete.cart.discount');
 Route::get('delete/order/item', [OrderController::class, 'orderItemDelete'])->name('delete.order.item');
 
 

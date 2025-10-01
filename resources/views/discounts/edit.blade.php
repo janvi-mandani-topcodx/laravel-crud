@@ -17,7 +17,6 @@
             });
             $('#searchProduct').hide()
             $('#searchCustomer').hide()
-            $('#amounts').hide()
             $('.end-date').hide()
             $('#minimumPurchase').hide()
             $('#minimumQuantity').hide()
@@ -30,7 +29,6 @@
             $(document).on('change' , '#allProducts' , function (){
                 if($(this).prop('checked')){
                     $('#searchProduct').hide();
-                    $('#searchProduct').val('');
                 }
             })
 
@@ -42,59 +40,48 @@
             $(document).on('change' , '#everyone' , function (){
                 if($(this).prop('checked')){
                     $('#searchCustomer').hide();
-                    $('#searchCustomer').val('');
-                }
-            })
-            $(document).on('change' , '#fixed' , function (){
-                if($(this).prop('checked')){
-                    $('#amounts').show();
                 }
             })
             $(document).on('change' , '#percentage' , function (){
                 if($(this).prop('checked')){
                     $('#amounts').hide();
-                    $('#amounts').val('');
                 }
             })
-            $(document).on('change' , '#endDate' , function (){
+            $(document).on('change' , '#endDateCheckBox' , function (){
                 if($(this).prop('checked')){
                     $('.end-date').show();
                 }
                 else{
                     $('.end-date').hide();
-                    $('.end-date').val('');
+                    $('#endDate').val('');
                 }
             })
             $(document).on('change' , '#purchaseAmount' , function (){
                 if($(this).prop('checked')){
-                    console.log("aaa")
                     $('#minimumQuantity').hide();
-                    $('#minimumQuantity').val('');
                     $('#minimumPurchase').show();
-                    $('#minimumPurchase').val('');
                 }
             })
             $(document).on('change' , '#quantityAmount' , function (){
                 if($(this).prop('checked')){
-                    $('#minimumPurchase').removeClass('d-block')
-                    console.log("vvv")
                     $('#minimumPurchase').hide();
                     $('#minimumQuantity').show();
-                    $('#minimumQuantity').val('');
-                    $('#minimumPurchase').val('');
                 }
             })
             $(document).on('change' , '#none' , function (){
                 if($(this).prop('checked')){
                     $('#minimumPurchase').hide();
-                    $('#minimumPurchase').val('');
                     $('#minimumQuantity').hide();
-                    $('#minimumQuantity').val('');
                 }
             })
             $(document).on('change' , '#limitNumber' , function (){
                 if($(this).prop('checked')){
                     $('#limitDiscount').show();
+                }
+                else{
+                    $('#limitDiscount').hide();
+                    $('#limitDiscount').val('');
+                    $('#limitDiscount').removeClass('d-block')
                 }
             })
 
