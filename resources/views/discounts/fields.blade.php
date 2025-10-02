@@ -146,13 +146,13 @@
                             <input type="text" id="limitDiscount" class="form-control" name="limit_number_discount" placeholder="Enter number of times use discounts "/>
                             <span style="color: darkred">@error('limit_number_discount') {{$message}} @enderror</span>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_one_use" value="limit one use" id="perCustomer">
+                                <input class="form-check-input" type="checkbox" name="limit_one_use" value="limit_one_use" id="perCustomer">
                                 <label class="form-check-label" for="perCustomer">
                                     Limit to one use per customer
                                 </label>
                             </div>
                             <div>
-                                <input class="form-check-input" type="checkbox" name="limit_new_customer" value="new customer only" id="newCustomer">
+                                <input class="form-check-input" type="checkbox" name="limit_new_customer" value="new_customer_only" id="newCustomer">
                                 <label class="form-check-label" for="newCustomer">
                                     New customers only
                                 </label>

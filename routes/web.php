@@ -4,7 +4,9 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\GiftCardsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrderController;
@@ -28,6 +30,8 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::resource('product', ProductController::class);
     Route::resource('order', OrderController::class);
     Route::resource('discounts', DiscountController::class);
+    Route::resource('gift-card', GiftCardsController::class);
+    Route::resource('credit', CreditController::class);
     Route::get('products/cart', [ProductController::class, 'proCart'])->name('cart.product');
     Route::get('cart', [CartController::class, 'cart'])->name('cart');
     Route::post('/cart/update', [CartController::class, 'updateCart'])->name('update.cart');
@@ -36,10 +40,11 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::get('items/search', [OrderController::class, 'orderSearch'])->name('order.item.search');
     Route::get('discount/product/search', [DiscountController::class, 'productSearch'])->name('discount.product.search');
     Route::get('discount/user/search', [DiscountController::class, 'userSearch'])->name('discount.user.search');
+    Route::get('gift/user/search', [GiftCardsController::class, 'giftCardUserSearch'])->name('gift.user.search');
     Route::post('discount/check', [DiscountController::class, 'discountCodeCheck'])->name('discount.code.check');
     Route::post('items/update/{items}', [OrderController::class, 'orderItemUpdate'])->name('order.items.update');
-//    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
 
+//    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
 //    Route::post('order/create', [CheckoutController::class, 'orderCreate'])->name('create.order');
 //    Route::get('order/index', [CheckoutController::class, 'orderIndex'])->name('orders.index');
 //    Route::get('order/show', [CheckoutController::class, 'orderShow'])->name('orders.show');
@@ -62,6 +67,7 @@ Route::get('delete/variant', [ProductController::class, 'variantDelete'])->name(
 Route::get('delete/cart', [CartController::class, 'cartDelete'])->name('delete.cart');
 Route::get('delete/cart/discount', [CartController::class, 'cartDiscountDelete'])->name('delete.cart.discount');
 Route::get('delete/order/item', [OrderController::class, 'orderItemDelete'])->name('delete.order.item');
+Route::get('credit/store/cart', [CartController::class, 'CreditStoreCart'])->name('credit.store.cart');
 
 
 Auth::routes(['verify' => true]);

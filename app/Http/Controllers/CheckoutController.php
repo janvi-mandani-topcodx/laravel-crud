@@ -18,7 +18,7 @@ class CheckoutController extends Controller
     public function checkout()
     {
         $carts = Cart::all();
-        $discount =CartDiscount::where('user_id' , auth()->id())->first();
+        $discount = CartDiscount::where('user_id' , auth()->id())->first();
         return view('checkout.index', compact('carts' , 'discount'));
     }
 

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateDiscountRequest;
+use App\Http\Requests\UpdateDiscountRequest;
 use App\Models\Cart;
 use App\Models\CartDiscount;
 use App\Models\Discount;
+use App\Models\GiftCard;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\DiscountRepository;
@@ -30,10 +32,10 @@ class DiscountController extends Controller
         if ($request->ajax()) {
             return DataTables::of(Discount::get())
                 ->editColumn('customer_id', function ($discount) {
-                    return $discount->customer_id == null ? null : $discount->user->full_name;
+                    return $discount->user ? $discount->user->full_name : '';
                 })
                 ->editColumn('product_id', function ($discount) {
-                    return $discount->product_id == null ? null : $discount->product->title;
+                    return $discount->product ? $discount->product->title : '';
                 })
                 ->editColumn('end_date', function ($discount) {
                     return $discount->end_date == null ? null : $discount->end_date;
@@ -60,9 +62,9 @@ class DiscountController extends Controller
      */
     public function store(CreateDiscountRequest $request)
     {
-        dd("aaa");
         $input = $request->all();
         $this->discountRepo->store($input);
+        return redirect()->route('discounts.index');
     }
 
     /**
@@ -70,7 +72,8 @@ class DiscountController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $discount =  Discount::find($id);
+        return view('discounts.show' , compact('discount'));
     }
 
     /**
@@ -85,7 +88,7 @@ class DiscountController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateDiscountRequest $request, string $id)
     {
         $input = $request->all();
         $discountData  = Discount::find($id);
@@ -177,9 +180,20 @@ class DiscountController extends Controller
             $input = $request->all();
             $discount = Discount::where('code' , $input['discount_code'])->first();
             $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
+            $giftCard = GiftCard::where('code' , $input['discount_code'])->first();
 
             $voucherDiscount =  new VoucherService();
-            return $voucherDiscount->discountVoucher($input , $discount , $cartDiscount);
-
+            if($discount){
+                return $voucherDiscount->discountVoucher($input , $discount , $cartDiscount);
+            }
+            else if($giftCard){
+                return  $voucherDiscount->giftVoucher($input , $giftCard);
+            }
+            else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Discount code not found'
+                ]);
+            }
     }
 }

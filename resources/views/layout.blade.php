@@ -65,6 +65,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('discounts.index')}}">Discounts</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('gift-card.index')}}">Gift Card</a>
+                        </li>
                     @endif
                 </ul>
             </div>

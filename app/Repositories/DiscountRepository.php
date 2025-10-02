@@ -38,6 +38,7 @@ class DiscountRepository extends BaseRepository
 
     public function update($data , $discountData)
     {
+        $productId = $data['product'] == 'all products' ? $data['product_id'] == null: $data['product_id'];
         $discountData->update([
             'code' => $data['code'],
             'amount' => $data['value'],
@@ -47,7 +48,7 @@ class DiscountRepository extends BaseRepository
             'customer_eligibility' => $data['customer'],
             'customer_id' => $data['customer_id'],
             'applies_product' => $data['product'],
-            'product_id' => $data['product_id'],
+            'product_id' => $productId,
             'usage_limit_number_of_times_use' => isset($data['limit_number_discount']) ? 1 : 0,
             'usage_limit_number' => $data['limit_number_discount'] ,
             'usage_limit_one_user_per_customer' => isset($data['limit_one_use']) ? 1 : 0,

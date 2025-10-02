@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CartDiscount extends Model
+class GiftCard extends Model
 {
     public $fillable = [
-        'id',
         'user_id',
+        'balance',
         'code',
-        'type',
-        'amount',
-        'discount_name'
+        'notes',
+        'expiry_at',
+        'enabled',
     ];
 
     public function user(){

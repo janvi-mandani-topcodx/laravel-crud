@@ -5,29 +5,21 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col col-12 text-center">
-                        <h2 class="">Discounts</h2>
+                        <h2 class="">Gift Cards</h2>
                         <div class="d-flex justify-content-end">
-                            <button class="btn btn-success"><a href="{{route('discounts.create')}}" class="text-decoration-none text-white">Create</a></button>
+                            <button class="btn btn-success"><a href="{{route('gift-card.create')}}" class="text-decoration-none text-white">Create</a></button>
                         </div>
                         <div class="row">
                             <div class="panel-body table-responsive">
-                                <table class="table table-hover" id="discount-container">
+                                <table class="table table-hover" id="gift-card-container">
                                     <thead>
                                     <tr>
                                         <th>Id</th>
+                                        <th class="text-center">User</th>
+                                        <th class="text-center">Balance</th>
                                         <th class="text-center">Code</th>
-                                        <th class="text-center">Amount</th>
-                                        <th class="text-center">Type</th>
-{{--                                        <th class="text-center">Minimum Requirements</th>--}}
-{{--                                        <th class="text-center">Minimum Amount</th>--}}
-                                        <th class="text-center">Customer Eligibility</th>
-                                        <th class="text-center">Customer</th>
-                                        <th class="text-center">Applies Product</th>
-                                        <th class="text-center">Product</th>
-{{--                                        <th class="text-center">Discount Apply Type</th>--}}
-{{--                                        <th class="text-center">Discount Type Number</th>--}}
-                                        <th class="text-center">Start Date</th>
-                                        <th class="text-center">End Date</th>
+                                        <th class="text-center">Notes</th>
+                                        <th class="text-center">Expiry At</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
@@ -36,7 +28,7 @@
 
                                     </tbody>
                                 </table>
-                                <div id="discount-tr">
+                                <div id="gift-card-tr">
 
                                 </div>
                             </div>
@@ -48,7 +40,7 @@
     </div>
 @endsection
 @section('scripts')
-    @include('discounts.templates');
+    @include('gift_cards.templates');
 
     <script>
         $(document).ready(function () {
@@ -59,41 +51,31 @@
                 }
             });
 
-            let table = new DataTable('#discount-container', {
+            let table = new DataTable('#gift-card-container', {
                 deferRender: true,
                 scroller: false,
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('discounts.index') }}",
+                    url: "{{ route('gift-card.index') }}",
                 },
                 columns: [
                     {
                         data: function(row) {
-                            let url = route('discounts.show' , row.id);
+                            let url = route('gift-card.show' , row.id);
                             return `<a href="${url}" data-id="${row.id}">${row.id}</a>`;
                         },
                         name: 'id'
                     },
+                    { data: 'customer_id' , name:'user'},
+                    { data: 'balance', name: 'balance' , type: 'string'},
                     { data : 'code',name: 'code'},
-                    { data: 'amount', name: 'amount' , type: 'string'},
-                    { data: 'type', name: 'type'},
-                    // { data: 'minimum_requirements', name: 'Minimum Requirements'},
-                    // { data: 'minimum_amount', name: 'Minimum Amount'},
-                    { data: 'customer_eligibility', name: 'Customer Eligibility'},
-                    { data: 'customer_id', name: 'customer' },
-                    { data: 'applies_product', name: 'applies product'},
-                    { data: 'product_id', name: 'product'},
-                    { data: 'start_date', name: 'start date' , type: 'string'},
-                    { data: 'end_date', name: 'end_date' , type: 'string'},
-                    { data: 'status', name: 'status' , type: 'string'},
-                    // { data: 'discount_apply_type', name: 'Discount Apply Type'},
-                    // { data: 'discount_type_number', name: 'Discount Type Number'},
-
-
+                    { data: 'notes', name: 'notes'},
+                    { data: 'expiry_at', name: 'expiry at' , type:'string'},
+                    { data: 'enabled', name: 'status' },
                     {
                         data: function (row) {
-                            let url = route('discounts.edit' , row.id);
+                            let url = route('gift-card.edit' , row.id);
                             let data = [{
                                 'id': row.id,
                                 'url': url,
@@ -113,7 +95,7 @@
                 let discountId = $(this).data('id');
 
                 $.ajax({
-                    url: route('discounts.destroy' , discountId),
+                    url: route('gift-card.destroy' , discountId),
                     type: "DELETE",
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content')

@@ -139,6 +139,39 @@
             </div>
         </div>
     </section>
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Credit</h3>
+                            <form method="POST" enctype="multipart/form-data" id="creditForm" action="">
+                                @csrf
+                                <div class="row">
+                                    <div class="col">
+                                        <div  class="form-group">
+                                            <label class="form-label fw-bold" for="creditAmount">Credit Amount</label>
+                                            <input type="text" id="creditAmount" class="form-control" value="" name="credit_amount" placeholder="Enter credit amount"/>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div  class="form-group">
+                                            <label class="form-label fw-bold" for="description">Description</label>
+                                            <input type="text" id="description" class="form-control" value="" name="description" placeholder="Enter description"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="btn btn-success" id="CreateCredit">Create</div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 @endsection
 
 @section('scripts')
@@ -212,6 +245,23 @@
                     }
                 });
             });
+
+            $(document).on('click' , '#CreateCredit' , function (){
+                let form = $(this).closest('form')[0];
+                let formData = new FormData(form);
+                let userId = $('#edit-user-id').data('id')
+                formData.append('user_id' , userId);
+                $.ajax({
+                    url: "{{route('credit.store')}}",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        window.location.href = "{{route('users.index')}}";
+                    },
+                });
+            })
 
         });
     </script>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('order_discounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->references('id')->on('orders');
+            $table->foreignId('order_id')->references('id')->on('orders')->onDelete('cascade')->onUpdate('cascade');
             $table->string('code');
             $table->string('type');
             $table->integer('amount');

@@ -82,8 +82,7 @@
                                     <p>${{$totalPrice}}</p>
                                 </div>
                             </div>
-
-                            @if($orderDiscount)
+                            @if(!$orderDiscount)
                                 <div class="row">
                                     <div class="col">
                                         <p>Discount : {{$orderDiscount->code}}</p>
@@ -159,27 +158,27 @@
                 success: function (response) {
                     window.location.href = '{{route('order.show' , $order->id)}}';
                 },
-                // error: function (response){
-                //     let errors = response.responseJSON.errors;
-                //     if (errors.firstName) {
-                //         $('.first_name-error').text(errors.firstName[0]);
-                //     }
-                //     if (errors.lastName) {
-                //         $('.last_name-error').text(errors.lastName[0]);
-                //     }
-                //     if (errors.delivery) {
-                //         $('.delivery-error').text(errors.delivery[0]);
-                //     }
-                //     if (errors.country) {
-                //         $('.country-error').text(errors.country[0]);
-                //     }
-                //     if (errors.state) {
-                //         $('.state-error').text(errors.state[0]);
-                //     }
-                //     if (errors.address) {
-                //         $('.address-error').text(errors.address[0]);
-                //     }
-                // }
+                error: function (response){
+                    let errors = response.responseJSON.errors;
+                    if (errors.firstName) {
+                        $('.first_name-error').text(errors.firstName[0]);
+                    }
+                    if (errors.lastName) {
+                        $('.last_name-error').text(errors.lastName[0]);
+                    }
+                    if (errors.delivery) {
+                        $('.delivery-error').text(errors.delivery[0]);
+                    }
+                    if (errors.country) {
+                        $('.country-error').text(errors.country[0]);
+                    }
+                    if (errors.state) {
+                        $('.state-error').text(errors.state[0]);
+                    }
+                    if (errors.address) {
+                        $('.address-error').text(errors.address[0]);
+                    }
+                }
             });
         });
 

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('message_replies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('message_id')->references('id')->on('messages');
+            $table->foreignId('message_id')->references('id')->on('messages')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('sent_by_admin');
             $table->string('message');
             $table->timestamps();

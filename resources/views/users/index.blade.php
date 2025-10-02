@@ -22,11 +22,11 @@
                                            placeholder="Search...">
                                 </div>
                             </div>
-                            @if ($role->hasPermissionTo('create user'))
+{{--                            @if ($role->hasPermissionTo('create user'))--}}
                                 <div class="col-xs-8 text-right w-66 p-0">
                                     <a href="/users/create" class="btn btn-sm btn-primary" id="create-user">Create New</a>
                                 </div>
-                            @endif
+{{--                            @endif--}}
                             <div class="">
                                     <div class="col-xs-8 text-right w-66 p-0">
                                         <button type="button" class="btn btn-sm btn-primary" id="exports" name="exports">Exports</button>

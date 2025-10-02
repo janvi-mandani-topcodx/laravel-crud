@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('minimum_requirements')->nullable();
             $table->string('minimum_amount')->nullable();
             $table->string('customer_eligibility')->nullable();
-            $table->foreignId('customer_id')->nullable()->references('id')->on('users');
+            $table->foreignId('customer_id')->nullable()->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('applies_product')->nullable();
-            $table->foreignId('product_id')->nullable()->references('id')->on('products');
+            $table->foreignId('product_id')->nullable()->references('id')->on('products')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('usage_limit_number_of_times_use')->nullable();
             $table->integer('usage_limit_number')->nullable();
             $table->boolean('usage_limit_one_user_per_customer')->nullable();

@@ -66,9 +66,8 @@ class OrderController extends Controller
     {
         $order = Order::with(['orderItems' , 'orderDiscount'])->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        $orderItems = $order->orderItems();
-        $orderDiscount = $order->orderDiscount();
-        dd($orderDiscount , $orderItems);
+        $orderItems = $order->orderItems;
+        $orderDiscount = $order->orderDiscount;
         $totalPrice = 0;
         foreach ($orderItems as $orderItem) {
             $total = $orderItem->quantity * $orderItem->price;
@@ -164,8 +163,6 @@ class OrderController extends Controller
         }
         foreach ($items as $item) {
             $orderItems = Arr::except($item, 'editId');
-
-
             if(isset($item['editId'])) {
                 $updateItems = $orderItem->where('id', $item['editId'])->first();
                 $updateItems->order()->update([

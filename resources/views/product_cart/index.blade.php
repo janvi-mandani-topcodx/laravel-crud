@@ -162,8 +162,37 @@
                     $('.total').text(totalPrice)
                     $('.subtotal').text(totalPrice)
             }
+            function discountAdd() {
+                console.log($('.discountData').text());
+                if ($('.discountData').text() != null) {
+                    let subtotalText = $('.subtotal').text();
+                    let mainTotal = subtotalText;
+
+                    $('.discount-apply').each(function() {
+                        let discount = $(this);
+                        let type = discount.find('.discount-show').data('type');
+                        let amount = discount.find('.discount-show').text();
+
+                        if (type === 'percentage') {
+                            let discountAmount = mainTotal * (amount / 100);
+                            console.log(discountAmount)
+                            mainTotal = mainTotal - discountAmount;
+                        } else if (type === 'fixed') {
+                            mainTotal = mainTotal - amount;
+                        }
+                        if (mainTotal < 0) {
+                            mainTotal = 0;
+                        }
+                    });
+                    console.log(mainTotal)
+
+                    $('.total').text(mainTotal);
+                    $('.total-checkout').text(mainTotal);
+                }
+            }
             updateTotal();
             buttons();
+            discountAdd()
             count();
             $(document).on('click', '.size', function () {
                 let price = $(this).data('price');
@@ -234,6 +263,7 @@
                         $('.offcanvas-body').find('#allCartData').append(response.html)
                         updateTotal();
                         count();
+                        discountAdd()
                     },
                 });
             })
@@ -302,6 +332,7 @@
             function updateQuantity(productId, variantId, quantity) {
                 updateTotal();
                 count();
+                discountAdd()
                 $.ajax({
                     url: route('update.cart'),
                     type: "POST",

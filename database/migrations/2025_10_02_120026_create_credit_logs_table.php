@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cart_discounts', function (Blueprint $table) {
+        Schema::create('credit_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->string('code');
-            $table->string('type');
-            $table->string('amount');
+            $table->foreignId('user_id')->references('id')->on('users');
+            $table->integer('old_credit');
+            $table->integer('new_credit');
+            $table->string('description');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cart_discounts');
+        Schema::dropIfExists('credit_logs');
     }
 };

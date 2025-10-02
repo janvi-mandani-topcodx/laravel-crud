@@ -53,7 +53,7 @@
                             <div class="position-absolute w-100" style="bottom: 20px; left:20px; padding-right: 40px;">
                                 <div class="d-flex justify-content-between dis gap-2 my-2">
                                     <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
-                                    <button class="btn btn-success" id="discountApply">Dis Apply</button>
+                                    <button class="btn btn-success" id="discountApply">Apply</button>
                                 </div>
                                 <div class="voucher-error text-danger"></div>
                                 <div class="d-flex justify-content-between">
@@ -63,15 +63,26 @@
                                         <span class="subtotal-checkout" id="totalAmount"></span>
                                     </div>
                                 </div>
-                                <div class="discountData ">
+                                <div></div>
+                                <div class="discountData">
                                     @if($discount)
-                                        <div class="d-flex justify-content-between ">
-                                            <label>Discount : {{$discount->code}}</label>
-                                            <div class="d-flex">
-                                                <span>$</span>
-                                                <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                       @if($discount->type == 'fixed')
+                                            <div class="d-flex justify-content-between ">
+                                                <label>Discount : {{$discount->code}}</label>
+                                                <div class="d-flex">
+                                                    <span>$</span>
+                                                    <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @else
+                                            <div class="d-flex justify-content-between ">
+                                                <label>Discount : {{$discount->code}}</label>
+                                                <div class="d-flex">
+                                                    <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                    <span>%</span>
+                                                </div>
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                                 <div class="d-flex justify-content-between">
@@ -128,22 +139,29 @@
             function discountAdd() {
                 console.log($('.discountData').text());
                 if ($('.discountData').text() != null) {
-                    let type = $('.discount-show-checkout').data('type');
-                    let amount = $('.discount-show-checkout').text();
-                    let subtotal = $('.subtotal-checkout').text();
-                    console.log("sub = " +subtotal);
-                    if (type == 'percentage') {
-                        let total = subtotal * (amount / 100);
-                        console.log(total)
-                        let mainTotal  = subtotal - total;
-                        $('.total-checkout').text(mainTotal)
-                        $('.total').text(mainTotal)
-                    }
-                    else if(type == 'fixed'){
-                        let totalPrice = subtotal - amount;
-                        $('.total-checkout').text(totalPrice)
-                        $('.total').text(totalPrice)
-                    }
+                    let subtotalText = $('.subtotal').text();
+                    let mainTotal = subtotalText;
+
+                    $('.discount-apply').each(function() {
+                        let discount = $(this);
+                        let type = discount.find('.discount-show-checkout').data('type');
+                        let amount = discount.find('.discount-show-checkout').text();
+
+                        if (type === 'percentage') {
+                            let discountAmount = mainTotal * (amount / 100);
+                            console.log(discountAmount)
+                            mainTotal = mainTotal - discountAmount;
+                        } else if (type === 'fixed') {
+                            mainTotal = mainTotal - amount;
+                        }
+                        if (mainTotal < 0) {
+                            mainTotal = 0;
+                        }
+                    });
+                    console.log(mainTotal)
+
+                    $('.total').text(mainTotal);
+                    $('.total-checkout').text(mainTotal);
                 }
             }
 
@@ -215,10 +233,10 @@
 
 
             function updateQuantity(productId, variantId, quantity) {
-                discountAdd();
                 console.log(productId , variantId,quantity)
                 updateTotal();
                 count();
+                discountAdd();
                 $.ajax({
                     url: route('update.cart'),
                     type: "POST",
@@ -311,6 +329,7 @@
                             row1.remove()
                             count();
                             updateTotal();
+                            discountAdd();
                         }
                     },
                 });

@@ -26,6 +26,14 @@
             $(document).on('change' , '#allProducts' , function (){
                 if($(this).prop('checked')){
                     $('#searchProduct').hide();
+                    $('#searchProduct').val('');
+                    $('.hidden-product-id').val('');
+                }
+            })
+
+            $(document).on('change' , '#specificProduct' , function (){
+                if($(this).prop('checked')){
+                    $('#searchProduct').show();
                 }
             })
 

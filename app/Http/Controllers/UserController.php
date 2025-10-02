@@ -77,13 +77,13 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $role = $user->roles->first();
-            if ($role->hasPermissionTo('create user')) {
+//            if ($role->hasPermissionTo('create user')) {
                 $roles = Role::all();
                 return view('users.create' , compact('roles'));
-            }
-            else{
-                return redirect()->route('users.index')->with(['error' => "You don't have permission to create user."]);
-            }
+//            }
+//            else{
+//                return redirect()->route('users.index')->with(['error' => "You don't have permission to create user."]);
+//            }
     }
     public function store(CreateUserRequest  $request)
     {
@@ -109,15 +109,15 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $role = $user->roles->first();
-        if ($role->hasPermissionTo('edit user')) {
+//        if ($role->hasPermissionTo('edit user')) {
                 $user = User::find($id);
                 $roles = Role::all();
 
                 return view('users.edit', compact('user', 'roles'));
-        }
-        else{
-            return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);
-        }
+//        }
+//        else{
+//            return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);
+//        }
 
     }
     public function update(UpdateUserRequest $request, string $id)
@@ -141,9 +141,11 @@ class UserController extends Controller
             'gender' => $input['gender'],
             'image' => null,
         ]);
-        $user->tags()->delete();
-        foreach ($input['tag'] as $tag) {
-            $user->tags()->create(['tag' => $tag]);
+        if(isset($input['tag'])){
+            $user->tags()->delete();
+            foreach ($input['tag'] as $tag) {
+                $user->tags()->create(['tag' => $tag]);
+            }
         }
         $user->syncRoles($role);
         $user->syncPermissions(Permission::pluck('name'));

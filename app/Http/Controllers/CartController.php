@@ -61,18 +61,17 @@ class CartController extends Controller
                         </div>
                     </div>
                 ';
-            if ($existingCartCount <= 1) {
+            if ($existingCartCount < 1) {
                 $html .= '
                     <div class="position-absolute  w-100" style="bottom: 20px; left:0;">
-                          <div class="d-flex justify-content-around">
+                          <div class="d-flex justify-content-between">
                             <label>Sub Total</label>
                             <div class="d-flex">
                                 <span>$</span>
                                 <span class="subtotal"></span>
                             </div>
                         </div>
-                        <hr>
-                        <div class="d-flex justify-content-around">
+                        <div class="d-flex justify-content-between">
                             <label>Total</label>
                             <div class="d-flex">
                                 <span>$</span>
@@ -80,7 +79,7 @@ class CartController extends Controller
                             </div>
                         </div>
                         <div class="d-flex justify-content-center">
-                            <div class="btn btn-danger w-75 checkoutBtn">Checkout</div>
+                            <div class="btn btn-success w-75 checkoutBtn">Checkout</div>
                         </div>
                     </div>
             ';
@@ -139,6 +138,11 @@ class CartController extends Controller
         $cartDiscount = CartDiscount::find($id);
         $cartDiscount->delete();
         return response()->json(['success' => 'discount deleted']);
+    }
+
+    public  function CreditStoreCart(Request $request)
+    {
+
     }
 
 //    public function updateItems(Request $request)

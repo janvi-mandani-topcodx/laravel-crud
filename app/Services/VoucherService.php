@@ -13,13 +13,15 @@ class VoucherService
     {
         if($discount){
            if(!$cartDiscount){
-                   if($discount->customer_id == null || $discount->customer_id != auth()->id()){
-                       return response()->json([
-                           'status' => 'error',
-                           'message' => 'You cannot access this card'
-                       ]);
+                   if($discount->customer_eligibility == 'specific_customer'){
+                       if($discount->customer_id == null || $discount->customer_id != auth()->id()){
+                           return response()->json([
+                               'status' => 'error',
+                               'message' => 'You cannot access this card'
+                           ]);
+                       }
                    }
-                   if($discount->minimum_requirements == 'quantity amount'){
+                   if($discount->minimum_requirements == 'quantity_amount'){
                        $amount = $discount->minimum_amount;
                        if($amount >= $input['count']){
                            return response()->json([
@@ -29,7 +31,7 @@ class VoucherService
                        }
                    }
 
-                   if($discount->minimum_requirements == 'purchase amount'){
+                   if($discount->minimum_requirements == 'purchase_amount'){
                        $purchaseAmount = $discount->minimum_amount;
                        if($purchaseAmount >= $input['subTotal']){
                            return response()->json([
@@ -39,7 +41,7 @@ class VoucherService
                        }
                    }
 
-                   if($discount->applies_product == 'specific product'){
+                   if($discount->applies_product == 'specific_product'){
                        if($discount->product_id != null){
                            $user = auth()->user();
                            $cart = $user->carts->where('product_id' , $discount->product_id)->first();
@@ -88,7 +90,7 @@ class VoucherService
 
                    $order = Order::where('user_id' , auth()->id())->count();
                    if($discount->usage_limit_number_of_times_use == 1 || $discount->usage_limit_one_user_per_customer == 1 || $discount->usage_limit_new_customer == 1){
-                       if($discount->usage_limit_number_of_times_use == 1){
+                       if($discount->usage_limit_number_of_times_use ==  1){
                            if($order >= $discount->usage_limit_number){
                                return response()->json([
                                    'status' => 'error',
@@ -101,6 +103,7 @@ class VoucherService
                                    'amount' => $discount->amount,
                                    'code' => $discount->code,
                                    'type' => $discount->type,
+                                   'discount_name' => 'discount',
                                ]);
                                return response()->json([
                                    'status' => 'success',
@@ -130,6 +133,7 @@ class VoucherService
                                    'discount_amount' => $discount->amount,
                                    'code' => $discount->code,
                                    'type' => $discount->type,
+                                   'discount_name' => 'discount',
                                ]);
                            }
                        }
@@ -147,6 +151,7 @@ class VoucherService
                                    'amount' => $discount->amount,
                                    'code' => $discount->code,
                                    'type' => $discount->type,
+                                   'discount_name' => 'discount',
                                ]);
                                return response()->json([
                                    'status' =>'success',
@@ -175,6 +180,50 @@ class VoucherService
                 'message' => 'discount code does not match'
             ]);
         }
+    }
+
+    public function giftVoucher($input , $giftCard)
+    {
+        if($giftCard->enabled == 0){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gift card is not active'
+            ]);
+        }
+
+        if($giftCard->balance == 0){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid gift card balance'
+            ]);
+        }
+        $currentDate = date('Y-m-d');
+        if ($giftCard->expiry_at < $currentDate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gift card expired'
+            ]);
+        }
+
+        if($giftCard->user_id != null && $giftCard->user_id != auth()->id()){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'you can not access this gift card'
+            ]);
+        }
+        CartDiscount::create([
+            'user_id'=>auth()->id(),
+            'amount' => $giftCard->balance,
+            'code' => $giftCard->code,
+            'discount_name' => 'gift_card',
+            'type' => 'fixed'
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'discount' => 'gift card',
+            'code' => $giftCard->code,
+            'balance' => $giftCard->balance,
+        ]);
     }
 
 }

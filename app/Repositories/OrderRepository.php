@@ -28,13 +28,15 @@ class OrderRepository extends BaseRepository
             'delivery' => $data['delivery'],
             'total' => $data['total'],
         ]);
-        $order->orderDiscount()->create([
-            'code' => $data['code'],
-            'type' => $data['type'],
-            'amount' => $data['amount'],
-        ]);
+
+        if($data['code'] != 'undefined'){
+            $order->orderDiscount()->create([
+                'code' => $data['code'],
+                'type' => $data['type'],
+                'amount' => $data['amount'],
+            ]);
+        }
         $this->orderItemStore($order , $data);
-        return redirect()->route('order.index');
     }
 
     public function orderItemStore($order , $data)
@@ -61,7 +63,10 @@ class OrderRepository extends BaseRepository
         foreach ($cart as $item) {
             $item->delete();
         }
-//        CartDiscount::delete();
+        $cartDiscounts = CartDiscount::where('user_id' , auth()->id())->get();
+        foreach ($cartDiscounts as $cartDiscount) {
+            $cartDiscount->delete();
+        }
     }
 
     public function update($data, $order){

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cart_discounts', function (Blueprint $table) {
+        Schema::create('gift_cards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('user_id')->nullable()->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('balance');
             $table->string('code');
-            $table->string('type');
-            $table->string('amount');
+            $table->string('notes')->nullable();
+            $table->date('expiry_at')->nullable();
+            $table->boolean('enabled');
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cart_discounts');
+        Schema::dropIfExists('gift_cards');
     }
 };

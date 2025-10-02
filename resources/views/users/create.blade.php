@@ -137,12 +137,12 @@
                     error: function (response) {
                         console.log(response.responseJSON);
                             let errors = response.responseJSON.errors;
-                            if (errors.firstName) {
-                                $('#first-name').siblings('span').text(errors.firstName[0]);
-                            }
-                            if (errors.lastName) {
-                                $('#last-name').siblings('span').text(errors.lastName[0]);
-                            }
+                            // if (errors.firstName) {
+                            //     $('#first-name').siblings('span').text(errors.firstName[0]);
+                            // }
+                            // if (errors.lastName) {
+                            //     $('#last-name').siblings('span').text(errors.lastName[0]);
+                            // }
                             if (errors.email) {
                                 $('#email').siblings('span').text(errors.email[0]);
                             }

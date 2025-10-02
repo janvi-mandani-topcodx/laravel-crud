@@ -29,6 +29,9 @@
             $(document).on('change' , '#allProducts' , function (){
                 if($(this).prop('checked')){
                     $('#searchProduct').hide();
+                    $('#searchProduct').val('');
+                    $('#searchProduct').removeClass('d-block');
+                    $('.hidden-product-id').val('');
                 }
             })
 
@@ -40,6 +43,9 @@
             $(document).on('change' , '#everyone' , function (){
                 if($(this).prop('checked')){
                     $('#searchCustomer').hide();
+                    $('#searchCustomer').val('');
+                    $('#searchCustomer').removeClass('d-block');
+                    $('.hidden-user-id').val('')
                 }
             })
             $(document).on('change' , '#percentage' , function (){
