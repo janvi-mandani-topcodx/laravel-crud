@@ -143,21 +143,35 @@ class CartController extends Controller
     public  function CreditStoreCart(Request $request)
     {
 
+        dd(min(auth()->user()->credits , $request->subtotal));
+        if($request->subtotal !=0){
+            $credit  = CartDiscount::where('user_id' , auth()->id())->where('discount_name' , 'credit')->first();
+            if($credit == null){
+                if($request->credit <= $request->subtotal){
+                    CartDiscount::create([
+                        'user_id'=>auth()->id(),
+                        'amount' => $request->credit,
+                        'code' => 'credit',
+                        'type' => 'fixed',
+                        'discount_name' => 'credit',
+                    ]);
+                }
+                else{
+                    CartDiscount::create([
+                        'user_id'=>auth()->id(),
+                        'amount' => $request->subtotal,
+                        'code' => 'credit',
+                        'type' => 'fixed',
+                        'discount_name' => 'credit',
+                    ]);
+                }
+            }
+            else{
+                return response()->json([
+                    'status' => false,
+                ]);
+            }
+        }
     }
 
-//    public function updateItems(Request $request)
-//    {
-//
-//        $input = $request->all();
-//        $orderItem = OrderItem::where('order_id', $input['order_id'])
-//            ->where('product_id', $input['product_id'])
-//            ->where('variant_id', $input['variant_id'])
-//            ->first();
-//        if ($orderItem) {
-//            $orderItem->quantity = $request->quantity;
-//            $orderItem->save();
-//            return response()->json(['message' => 'Quantity updated']);
-//        }
-//        return response()->json(['message' => 'Item not found'], 404);
-//    }
 }

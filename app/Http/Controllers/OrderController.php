@@ -81,6 +81,7 @@ class OrderController extends Controller
         $order = Order::with('orderItems')->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
         $orderDiscounts = $order->orderDiscounts;
+
         return view('orders.edit', compact('order', 'shippingDetails' , 'orderDiscounts'));
     }
 

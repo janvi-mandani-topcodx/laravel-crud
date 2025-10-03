@@ -87,7 +87,7 @@
                                        @if($orderDiscount->type == 'percentage')
                                             <div class="row">
                                                 <div class="col">
-                                                    <p>Discount : {{$orderDiscount->code}}</p>
+                                                    <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                 </div>
                                                 <div class="col text-end me-5">
                                                     <p>{{$orderDiscount->amount}}%</p>
@@ -96,7 +96,7 @@
                                        @else
                                             <div class="row">
                                                 <div class="col">
-                                                    <p>Discount : {{$orderDiscount->code}}</p>
+                                                    <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                 </div>
                                                 <div class="col text-end me-5">
                                                     <p>${{$orderDiscount->amount}}</p>

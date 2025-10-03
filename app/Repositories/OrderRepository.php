@@ -69,17 +69,22 @@ class OrderRepository extends BaseRepository
                 'code' => $data['code'][$key],
                 'type' => $data['type'][$key],
                 'amount' => $data['amount'][$key],
-                'name' => $data['name'][$key],
+                'discount_name' => $data['name'][$key],
             ];
 
-           if($item['name'] == 'gift_card'){
+           if($item['discount_name'] == 'gift_card'){
                $order->orderDiscounts()->create($item);
                $giftCard = GiftCard::where('code', $item['code'])->first();
-               $giftCard->balance =  0;
+               $giftCard->balance -=  $item['amount'];
                $giftCard->save();
            }
            else{
                $order->orderDiscounts()->create($item);
+               if($item['discount_name'] == 'credit') {
+                   $user = $order->user;
+                   $user->credits -= $item['amount'];
+                   $user->save();
+               }
            }
         }
     }

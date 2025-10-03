@@ -58,9 +58,9 @@
                                        @if($orderDiscounts)
                                            @foreach($orderDiscounts as $orderDiscount)
                                                @if($orderDiscount->type == 'percentage')
-                                                   <div class="row discount-apply">
+                                                   <div class="row discount-apply {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit' : 'discount-data')}}">
                                                        <div class="col">
-                                                           <p>Discount : {{$orderDiscount->code}}</p>
+                                                           <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
                                                        <div class="col d-flex justify-content-end">
                                                            <p class="discount-show-checkout" data-type="{{$orderDiscount->type}}">{{$orderDiscount->amount}}</p>
@@ -68,9 +68,9 @@
                                                        </div>
                                                    </div>
                                                @else
-                                                   <div class="row discount-apply">
+                                                   <div class="row {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? '' : 'discount-data')}}">
                                                        <div class="col">
-                                                           <p>Discount : {{$orderDiscount->code}}</p>
+                                                           <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
                                                        <div class="col d-flex justify-content-end">
                                                            <span>$</span>
@@ -174,33 +174,48 @@
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal-order-edit').text();
                     let mainTotal = subtotalText;
-                    let totalPrice = 0;
-                    $('.discount-apply').each(function() {
+                    $('.credit').each(function() {
+                        let discount = $(this);
+                        let credit = discount.find('.discount-show-checkout').text();
+                        if(credit != null) {
+                            mainTotal = mainTotal - credit;
+                        }
+                        else{
+                            mainTotal = mainTotal
+                        }
+                    })
+                    console.log("aaa bbbb" + mainTotal)
+                    $('.gift-card').each(function() {
+                        let discount = $(this);
+                        let amount = discount.find('.discount-show-checkout').text();
+                        console.log("amount = " + amount)
+                        mainTotal = mainTotal - amount;
+                        console.log("mainTotal = " + mainTotal);
+                        if (mainTotal < 0) {
+                            mainTotal = 0;
+                        }
+                    });
+
+                    $('.discount-data').each(function() {
                         let discount = $(this);
                         let type = discount.find('.discount-show-checkout').data('type');
                         let amount = discount.find('.discount-show-checkout').text();
 
                         if (type === 'percentage') {
                             let discountAmount = mainTotal * (amount / 100);
-                            console.log(discountAmount)
                             mainTotal = mainTotal - discountAmount;
                         } else if (type === 'fixed') {
                             mainTotal = mainTotal - amount;
                         }
+                        console.log("discountTotal = " + mainTotal )
                         if (mainTotal < 0) {
                             mainTotal = 0;
                         }
                     });
+
                     console.log(mainTotal)
 
-                    let credit = $('.credit').text();
-                    if(credit != null) {
-                        totalPrice = mainTotal - credit;
-                    }
-                    else{
-                        totalPrice = mainTotal
-                    }
-                    $('.total-order-edit').text(totalPrice);
+                    $('.total-order-edit').text(mainTotal);
                 }
                 else{
                     subtotal = $('.subtotal-order-edit').text();
@@ -231,8 +246,13 @@
             //     $('.increment-checkout-'+ productId +'-' +variantId ).siblings('.quantity-checkout').text(newQuantity);
             //     updateQuantity(productId, variantId , newQuantity , orderId)
             // }
+
+
             updateTotalOrder();
             discountAddOrder()
+
+
+
             // $(document).on('click' , '.increment-checkout' , function (){
             //     var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
             //     var productId = $(this).closest('.d-flex').data('product');

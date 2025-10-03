@@ -38,7 +38,7 @@ class DiscountRepository extends BaseRepository
     public function update($data , $discountData)
     {
 //        dump($discountData , $data );
-        $productId = $data['product'] == 'all_products' ? null : $data['product'];
+        $productId = $data['product'] == 'all_products' ? null : $data['product_id'];
 //        dd($productId);
         $discountData->update([
             'code' => $data['code'],

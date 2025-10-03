@@ -7,6 +7,7 @@ use App\Models\CartDiscount;
 use App\Models\CreditLog;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -20,7 +21,7 @@ class CheckoutController extends Controller
     {
         $carts = Cart::all();
         $discounts = CartDiscount::where('user_id' , auth()->id())->get();
-        $credit  = CreditLog::where('user_id' , auth()->id())->first();
+        $credit  = User::where('id' , auth()->id())->first();
         return view('checkout.index', compact('carts' , 'discounts' , 'credit'));
     }
 

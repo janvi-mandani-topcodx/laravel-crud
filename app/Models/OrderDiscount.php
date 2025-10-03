@@ -12,5 +12,6 @@ class OrderDiscount extends Model
         'code',
         'type',
         'amount',
+        'discount_name',
     ];
 }

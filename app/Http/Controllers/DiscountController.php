@@ -178,17 +178,33 @@ class DiscountController extends Controller
 
     public function discountCodeCheck(Request $request)
     {
-            $input = $request->all();
-            $discount = Discount::where('code' , $input['discount_code'])->first();
+        $input = $request->all();
+        $discount = Discount::where('code' , $input['discount_code'])->first();
             $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
             $giftCard = GiftCard::where('code' , $input['discount_code'])->first();
 
             $voucherDiscount =  new VoucherService();
             if($discount){
-                return $voucherDiscount->discountVoucher($input , $discount , $cartDiscount);
+                if($input['total'] != 0){
+                    return $voucherDiscount->discountVoucher($input , $discount , $cartDiscount);
+                }
+                else{
+                    return  response()->json([
+                        'status' => 'error',
+                        'message' => 'Discount is not apply'
+                    ]);
+                }
             }
             else if($giftCard){
-                return  $voucherDiscount->giftVoucher($input , $giftCard);
+                if($input['total'] != 0){
+                    return  $voucherDiscount->giftVoucher($input , $giftCard);
+                }
+                else{
+                    return  response()->json([
+                        'status' => 'error',
+                        'message' => 'Gift Card is not apply'
+                    ]);
+                }
             }
             else{
                 return response()->json([
