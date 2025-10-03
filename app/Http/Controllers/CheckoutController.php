@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartDiscount;
+use App\Models\CreditLog;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\OrderRepository;
@@ -18,8 +19,9 @@ class CheckoutController extends Controller
     public function checkout()
     {
         $carts = Cart::all();
-        $discount = CartDiscount::where('user_id' , auth()->id())->first();
-        return view('checkout.index', compact('carts' , 'discount'));
+        $discounts = CartDiscount::where('user_id' , auth()->id())->get();
+        $credit  = CreditLog::where('user_id' , auth()->id())->first();
+        return view('checkout.index', compact('carts' , 'discounts' , 'credit'));
     }
 
 //    public function orderIndex(Request $request)

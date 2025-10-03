@@ -77,10 +77,10 @@
                         <div id="outputContainer">
 
                         </div>
-                        <div>
-                            <button class="btn btn-danger sweet-alert-button">SweetAlert</button>
-                        </div>
-                        <div id="summernote"></div>
+{{--                        <div>--}}
+{{--                            <button class="btn btn-danger sweet-alert-button">SweetAlert</button>--}}
+{{--                        </div>--}}
+{{--                        <div id="summernote"></div>--}}
                     </div>
                 </div>
             </div>

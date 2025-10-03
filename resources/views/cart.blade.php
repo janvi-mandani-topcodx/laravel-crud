@@ -38,11 +38,13 @@
                 @endforeach
                     <div class="position-absolute w-100 px-2" style="bottom: 20px; left:0;">
 
-                        <div class="d-flex justify-content-between dis gap-2">
-                            <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
-                            <button class="btn btn-success" id="discountApply">Apply</button>
-                        </div>
-                        <div class="voucher-error text-danger"></div>
+                       <div class="discount-div">
+                           <div class="d-flex justify-content-between dis gap-2">
+                               <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
+                               <button class="btn btn-success" id="discountApply">Apply</button>
+                           </div>
+                           <div class="voucher-error text-danger"></div>
+                       </div>
 
 
                         <div class="d-flex justify-content-between my-2" id="subtotal">
@@ -55,24 +57,36 @@
                         <div class="discountData my-2">
                             @php
                                 $discounts = \App\Models\CartDiscount::where('user_id' , auth()->id())->get();
-                                $credit  = \App\Models\CreditLog::where('user_id' , auth()->id())->first();
+                                $credit = \App\Models\User::where('id' , auth()->id())->first();
                             @endphp
                             @if($discounts)
                                @foreach($discounts as $discount)
-                                    <div class="d-flex justify-content-between discount-apply">
-                                        <label>{{$discount->discount_name}} : {{$discount->code}}</label>
-                                        <div>
-                                            <div class="d-flex">
-                                                <span>$</span>
-                                                <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                    @if($discount->type == 'fixed')
+                                        <div class="d-flex justify-content-between discount-apply">
+                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>
+                                            <div>
+                                                <div class="d-flex">
+                                                    <span>$</span>
+                                                    <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                </div>
                                             </div>
-                                            {{--                                        <div>--}}
-                                            {{--                                            <button type="button" class="btn-close close-discount" aria-label="Close" data-id="{{$discount->id}}"></button>--}}
-                                            {{--                                        </div>--}}
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="d-flex justify-content-between discount-apply">
+                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>
+                                            <div>
+                                                <div class="d-flex">
+                                                    <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                    <span>%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                @endforeach
                             @endif
+                        </div>
+                        <div class="gift-card-data">
+
                         </div>
 
                         @if($credit)
@@ -80,7 +94,7 @@
                                 <label>Credit</label>
                                 <div class="d-flex">
                                     <span>$</span>
-                                    <span class="credit">{{$credit->new_credit}}</span>
+                                    <span class="credit">{{$credit->credits}}</span>
                                 </div>
                             </div>
                         @endif
@@ -147,12 +161,21 @@
             $('.subtotal').text(totalPrice)
             $('.total-checkout').text(totalPrice)
             $('.subtotal-checkout').text(totalPrice)
+            console.log($('.subtotal').text() == 0)
+            if($('.subtotal').text() == 0){
+                $('.checkoutBtn').hide();
+                $('.discount-div').hide();
+            }
+            else{
+                $('.checkoutBtn').show();
+                $('.discount-div').show();
+            }
         }
 
 
         function discountAdd() {
+            let subtotalText = $('.subtotal').text();
             if ($('.discountData').text() != null) {
-                let subtotalText = $('.subtotal').text();
                 let mainTotal = subtotalText;
                 let totalPrice = 0;
                 $('.discount-apply').each(function() {
@@ -175,7 +198,13 @@
 
                 let credit = $('.credit').text();
                 if(credit != null) {
-                    totalPrice = mainTotal - credit;
+                    if(credit <= subtotalText){
+                        totalPrice = mainTotal - credit;
+                    }
+                    else{
+                        totalPrice = mainTotal - mainTotal;
+                        $('.credit').text(mainTotal);
+                    }
                 }
                 else{
                     totalPrice = mainTotal
@@ -237,16 +266,17 @@
                         discountAdd()
                     }
                     else if(response.status == 'success' && response.discount_amount){
-                        const discount = `
+                        if ($('.discountData').text('')) {
+                            const discount = `
                             <div class="d-flex justify-content-between discount-apply">
                                 <label>Discount : ${response.code}</label>
                                 <div class="d-flex">
-                                    <span>$</span>
+                                    <span>${response.type == 'fixed' ? '$' : ''}</span>
                                     <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                    <span>${response.type == 'percentage' ? '%' : ''}</span>
                                 </div>
                             </div>
                         `;
-                        if ($('.discountData').text('')) {
                             $('.voucher-error').text('')
                             $('.discountData').append(discount)
                             discountAdd();
@@ -276,9 +306,9 @@
                                 </div>
                             </div>
                         `;
-                        if ($('.discountData').text('')) {
+                        if ($('.gift-card-data').text('')) {
                             $('.voucher-error').text('')
-                            $('.discountData').append(giftCardDiscount)
+                            $('.gift-card-data').append(giftCardDiscount)
                             discountAdd();
                         }
                     }

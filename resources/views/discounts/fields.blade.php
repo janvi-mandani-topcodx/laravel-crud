@@ -51,7 +51,7 @@
                         <label>APPLIES TO</label>
                         <div class="ps-3">
                             <div>
-                                <input class="form-check-input" type="radio" name="product" value="all products" id="allProducts">
+                                <input class="form-check-input" type="radio" name="product" value="all_products" id="allProducts">
                                 <label class="form-check-label" for="allProducts">
                                     All Products
                                 </label>

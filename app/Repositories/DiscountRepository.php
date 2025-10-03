@@ -30,15 +30,16 @@ class DiscountRepository extends BaseRepository
             'usage_limit_new_customer' => isset($data['limit_new_customer']) ? 1 : 0,
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
-            'status' => $data['status']== 'on' ? 1 : 0,
+            'status' => isset($data['status']) && $data['status']== 'on' ? 1 : 0
         ]);
-        return redirect()->route('discounts.index');
     }
 
 
     public function update($data , $discountData)
     {
-        $productId = $data['product'] == 'all products' ? $data['product_id'] == null: $data['product_id'];
+//        dump($discountData , $data );
+        $productId = $data['product'] == 'all_products' ? null : $data['product'];
+//        dd($productId);
         $discountData->update([
             'code' => $data['code'],
             'amount' => $data['value'],
@@ -55,7 +56,7 @@ class DiscountRepository extends BaseRepository
             'usage_limit_new_customer' => isset($data['limit_new_customer']) ? 1 : 0,
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
-            'status' => $data['status']== 'on' ? 1 : 0,
+            'status' => isset($data['status']) && $data['status'] == 'on' ? 1 : 0,
         ]);
     }
 }

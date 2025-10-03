@@ -54,17 +54,33 @@
                                             <span class="subtotal-order-edit" id=""></span>
                                         </div>
                                     </div>
-                                    @if($orderDiscount)
-                                        <div class="discountData">
-                                            <div class="d-flex justify-content-between ">
-                                                <label>Discount : {{$orderDiscount->code}}</label>
-                                                <div class="d-flex">
-                                                    <span>$</span>
-                                                    <span class="discount-show-checkout" data-type="{{$orderDiscount->type}}" data-code="{{$orderDiscount->code}}">{{$orderDiscount->amount}}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
+                                   <div class="discountData">
+                                       @if($orderDiscounts)
+                                           @foreach($orderDiscounts as $orderDiscount)
+                                               @if($orderDiscount->type == 'percentage')
+                                                   <div class="row discount-apply">
+                                                       <div class="col">
+                                                           <p>Discount : {{$orderDiscount->code}}</p>
+                                                       </div>
+                                                       <div class="col d-flex justify-content-end">
+                                                           <p class="discount-show-checkout" data-type="{{$orderDiscount->type}}">{{$orderDiscount->amount}}</p>
+                                                           <span>%</span>
+                                                       </div>
+                                                   </div>
+                                               @else
+                                                   <div class="row discount-apply">
+                                                       <div class="col">
+                                                           <p>Discount : {{$orderDiscount->code}}</p>
+                                                       </div>
+                                                       <div class="col d-flex justify-content-end">
+                                                           <span>$</span>
+                                                           <p class="discount-show-checkout" data-type="{{$orderDiscount->type}}">{{$orderDiscount->amount}}</p>
+                                                       </div>
+                                                   </div>
+                                               @endif
+                                           @endforeach
+                                       @endif
+                                   </div>
                                     <div class="d-flex justify-content-between">
                                         <label>Total</label>
                                         <div class="d-flex">
@@ -136,24 +152,55 @@
             }
 
             function discountAddOrder() {
-                let subtotal = ''
+                // let subtotal = ''
                 // console.log($('.discountData').)
-                if ($('.discountData').length > 0) {
-                    console.log("aaa")
-                    let type = $('.discount-show-checkout').data('type');
-                    let amount = $('.discount-show-checkout').text();
-                    subtotal = $('.subtotal-order-edit').text();
-                    console.log("sub = " +subtotal);
-                    if (type == 'percentage') {
-                        let total = subtotal * (amount / 100);
-                        console.log(total)
-                        let mainTotal  = subtotal - total;
-                        $('.total-order-edit').text(mainTotal)
+                // if ($('.discountData').length > 0) {
+                //     console.log("aaa")
+                //     let type = $('.discount-show-checkout').data('type');
+                //     let amount = $('.discount-show-checkout').text();
+                //     subtotal = $('.subtotal-order-edit').text();
+                //     console.log("sub = " +subtotal);
+                //     if (type == 'percentage') {
+                //         let total = subtotal * (amount / 100);
+                //         console.log(total)
+                //         let mainTotal  = subtotal - total;
+                //         $('.total-order-edit').text(mainTotal)
+                //     }
+                //     else if(type == 'fixed'){
+                //         let totalPrice = subtotal - amount;
+                //         $('.total-order-edit').text(totalPrice)
+                //     }
+                // }
+                if ($('.discountData').text() != null) {
+                    let subtotalText = $('.subtotal-order-edit').text();
+                    let mainTotal = subtotalText;
+                    let totalPrice = 0;
+                    $('.discount-apply').each(function() {
+                        let discount = $(this);
+                        let type = discount.find('.discount-show-checkout').data('type');
+                        let amount = discount.find('.discount-show-checkout').text();
+
+                        if (type === 'percentage') {
+                            let discountAmount = mainTotal * (amount / 100);
+                            console.log(discountAmount)
+                            mainTotal = mainTotal - discountAmount;
+                        } else if (type === 'fixed') {
+                            mainTotal = mainTotal - amount;
+                        }
+                        if (mainTotal < 0) {
+                            mainTotal = 0;
+                        }
+                    });
+                    console.log(mainTotal)
+
+                    let credit = $('.credit').text();
+                    if(credit != null) {
+                        totalPrice = mainTotal - credit;
                     }
-                    else if(type == 'fixed'){
-                        let totalPrice = subtotal - amount;
-                        $('.total-order-edit').text(totalPrice)
+                    else{
+                        totalPrice = mainTotal
                     }
+                    $('.total-order-edit').text(totalPrice);
                 }
                 else{
                     subtotal = $('.subtotal-order-edit').text();

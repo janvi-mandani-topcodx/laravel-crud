@@ -15,7 +15,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
-    private $orderRepo;
+    private $OrderRepo;
 
     public function __construct(OrderRepository $orderRepository)
     {
@@ -64,24 +64,24 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        $order = Order::with(['orderItems' , 'orderDiscount'])->find($id);
+        $order = Order::with(['orderItems' , 'orderDiscounts'])->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
         $orderItems = $order->orderItems;
-        $orderDiscount = $order->orderDiscount;
+        $orderDiscounts = $order->orderDiscounts;
         $totalPrice = 0;
         foreach ($orderItems as $orderItem) {
             $total = $orderItem->quantity * $orderItem->price;
             $totalPrice += $total;
         }
-        return view('orders.show', compact('order' , 'shippingDetails' , 'orderItems' , 'orderDiscount' , 'totalPrice'));
+        return view('orders.show', compact('order' , 'shippingDetails' , 'orderItems' , 'orderDiscounts' , 'totalPrice'));
     }
 
     public function edit(string $id)
     {
         $order = Order::with('orderItems')->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        $orderDiscount = OrderDiscount::where('order_id', $id)->first();
-        return view('orders.edit', compact('order', 'shippingDetails' , 'orderDiscount'));
+        $orderDiscounts = $order->orderDiscounts;
+        return view('orders.edit', compact('order', 'shippingDetails' , 'orderDiscounts'));
     }
 
     public function update(Request $request, string $id)
@@ -144,7 +144,7 @@ class OrderController extends Controller
         return response()->json(['success' => 'Item deleted']);
     }
 
-    public function orderItemUpdate(Request $request , string $id)
+    public function  orderItemUpdate(Request $request , string $id)
     {
         $input = $request->all();
         $orderItem = OrderItem::where('order_id', $id)->get();

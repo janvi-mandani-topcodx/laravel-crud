@@ -2,7 +2,7 @@
 @section('content')
     <div>
         <h3 class="d-flex justify-content-center my-3">Edit discount</h3>
-        <form method="POST" id="discountForm" enctype="multipart/form-data" action="{{ route('discounts.index') }}">
+        <form method="POST" id="discountForm" enctype="multipart/form-data" action="{{ route('discounts.update' , $discount->id) }}">
             @include('discounts.edit_fields')
         </form>
     </div>
@@ -66,12 +66,18 @@
                 if($(this).prop('checked')){
                     $('#minimumQuantity').hide();
                     $('#minimumPurchase').show();
+                    $('#minimumQuantity').removeClass('d-block');
+                    $('#minimumQuantity').val('');
+                    $('#minimumPurchase').val('');
                 }
             })
             $(document).on('change' , '#quantityAmount' , function (){
                 if($(this).prop('checked')){
                     $('#minimumPurchase').hide();
+                    $('#minimumPurchase').removeClass('d-block');
                     $('#minimumQuantity').show();
+                    $('#minimumQuantity').val('');
+                    $('#minimumPurchase').val('');
                 }
             })
             $(document).on('change' , '#none' , function (){
@@ -91,22 +97,22 @@
                 }
             })
 
-            $(document).on('click' , '#updateDiscount' ,  function (e){
-                e.preventDefault()
-                let form = $(this).closest('form')[0];
-                let formData = new FormData(form);
+            // $(document).on('click' , '#updateDiscount' ,  function (e){
+                {{--e.preventDefault()--}}
+                {{--let form = $(this).closest('form')[0];--}}
+                {{--let formData = new FormData(form);--}}
 
-                $.ajax({
-                    url: "{{route('discounts.update' , $discount->id)}}",
-                    method: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        window.location.href = '{{ route('discounts.index') }}';
-                    }
-                });
-            })
+                {{--$.ajax({--}}
+                {{--    url: "{{route('discounts.update' , $discount->id)}}",--}}
+                {{--    method: "POST",--}}
+                {{--    data: formData,--}}
+                {{--    contentType: false,--}}
+                {{--    processData: false,--}}
+                {{--    success: function (response) {--}}
+                {{--        window.location.href = '{{ route('discounts.index') }}';--}}
+                {{--    }--}}
+                {{--});--}}
+            // })
 
             $(document).on('keyup', '#searchProduct' ,  function () {
                 let query = $(this).val();
@@ -134,6 +140,8 @@
                         search: query
                     },
                     success: function (response) {
+                        console.log(response.html)
+                        console.log( $('#userSearchData'))
                         $('#userSearchData').html(response.html);
                     },
                     error: function (response){

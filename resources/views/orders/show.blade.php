@@ -82,15 +82,28 @@
                                     <p>${{$totalPrice}}</p>
                                 </div>
                             </div>
-                            @if(!$orderDiscount)
-                                <div class="row">
-                                    <div class="col">
-                                        <p>Discount : {{$orderDiscount->code}}</p>
-                                    </div>
-                                    <div class="col text-end me-5">
-                                        <p>${{$orderDiscount->amount}}</p>
-                                    </div>
-                                </div>
+                            @if($orderDiscounts)
+                                @foreach($orderDiscounts as $orderDiscount)
+                                       @if($orderDiscount->type == 'percentage')
+                                            <div class="row">
+                                                <div class="col">
+                                                    <p>Discount : {{$orderDiscount->code}}</p>
+                                                </div>
+                                                <div class="col text-end me-5">
+                                                    <p>{{$orderDiscount->amount}}%</p>
+                                                </div>
+                                            </div>
+                                       @else
+                                            <div class="row">
+                                                <div class="col">
+                                                    <p>Discount : {{$orderDiscount->code}}</p>
+                                                </div>
+                                                <div class="col text-end me-5">
+                                                    <p>${{$orderDiscount->amount}}</p>
+                                                </div>
+                                            </div>
+                                    @endif
+                                @endforeach
                             @endif
 
                             <div class="row">

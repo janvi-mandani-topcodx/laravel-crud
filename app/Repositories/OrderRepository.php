@@ -3,6 +3,7 @@
 namespace App\Repositories;
 use App\Models\Cart;
 use App\Models\CartDiscount;
+use App\Models\GiftCard;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -21,21 +22,13 @@ class OrderRepository extends BaseRepository
     {
         $shippingDetails = Arr::only($data, ['first_name' , 'last_name', 'address' , 'state' , 'country']);
         $jsonData = json_encode($shippingDetails);
-
         $order = Order::create([
             'user_id' => auth()->id(),
             'shipping_details' => $jsonData,
             'delivery' => $data['delivery'],
             'total' => $data['total'],
         ]);
-
-        if($data['code'] != 'undefined'){
-            $order->orderDiscount()->create([
-                'code' => $data['code'],
-                'type' => $data['type'],
-                'amount' => $data['amount'],
-            ]);
-        }
+        $this->orderDiscountStore($order , $data);
         $this->orderItemStore($order , $data);
     }
 
@@ -66,6 +59,28 @@ class OrderRepository extends BaseRepository
         $cartDiscounts = CartDiscount::where('user_id' , auth()->id())->get();
         foreach ($cartDiscounts as $cartDiscount) {
             $cartDiscount->delete();
+        }
+    }
+
+    public  function orderDiscountStore($order , $data)
+    {
+        foreach ($data['code'] as $key => $value) {
+            $item = [
+                'code' => $data['code'][$key],
+                'type' => $data['type'][$key],
+                'amount' => $data['amount'][$key],
+                'name' => $data['name'][$key],
+            ];
+
+           if($item['name'] == 'gift_card'){
+               $order->orderDiscounts()->create($item);
+               $giftCard = GiftCard::where('code', $item['code'])->first();
+               $giftCard->balance =  0;
+               $giftCard->save();
+           }
+           else{
+               $order->orderDiscounts()->create($item);
+           }
         }
     }
 

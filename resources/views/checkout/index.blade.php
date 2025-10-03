@@ -53,7 +53,7 @@
                             <div class="position-absolute w-100" style="bottom: 20px; left:20px; padding-right: 40px;">
                                 <div class="d-flex justify-content-between dis gap-2 my-2">
                                     <input type="text" id="discountCode" name="discount_code" class="discount-code form-control w-75">
-                                    <button class="btn btn-success" id="discountApply">Apply</button>
+                                    <button class="btn btn-success" id="discountApplyCheckout">Apply</button>
                                 </div>
                                 <div class="voucher-error text-danger"></div>
                                 <div class="d-flex justify-content-between">
@@ -65,25 +65,38 @@
                                 </div>
                                 <div></div>
                                 <div class="discountData">
-                                    @if($discount)
-                                       @if($discount->type == 'fixed')
-                                            <div class="d-flex justify-content-between ">
-                                                <label>Discount : {{$discount->code}}</label>
-                                                <div class="d-flex">
-                                                    <span>$</span>
-                                                    <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                    <div class="my-2">
+                                        @if($discounts)
+                                            @foreach($discounts as $discount)
+                                                <div class="all-discounts-apply">
+                                                    @if($discount->type == 'fixed')
+                                                        <div class="d-flex justify-content-between discount-apply">
+                                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>
+                                                            <div>
+                                                                <div class="d-flex">
+                                                                    <span>$</span>
+                                                                    <span class="discount-show-checkout" data-name="{{$discount->discount_name}}" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="d-flex justify-content-between discount-apply">
+                                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>
+                                                            <div>
+                                                                <div class="d-flex">
+                                                                    <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
+                                                                    <span>%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                            </div>
-                                        @else
-                                            <div class="d-flex justify-content-between ">
-                                                <label>Discount : {{$discount->code}}</label>
-                                                <div class="d-flex">
-                                                    <span class="discount-show-checkout" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>
-                                                    <span>%</span>
-                                                </div>
-                                            </div>
+                                            @endforeach
                                         @endif
-                                    @endif
+                                    </div>
+                                </div>
+                                <div class="gift-card-data">
+
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <label>Total</label>
@@ -109,7 +122,6 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-
 
             function count() {
                 let totalCount = 0;
@@ -141,18 +153,21 @@
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal').text();
                     let mainTotal = subtotalText;
+                    console.log("main" +mainTotal)
 
                     $('.discount-apply').each(function() {
                         let discount = $(this);
                         let type = discount.find('.discount-show-checkout').data('type');
                         let amount = discount.find('.discount-show-checkout').text();
-
+                        console.log(type)
+                        console.log(amount)
                         if (type === 'percentage') {
                             let discountAmount = mainTotal * (amount / 100);
-                            console.log(discountAmount)
+                            console.log("disc" + discountAmount)
                             mainTotal = mainTotal - discountAmount;
                         } else if (type === 'fixed') {
                             mainTotal = mainTotal - amount;
+                            console.log("disc" + mainTotal)
                         }
                         if (mainTotal < 0) {
                             mainTotal = 0;
@@ -164,6 +179,79 @@
                     $('.total-checkout').text(mainTotal);
                 }
             }
+
+            $(document).on('click', '#discountApplyCheckout', function () {
+                let discountCode = $(this).parents('.dis').find('#discountCode').val();
+                let count = $('.count').text();
+                let subTotal = $('#subtotal').find('.subtotal').text();
+                $.ajax({
+                    url: "{{route('discount.code.check')}}",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                        discount_code: discountCode,
+                        count: count,
+                        subTotal: subTotal,
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function (response) {
+                        $('#discountCode').val('');
+                        if (response.status == 'error') {
+                            $('.voucher-error').text(response.message)
+                            updateTotal()
+                            discountAdd()
+                        }
+                        else if(response.status == 'success' && response.discount_amount){
+                            if ($('.discountData').text('')) {
+                                const discount = `
+                            <div class="d-flex justify-content-between discount-apply">
+                                <label>Discount : ${response.code}</label>
+                                <div class="d-flex">
+                                    <span>${response.type == 'fixed' ? '$' : ''}</span>
+                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                    <span>${response.type == 'percentage' ? '%' : ''}</span>
+                                </div>
+                            </div>
+                        `;
+                                $('.voucher-error').text('')
+                                $('.discountData').append(discount)
+                                discountAdd();
+                            }
+                        }
+                        if(response.status == 'warning'){
+                            $('.voucher-error').text(response.message)
+                            const discount = `
+                            <div class="d-flex justify-content-between discount-apply">
+                                <label>Discount : ${response.code}</label>
+                                <div class="d-flex">
+                                    <span>$</span>
+                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                </div>
+                            </div>
+                        `;
+                            $('.discountData').append(discount)
+                        }
+
+                        if(response.status == 'success'  &&  response.discount == 'gift card'){
+                            const giftCardDiscount = `
+                            <div class="d-flex justify-content-between discount-apply">
+                                <label>Gift Card : ${response.code}</label>
+                                <div class="d-flex">
+                                    <span>$</span>
+                                    <span class="discount-show" data-type="fixed" data-code="${response.code}">${response.balance}</span>
+                                </div>
+                            </div>
+                        `;
+                            if ($('.gift-card-data').text('')) {
+                                $('.voucher-error').text('')
+                                $('.gift-card-data').append(giftCardDiscount)
+                                discountAdd();
+                            }
+                        }
+                    },
+                });
+            });
+
 
             function allDecrement(quantity ,productId , variantId){
                 var currentQuantity = parseInt(quantity.text());
@@ -257,10 +345,6 @@
                 let form = $(this).closest('form')[0];
                 let formData = new FormData(form);
                 let total = $('.total-checkout').text();
-                let amount = $('.discount-show-checkout').text();
-                let code = $('.discount-show-checkout').data('code');
-                let type = $('.discount-show-checkout').data('type');
-                console.log(amount)
                 $('.cartData').each(function () {
                     let productId = $(this).data('product');
                     let variantId = $(this).data('variant');
@@ -271,10 +355,17 @@
                     formData.append('variantId[]' , variantId )
                     formData.append('quantity[]' , quantity )
                 });
-                formData.append('amount' , amount)
-                formData.append('code' , code)
-                formData.append('type' , type)
-
+                $('.all-discounts-apply').each(function () {
+                    console.log($('.discount-show-checkout').text())
+                    let amount = $(this).find('.discount-show-checkout').text();
+                    let code = $(this).find('.discount-show-checkout').data('code');
+                    let type = $(this).find('.discount-show-checkout').data('type');
+                    let discountName = $(this).find('.discount-show-checkout').data('name');
+                    formData.append('amount[]' , amount)
+                    formData.append('code[]' , code)
+                    formData.append('type[]' , type);
+                    formData.append('name[]' , discountName);
+                });
                 formData.append('total', total);
                 $.ajax({
                     url: "{{route('order.store')}}",

@@ -93,6 +93,7 @@ class DiscountController extends Controller
         $input = $request->all();
         $discountData  = Discount::find($id);
         $this->discountRepo->update($input , $discountData);
+        return redirect()->route('discounts.index');
     }
 
     /**

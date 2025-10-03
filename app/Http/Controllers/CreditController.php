@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CreditLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CreditController extends Controller
@@ -29,12 +30,29 @@ class CreditController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
-        CreditLog::create([
-            'user_id' => $input['user_id'],
-            'description' => $input['description'],
-            'old_credit' => $input['credit_amount'],
-            'new_credit' => $input['credit_amount'],
-        ]);
+
+        $user = User::where('id' , $input['user_id'])->first();
+        if($user->credits != null){
+            $credit = CreditLog::create([
+                'user_id' => $input['user_id'],
+                'description' => $input['description'],
+                'previews_balance' => $user->credits,
+                'new_balance' => $input['credit_amount'],
+            ]);
+            $user->credits = $user->credits + $input['credit_amount'];
+            $user->save();
+        }
+        else{
+            $credit = CreditLog::create([
+                'user_id' => $input['user_id'],
+                'description' => $input['description'],
+                'previews_balance' => 0,
+                'new_balance' => $input['credit_amount'],
+            ]);
+            $userCredit = $credit->user;
+            $userCredit->credits  = $input['credit_amount'];
+            $userCredit->save();
+        }
     }
 
     /**

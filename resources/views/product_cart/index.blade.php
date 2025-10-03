@@ -161,6 +161,17 @@
                     });
                     $('.total').text(totalPrice)
                     $('.subtotal').text(totalPrice)
+
+                    if($('.subtotal').text() == 0){
+                        console.log("ssdsssss")
+                        $('.checkoutBtn').hide();
+                        $('.discount-div').hide();
+                    }
+                    else{
+                        console.log("sasasasasa")
+                        $('.checkoutBtn').show();
+                        $('.discount-div').show();
+                    }
             }
             function discountAdd() {
                 console.log($('.discountData').text());
