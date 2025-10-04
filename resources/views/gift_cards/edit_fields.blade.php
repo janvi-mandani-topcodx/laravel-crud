@@ -15,7 +15,7 @@
                     <div class="col-6">
                         <div  class="form-group">
                             <label class="form-label fw-bold " for="balance">Initial Balance</label>
-                            <input type="text" id="initialBalance" class="form-control"  value="{{$giftCard->balance}}"  name="initial_balance" placeholder="Enter your balance" readonly/>
+                            <input type="text" id="initialBalance" class="form-control"  value="{{$giftCard->initial_balance}}"  name="initial_balance" placeholder="Enter your balance" readonly/>
                             <span style="color: darkred"></span>
                         </div>
                     </div>

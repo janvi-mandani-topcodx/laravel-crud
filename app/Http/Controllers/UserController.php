@@ -7,6 +7,8 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Jobs\SendEmailUserData;
 use App\Mail\EmailVarification;
 use App\Mail\ResetPassword;
+use App\Models\CreditLog;
+use App\Models\GiftCard;
 use App\Models\Message;
 //use App\Models\Role;
 use App\Models\Tag;
@@ -109,15 +111,16 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $role = $user->roles->first();
-//        if ($role->hasPermissionTo('edit user')) {
+        if ($role->hasPermissionTo('edit user')) {
                 $user = User::find($id);
                 $roles = Role::all();
+                $giftCards =  CreditLog::where('user_id', $id)->orWhere('user_id' , null)->get();
 
-                return view('users.edit', compact('user', 'roles'));
-//        }
-//        else{
-//            return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);
-//        }
+                return view('users.edit', compact('user', 'roles' , 'giftCards'));
+        }
+        else{
+            return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);
+        }
 
     }
     public function update(UpdateUserRequest $request, string $id)

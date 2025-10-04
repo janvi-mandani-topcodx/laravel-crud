@@ -126,6 +126,9 @@
                             <input type="text" id="searchCustomer" class="form-control" name="customer_name" placeholder="search customer"/>
                             <span style="color: darkred">@error('customer_name') {{$message}} @enderror</span>
                             <input type="hidden" class="hidden-user-id" name="customer_id">
+                            <div id="userSearchData" class="position-absolute" style=" top: 164px; left: 74px; width: 433px;">
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -191,10 +194,7 @@
                 </div>
             </section>
         </div>
-        <div id="productSearch" class="position-absolute" style=" bottom: 34px; left: 78px; width: 433px;">
-
-        </div>
-        <div id="userSearchData" class="position-absolute" style=" top: -118px; left: 78px; width: 433px;">
+        <div id="productSearch" class="position-absolute" style=" bottom: -102px; left: 78px; width: 433px;">
 
         </div>
     </div>

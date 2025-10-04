@@ -107,6 +107,9 @@ class DiscountController extends Controller
     public function productSearch(Request $request)
     {
         $searchTerm = $request->input('search');
+        if ($searchTerm == ''){
+            return response()->json(['html' => '']);
+        }
         if ($searchTerm) {
             $products = Product::where('title', 'LIKE', '%' . $searchTerm . '%')
                 ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
@@ -146,6 +149,9 @@ class DiscountController extends Controller
     public function userSearch(Request $request)
     {
         $searchTerm = $request->input('search');
+        if ($searchTerm == ''){
+            return response()->json(['html' => '']);
+        }
         if ($searchTerm) {
             $users = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
                 ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
@@ -180,8 +186,8 @@ class DiscountController extends Controller
     {
         $input = $request->all();
         $discount = Discount::where('code' , $input['discount_code'])->first();
-            $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
-            $giftCard = GiftCard::where('code' , $input['discount_code'])->first();
+        $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
+        $giftCard = GiftCard::where('code' , $input['discount_code'])->first();
 
             $voucherDiscount =  new VoucherService();
             if($discount){
@@ -209,7 +215,7 @@ class DiscountController extends Controller
             else{
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Discount code not found'
+                    'message' => 'Gift card not found'
                 ]);
             }
     }

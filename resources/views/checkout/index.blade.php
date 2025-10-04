@@ -78,7 +78,7 @@
                                         @if($discounts)
                                             @foreach($discounts as $discount)
                                                     @if($discount->type == 'fixed')
-                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit-checkout')}}">
+                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit')}}">
                                                             <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
                                                             <div>
                                                                 <div class="d-flex">
@@ -88,7 +88,7 @@
                                                             </div>
                                                         </div>
                                                     @else
-                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit-checkout')}}">
+                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit')}}">
                                                             <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
                                                             <div>
                                                                 <div class="d-flex">
@@ -100,32 +100,6 @@
                                                     @endif
                                             @endforeach
                                         @endif
-
-{{--                                        @if($discounts)--}}
-{{--                                            @foreach($discounts as $discount)--}}
-{{--                                                    @if($discount->type == 'fixed')--}}
-{{--                                                        <div class="d-flex justify-content-between discount-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : 'discount-data'}}">--}}
-{{--                                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>--}}
-{{--                                                            <div>--}}
-{{--                                                                <div class="d-flex">--}}
-{{--                                                                    <span>$</span>--}}
-{{--                                                                    <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>--}}
-{{--                                                                </div>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    @else--}}
-{{--                                                        <div class="d-flex justify-content-between discount-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : 'discount-data'}}">--}}
-{{--                                                            <label>{{$discount->discount_name}} : {{$discount->code}}</label>--}}
-{{--                                                            <div>--}}
-{{--                                                                <div class="d-flex">--}}
-{{--                                                                    <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}">{{$discount->amount}}</span>--}}
-{{--                                                                    <span>%</span>--}}
-{{--                                                                </div>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    @endif--}}
-{{--                                            @endforeach--}}
-{{--                                        @endif--}}
                                     </div>
                                 </div>
                                 <div class="gift-card-data">
@@ -187,25 +161,27 @@
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal-checkout').text();
                     let mainTotal = subtotalText;
-                    $('.credit-checkout').each( function (){
-                        let credit = $('.credit-checkout').text();
-                        if(credit != null) {
-                            if(credit <= subtotalText){
-                                mainTotal = mainTotal - credit;
+                    $('.credit').each(function() {
+                        let credit = $(this);
+                        let amount = credit.find('.discount-show-checkout').text();
+                        if(amount != null) {
+                            if(amount <= subtotalText){
+                                mainTotal = mainTotal - amount;
                             }
                             else{
                                 mainTotal = mainTotal - mainTotal;
-                                $('.credit').text(mainTotal);
+                                $('.discount-show-checkout').text(mainTotal);
                             }
                         }
                         else{
                             mainTotal = mainTotal;
                         }
-                    })
+                    });
+                    console.log(mainTotal)
                     $('.gift-card').each(function() {
                         let discount = $(this);
                         let amount = discount.find('.discount-show-checkout').text();
-                        console.log("amount = " + amount)
+                        console.log("main = " + mainTotal)
                         if(amount <= subtotalText){
                             mainTotal = mainTotal - amount;
                             console.log("reree" + mainTotal)
@@ -214,8 +190,6 @@
                             discount.find('.discount-show-checkout').text(mainTotal)
                             mainTotal = mainTotal - mainTotal;
                         }
-                        // mainTotal = mainTotal - amount;
-                        console.log("mainTotal = " + mainTotal);
                         if (mainTotal < 0) {
                             mainTotal = 0;
                         }
@@ -237,49 +211,17 @@
                             mainTotal = 0;
                         }
                     });
-                    console.log("aabbcc = " + mainTotal)
-
 
                     $('.total').text(mainTotal);
                     $('.total-checkout').text(mainTotal);
                 }
             }
-            // function discountAdd() {
-            //     console.log($('.discountData').text());
-            //     if ($('.discountData').text() != null) {
-            //         let subtotalText = $('.subtotal').text();
-            //         let mainTotal = subtotalText;
-            //         console.log("main" +mainTotal)
-            //
-            //         $('.discount-apply').each(function() {
-            //             let discount = $(this);
-            //             let type = discount.find('.discount-show-checkout').data('type');
-            //             let amount = discount.find('.discount-show-checkout').text();
-            //             console.log(type)
-            //             console.log(amount)
-            //             if (type === 'percentage') {
-            //                 let discountAmount = mainTotal * (amount / 100);
-            //                 console.log("disc" + discountAmount)
-            //                 mainTotal = mainTotal - discountAmount;
-            //             } else if (type === 'fixed') {
-            //                 mainTotal = mainTotal - amount;
-            //                 console.log("disc" + mainTotal)
-            //             }
-            //             if (mainTotal < 0) {
-            //                 mainTotal = 0;
-            //             }
-            //         });
-            //         console.log(mainTotal)
-            //
-            //         $('.total').text(mainTotal);
-            //         $('.total-checkout').text(mainTotal);
-            //     }
-            // }
 
             $(document).on('click', '#discountApplyCheckout', function () {
                 let discountCode = $(this).parents('.dis').find('#discountCode').val();
                 let count = $('.count').text();
                 let subTotal = $('#subtotal').find('.subtotal').text();
+                let total = $('.total-checkout').text();
                 $.ajax({
                     url: "{{route('discount.code.check')}}",
                     type: "POST",
@@ -288,40 +230,38 @@
                         discount_code: discountCode,
                         count: count,
                         subTotal: subTotal,
+                        total : total,
                         _token: $('meta[name="csrf-token"]').attr('content'),
                     },
                     success: function (response) {
                         $('#discountCode').val('');
                         if (response.status == 'error') {
                             $('.voucher-error').text(response.message)
-                            updateTotal()
-                            discountAdd()
                         }
                         else if(response.status == 'success' && response.discount_amount){
                             if ($('.discountData').text('')) {
                                 const discount = `
-                            <div class="d-flex justify-content-between discount-apply">
+                            <div class="d-flex justify-content-between discount-apply discount-data">
                                 <label>Discount : ${response.code}</label>
                                 <div class="d-flex">
                                     <span>${response.type == 'fixed' ? '$' : ''}</span>
-                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                    <span class="discount-show-checkout" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
                                     <span>${response.type == 'percentage' ? '%' : ''}</span>
                                 </div>
                             </div>
                         `;
                                 $('.voucher-error').text('')
                                 $('.discountData').append(discount)
-                                discountAdd();
                             }
                         }
                         if(response.status == 'warning'){
                             $('.voucher-error').text(response.message)
                             const discount = `
-                            <div class="d-flex justify-content-between discount-apply">
+                            <div class="d-flex justify-content-between discount-apply discount-data">
                                 <label>Discount : ${response.code}</label>
                                 <div class="d-flex">
                                     <span>$</span>
-                                    <span class="discount-show" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
+                                    <span class="discount-show-checkout" data-type="${response.type}" data-code="${response.code}">${response.discount_amount}</span>
                                 </div>
                             </div>
                         `;
@@ -330,20 +270,22 @@
 
                         if(response.status == 'success'  &&  response.discount == 'gift card'){
                             const giftCardDiscount = `
-                            <div class="d-flex justify-content-between discount-apply">
+                            <div class="d-flex justify-content-between discount-apply gift-card">
                                 <label>Gift Card : ${response.code}</label>
                                 <div class="d-flex">
                                     <span>$</span>
-                                    <span class="discount-show" data-type="fixed" data-code="${response.code}">${response.balance}</span>
+                                    <span class="discount-show-checkout" data-type="fixed" data-code="${response.code}">${response.balance}</span>
                                 </div>
                             </div>
                         `;
                             if ($('.gift-card-data').text('')) {
                                 $('.voucher-error').text('')
                                 $('.gift-card-data').append(giftCardDiscount)
-                                discountAdd();
+
                             }
                         }
+                        updateTotal()
+                        discountAdd()
                     },
                 });
             });

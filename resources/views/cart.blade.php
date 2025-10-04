@@ -55,26 +55,15 @@
                             </div>
                             @php
                                 $discounts = \App\Models\CartDiscount::where('user_id' , auth()->id())->get();
-                                $credit = \App\Models\User::where('id' , auth()->id())->first();
-                            @endphp
 
-                            @if($credit->credits != null || $credit->credits != 0)
-                                <div class="creditApply d-flex justify-content-between my-2">
-                                    <label>Credit</label>
-                                    <div class="d-flex">
-                                        <span>$</span>
-                                        <span class="credit">{{$credit->credits}}</span>
-                                    </div>
-                                </div>
-                            @endif
+                            @endphp
                             <div class="discountData my-2">
                                 @if($discounts)
-                                   @foreach($discounts as $discount)
-                                       @if($discount->discount_name != 'credit')
+                                @foreach($discounts as $discount)
                                             @if($discount->type == 'fixed')
-                                                <div class="d-flex justify-content-between discount-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : 'discount-data'}}">
+                                                <div class="d-flex justify-content-between discount-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' : 'credit')}}">
                                                     <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
-                                                    <div>
+                                                    <div class="d-flex">
                                                         <div class="d-flex">
                                                             <span>$</span>
                                                         </div>
@@ -82,9 +71,9 @@
                                                     </div>
                                                 </div>
                                             @else
-                                                <div class="d-flex justify-content-between discount-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : 'discount-data'}}">
-                                                    <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
-                                                    <div>
+                                                <div class="d-flex justify-content-between discount-apply discount-data">
+                                                    <label>{{ $discount->discount_name }}: {{$discount->code}}</label>
+                                                    <div class="d-flex">
                                                         <div class="d-flex">
                                                             <span class="discount-show" data-type="{{$discount->type}}" data-code="{{$discount->code}}" data-name="{{$discount->discount_name}}">{{$discount->amount}}</span>
                                                             <span>%</span>
@@ -92,7 +81,6 @@
                                                     </div>
                                                 </div>
                                             @endif
-                                        @endif
                                    @endforeach
                                 @endif
                             </div>
@@ -125,36 +113,19 @@
 
             function creditStore(){
                 let subtotalText = $('.subtotal').text();
-                let mainTotal = subtotalText;
-                // let credit = $('.credit').text();
-                // if(credit != null) {
-                //     console.log(credit)
-                //     console.log(subtotalText)
-                //     if(credit <= subtotalText){
-                //         mainTotal =  mainTotal - credit;
-                //     }
-                //     else{
-                //         mainTotal = mainTotal;
-                //         $('.credit').text(mainTotal);
-                //     }
-                // }
-                // else{
-                //     mainTotal = mainTotal;
-                // }
-                // if(credit != null ){
-                    $.ajax({
-                        url: route('credit.store.cart'),
-                        type: "GET",
-                        data: {
-                            subtotal : subtotalText,
-                        },
-                        success: function (response) {
-
-                        }
-                    });
-                // }
+                $.ajax({
+                    url: route('credit.store.cart'),
+                    type: "GET",
+                    data: {
+                        subtotal : subtotalText,
+                    },
+                    success: function (response) {
+                    }
+                });
             }
+
             creditStore();
+            $('.creditApply').remove();
             function count() {
                 let totalCount = 0;
                 $('.quantity-cart').each(function () {
@@ -183,8 +154,10 @@
                 if($('.subtotal').text() == 0){
                     $('.checkoutBtn').hide();
                     $('.discount-div').hide();
+                    $('.discountData').hide();
                 }
                 else{
+                    $('.discountData').show();
                     $('.checkoutBtn').show();
                     $('.discount-div').show();
                 }
@@ -194,29 +167,33 @@
             function discountAdd() {
                 let subtotalText = $('.subtotal').text();
                 let mainTotal = subtotalText;
-                let credit = $('.credit').text();
-                if(credit != null) {
-                    if(credit <= subtotalText){
-                        mainTotal = mainTotal - credit;
-                    }
-                    else{
-                        mainTotal = mainTotal - mainTotal;
-                        $('.credit').text(mainTotal);
-                    }
-                }
-                else{
-                    mainTotal = mainTotal;
-                }
-
 
                 if ($('.discountData').text() != null) {
+
+                    $('.credit').each(function() {
+                        let credit = $(this);
+                        let amount = credit.find('.discount-show').text();
+                        if(amount != null) {
+                            if(amount <= subtotalText){
+                                mainTotal = mainTotal - amount;
+                            }
+                            else{
+                                mainTotal = mainTotal - mainTotal;
+                                $('#CreditShow').text('');
+                                $('.discount-show').text(mainTotal);
+                            }
+                        }
+                        else{
+                            mainTotal = mainTotal;
+                        }
+                    });
+                    console.log(mainTotal)
                     $('.gift-card').each(function() {
                         let discount = $(this);
                         let amount = discount.find('.discount-show').text();
                         console.log("main = " + mainTotal)
                         if(amount <= subtotalText){
                             mainTotal = mainTotal - amount;
-                            console.log("reree" + mainTotal)
                         }
                         else{
                             discount.find('.discount-show').text(mainTotal)

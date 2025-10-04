@@ -123,15 +123,4 @@ class GiftCardsController extends Controller
             return response()->json(['html' => $html]);
         }
     }
-
-    public function giftCardCheck(Request $request)
-    {
-//        $input = $request->all();
-//
-////        $cartDiscount = CartDiscount::where('code' , $input['discount_code'])->first();
-//
-//        $voucherDiscount =  new VoucherService();
-//        return $voucherDiscount->giftVoucher($input , $giftCode);
-    }
-
 }

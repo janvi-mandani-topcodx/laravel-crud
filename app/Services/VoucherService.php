@@ -97,21 +97,6 @@ class VoucherService
                                    'message' => 'you can not use this discount'
                                ]);
                            }
-                           else{
-                               CartDiscount::create([
-                                   'user_id'=>auth()->id(),
-                                   'amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                                   'discount_name' => 'discount',
-                               ]);
-                               return response()->json([
-                                   'status' => 'success',
-                                   'discount_amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                               ]);
-                           }
                        }
 
                        if($discount->usage_limit_one_user_per_customer == 1){
@@ -119,21 +104,6 @@ class VoucherService
                                return response()->json([
                                    'status' => 'error',
                                    'message' => 'you are only one time use this discount'
-                               ]);
-                           }
-                           else{
-                               CartDiscount::create([
-                                   'user_id'=>auth()->id(),
-                                   'amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                               ]);
-                               return response()->json([
-                                   'status' => 'success',
-                                   'discount_amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                                   'discount_name' => 'discount',
                                ]);
                            }
                        }
@@ -145,24 +115,21 @@ class VoucherService
                                    'message' => 'you are not new customer'
                                ]);
                            }
-                           else{
-                               CartDiscount::create([
-                                   'user_id'=>auth()->id(),
-                                   'amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                                   'discount_name' => 'discount',
-                               ]);
-                               return response()->json([
-                                   'status' =>'success',
-                                   'discount_amount' => $discount->amount,
-                                   'code' => $discount->code,
-                                   'type' => $discount->type,
-                               ]);
-                           }
                        }
                    }
-
+               CartDiscount::create([
+                   'user_id'=>auth()->id(),
+                   'amount' => $discount->amount,
+                   'code' => $discount->code,
+                   'type' => $discount->type,
+                   'discount_name' => 'discount',
+               ]);
+               return response()->json([
+                   'status' =>'success',
+                   'discount_amount' => $discount->amount,
+                   'code' => $discount->code,
+                   'type' => $discount->type,
+               ]);
            }
            else if($cartDiscount != null && $cartDiscount->code == $input['discount_code']){
                return response()->json([
@@ -213,7 +180,7 @@ class VoucherService
         }
         CartDiscount::create([
             'user_id'=>auth()->id(),
-            'amount' => $giftCard->balance,
+            'amount' => min($giftCard->balance , $input['total']),
             'code' => $giftCard->code,
             'discount_name' => 'gift_card',
             'type' => 'fixed'
@@ -222,8 +189,7 @@ class VoucherService
             'status' => 'success',
             'discount' => 'gift card',
             'code' => $giftCard->code,
-            'balance' => $giftCard->balance,
+            'balance' => min($giftCard->balance , $input['total']),
         ]);
     }
-
 }

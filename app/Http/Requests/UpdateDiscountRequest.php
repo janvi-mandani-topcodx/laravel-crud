@@ -23,7 +23,7 @@ class UpdateDiscountRequest extends FormRequest
     {
         return [
             'code' => 'required',
-            'value' => 'required',
+            'value' => 'required | integer',
             'minimum_purchase'=>'required_if:requirement,purchase_amount',
             'minimum_quantity'=>'required_if:requirement,quantity_amount',
             'customer_name' => 'required_if:customer,specific_customer',

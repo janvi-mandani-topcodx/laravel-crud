@@ -59,6 +59,7 @@
                 }
                 else{
                     $('.end-date').hide();
+                    $('.end-date').removeClass('d-block');
                     $('#endDate').val('');
                 }
             })
@@ -84,6 +85,10 @@
                 if($(this).prop('checked')){
                     $('#minimumPurchase').hide();
                     $('#minimumQuantity').hide();
+                    $('#minimumQuantity').val('');
+                    $('#minimumPurchase').val('');
+                    $('#minimumPurchase').removeClass('d-block');
+                    $('#minimumQuantity').removeClass('d-block');
                 }
             })
             $(document).on('change' , '#limitNumber' , function (){

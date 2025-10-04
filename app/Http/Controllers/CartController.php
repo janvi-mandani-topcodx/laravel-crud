@@ -142,29 +142,28 @@ class CartController extends Controller
 
     public  function CreditStoreCart(Request $request)
     {
-
-        dd(min(auth()->user()->credits , $request->subtotal));
         if($request->subtotal !=0){
             $credit  = CartDiscount::where('user_id' , auth()->id())->where('discount_name' , 'credit')->first();
-            if($credit == null){
-                if($request->credit <= $request->subtotal){
+            $isCredit = auth()->user()->credits;
+            if($credit == null && $isCredit != 0){
+//                if($request->credit <= $request->subtotal){
                     CartDiscount::create([
                         'user_id'=>auth()->id(),
-                        'amount' => $request->credit,
+                        'amount' => min(auth()->user()->credits , $request->subtotal),
                         'code' => 'credit',
                         'type' => 'fixed',
                         'discount_name' => 'credit',
                     ]);
-                }
-                else{
-                    CartDiscount::create([
-                        'user_id'=>auth()->id(),
-                        'amount' => $request->subtotal,
-                        'code' => 'credit',
-                        'type' => 'fixed',
-                        'discount_name' => 'credit',
-                    ]);
-                }
+//                }
+//                else{
+//                    CartDiscount::create([
+//                        'user_id'=>auth()->id(),
+//                        'amount' => $request->subtotal,
+//                        'code' => 'credit',
+//                        'type' => 'fixed',
+//                        'discount_name' => 'credit',
+//                    ]);
+//                }
             }
             else{
                 return response()->json([

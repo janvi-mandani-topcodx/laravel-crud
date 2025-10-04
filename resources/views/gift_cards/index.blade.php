@@ -16,6 +16,7 @@
                                     <tr>
                                         <th>Id</th>
                                         <th class="text-center">User</th>
+                                        <th class="text-center">Initial Balance</th>
                                         <th class="text-center">Balance</th>
                                         <th class="text-center">Code</th>
                                         <th class="text-center">Notes</th>
@@ -68,6 +69,7 @@
                         name: 'id'
                     },
                     { data: 'customer_id' , name:'user'},
+                    { data: 'initial_balance', name: 'initial balance' , type: 'string'},
                     { data: 'balance', name: 'balance' , type: 'string'},
                     { data : 'code',name: 'code'},
                     { data: 'notes', name: 'notes'},

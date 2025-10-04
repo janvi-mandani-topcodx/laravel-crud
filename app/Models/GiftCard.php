@@ -9,6 +9,7 @@ class GiftCard extends Model
     public $fillable = [
         'user_id',
         'balance',
+        'initial_balance',
         'code',
         'notes',
         'expiry_at',

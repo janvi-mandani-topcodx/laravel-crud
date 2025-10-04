@@ -145,7 +145,7 @@
                 <div class="col-12 col-lg-9 col-xl-7">
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Credit</h3>
+                            <h4 class="mb-4 pb-2 pb-md-0 mb-md-5">Current Credit  : ${{$user->credits}}</h4>
                             <form method="POST" enctype="multipart/form-data" id="creditForm" action="">
                                 @csrf
                                 <div class="row">
@@ -166,6 +166,46 @@
                                     <div class="btn btn-success" id="CreateCredit">Create</div>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h4 class="mb-4 pb-2 pb-md-0 mb-md-5">Card Redemption</h4>
+                            <form method="POST" enctype="multipart/form-data" id="creditForm" action="">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-10">
+                                        <div  class="form-group">
+                                            <input type="text" id="redeemAmount" class="form-control" value="" name="credit_amount" placeholder="Enter redeem"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="btn btn-success" id="CreateCredit">REDEEM</div>
+                                    </div>
+                                </div>
+                            </form>
+                            @foreach($giftCards  as $giftCard)
+                                <div class="row my-2">
+                                    <div class="col">
+                                        <div>{{$giftCard->created_at}}</div>
+                                    </div>
+                                    <div class="col text-end">
+                                        <div>Previous Balance : ${{$giftCard->initial_balance}}</div>
+                                        <div><span class="text-success fs-5 fw-bold">New Balance</span> : ${{$giftCard->balance}}</div>
+                                    </div>
+                                </div>
+                                <hr>
+                            @endforeach
+
                         </div>
                     </div>
                 </div>

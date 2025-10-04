@@ -58,7 +58,7 @@
                                        @if($orderDiscounts)
                                            @foreach($orderDiscounts as $orderDiscount)
                                                @if($orderDiscount->type == 'percentage')
-                                                   <div class="row discount-apply {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit' : 'discount-data')}}">
+                                                   <div class="row discount-apply {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data')}}">
                                                        <div class="col">
                                                            <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
@@ -68,7 +68,7 @@
                                                        </div>
                                                    </div>
                                                @else
-                                                   <div class="row {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? '' : 'discount-data')}}">
+                                                   <div class="row {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data')}}">
                                                        <div class="col">
                                                            <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
@@ -152,29 +152,10 @@
             }
 
             function discountAddOrder() {
-                // let subtotal = ''
-                // console.log($('.discountData').)
-                // if ($('.discountData').length > 0) {
-                //     console.log("aaa")
-                //     let type = $('.discount-show-checkout').data('type');
-                //     let amount = $('.discount-show-checkout').text();
-                //     subtotal = $('.subtotal-order-edit').text();
-                //     console.log("sub = " +subtotal);
-                //     if (type == 'percentage') {
-                //         let total = subtotal * (amount / 100);
-                //         console.log(total)
-                //         let mainTotal  = subtotal - total;
-                //         $('.total-order-edit').text(mainTotal)
-                //     }
-                //     else if(type == 'fixed'){
-                //         let totalPrice = subtotal - amount;
-                //         $('.total-order-edit').text(totalPrice)
-                //     }
-                // }
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal-order-edit').text();
                     let mainTotal = subtotalText;
-                    $('.credit').each(function() {
+                    $('.credit-order').each(function() {
                         let discount = $(this);
                         let credit = discount.find('.discount-show-checkout').text();
                         if(credit != null) {
