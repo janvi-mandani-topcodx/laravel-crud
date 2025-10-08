@@ -64,6 +64,9 @@ class OrderRepository extends BaseRepository
 
     public  function orderDiscountStore($order , $data)
     {
+        if(!isset($data['code'])){
+            return false;
+        }
         foreach ($data['code'] as $key => $value) {
             $item = [
                 'code' => $data['code'][$key],
@@ -73,13 +76,17 @@ class OrderRepository extends BaseRepository
             ];
 
            if($item['discount_name'] == 'gift_card'){
-               $order->orderDiscounts()->create($item);
+               if($item['amount'] > 0 ){
+                   $order->orderDiscounts()->create($item);
+               }
                $giftCard = GiftCard::where('code', $item['code'])->first();
                $giftCard->balance -=  $item['amount'];
                $giftCard->save();
            }
            else{
-               $order->orderDiscounts()->create($item);
+               if($item['amount'] > 0 ){
+                   $order->orderDiscounts()->create($item);
+               }
                if($item['discount_name'] == 'credit') {
                    $user = $order->user;
                    $user->credits -= $item['amount'];

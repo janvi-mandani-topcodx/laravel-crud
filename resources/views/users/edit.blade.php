@@ -145,7 +145,10 @@
                 <div class="col-12 col-lg-9 col-xl-7">
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h4 class="mb-4 pb-2 pb-md-0 mb-md-5">Current Credit  : ${{$user->credits}}</h4>
+                            <div class="d-flex">
+                                <h4 class="mb-4 pb-2 pb-md-0 mb-md-5 ">Current Credit  : $</h4>
+                                <h4 class="current-balance"> {{$user->credits ?? 0}} </h4>
+                            </div>
                             <form method="POST" enctype="multipart/form-data" id="creditForm" action="">
                                 @csrf
                                 <div class="row">
@@ -166,6 +169,25 @@
                                     <div class="btn btn-success" id="CreateCredit">Create</div>
                                 </div>
                             </form>
+                              <table class="table table-hover my-4">
+                                  <thead>
+                                    <tr>
+                                        <th>Previous Balance</th>
+                                        <th>New Balance</th>
+                                        <th>Description</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody class="tbody">
+                                      @foreach($credits->where('type' , 'credit') as $credit)
+                                            <tr>
+                                                <td>{{$credit->previous_balance}}</td>
+                                                <td>{{$credit->new_balance}}</td>
+                                                <td>{{$credit->description}}</td>
+                                            </tr>
+                                      @endforeach
+                                  </tbody>
+                              </table>
+
                         </div>
                     </div>
                 </div>
@@ -179,7 +201,7 @@
                 <div class="col-12 col-lg-9 col-xl-7">
                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
-                            <h4 class="mb-4 pb-2 pb-md-0 mb-md-5">Card Redemption</h4>
+                            <h4 class="mb-4 pb-2 pb-md-0 mb-md-5">Card Redeemption</h4>
                             <form method="POST" enctype="multipart/form-data" id="creditForm" action="">
                                 @csrf
                                 <div class="row">
@@ -189,23 +211,25 @@
                                         </div>
                                     </div>
                                     <div class="col-2">
-                                        <div class="btn btn-success" id="CreateCredit">REDEEM</div>
+                                        <div class="btn btn-success" id="CreateCreditRedeem">REDEEM</div>
                                     </div>
                                 </div>
                             </form>
-                            @foreach($giftCards  as $giftCard)
-                                <div class="row my-2">
-                                    <div class="col">
-                                        <div>{{$giftCard->created_at}}</div>
+                            <div class="redeem-data">
+                                @foreach($credits->where('type' , 'redeem') as $credit)
+                                    <div class="row my-2">
+                                        <div class="col">
+                                            <div>{{$credit->created_at}}</div>
+                                        </div>
+                                        <div class="col text-end">
+                                            <div>Previous Balance : ${{$credit->previous_balance}}</div>
+                                            <div><span class="text-success fs-5 fw-bold">New Balance</span> : ${{$credit->new_balance}}</div>
+                                        </div>
                                     </div>
-                                    <div class="col text-end">
-                                        <div>Previous Balance : ${{$giftCard->initial_balance}}</div>
-                                        <div><span class="text-success fs-5 fw-bold">New Balance</span> : ${{$giftCard->balance}}</div>
-                                    </div>
-                                </div>
-                                <hr>
-                            @endforeach
-
+                                    <hr>
+                                @endforeach
+                                <div class="append-redeem"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,6 +246,41 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+            $(document).on('click' , '#CreateCreditRedeem' , function (e){
+                e.preventDefault();
+                let form = $(this).closest('form')[0];
+                let formData = new FormData(form);
+                let userId = $('#edit-user-id').data('id')
+                formData.append('user_id' , userId);
+                formData.append('type' , 'redeem');
+                $.ajax({
+                    url: "{{route('credit.store')}}",
+                    method: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        const redeem = `
+                             <div class="row my-2">
+                                    <div class="col">
+                                        <div>${response.created_at}</div>
+                                    </div>
+                                    <div class="col text-end">
+                                        <div>Previous Balance : $${response.previous_balance}</div>
+                                        <div><span class="text-success fs-5 fw-bold">New Balance</span> : $${response.new_balance}</div>
+                                    </div>
+                                </div>
+                                <hr>
+                       `;
+                        $('.append-redeem').append(redeem)
+                        let current = $('.current-balance').text();
+                        let balance = parseInt(current) + parseInt(response.new_balance);
+                        $('.current-balance').html(balance)
+                        $('#redeemAmount').val('')
+                    },
+                });
+            })
 
             $(document).on('click' , '#add-tags' , function (){
                 const newTag = `
@@ -291,6 +350,7 @@
                 let formData = new FormData(form);
                 let userId = $('#edit-user-id').data('id')
                 formData.append('user_id' , userId);
+                formData.append('type' , 'credit');
                 $.ajax({
                     url: "{{route('credit.store')}}",
                     method: "POST",
@@ -298,7 +358,20 @@
                     contentType: false,
                     processData: false,
                     success: function (response) {
-                        window.location.href = "{{route('users.index')}}";
+                        const credit = `
+                            <tr>
+                                <td>${response.previous_balance}</td>
+                                <td>${response.new_balance}</td>
+                                <td>${response.description}</td>
+                            </tr>
+                       `;
+                        $('.tbody').append(credit)
+                        let current = $('.current-balance').text();
+                        let balance = parseInt(current) + parseInt(response.new_balance)
+                        console.log(balance)
+                        $('.current-balance').html(balance)
+                        $('#description').val('');
+                        $('#creditAmount').val('');
                     },
                 });
             })

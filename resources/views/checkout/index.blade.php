@@ -47,7 +47,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{--                            <hr class="my-3">--}}
                             @endforeach
                         </div>
                             <div class="position-absolute w-100" style="bottom: 20px; left:20px; padding-right: 40px;">
@@ -64,21 +63,12 @@
                                     </div>
                                 </div>
                                 <div></div>
-{{--                                @if($credit->credits != null)--}}
-{{--                                    <div class="creditApply d-flex justify-content-between my-2 all-discounts-apply">--}}
-{{--                                        <label>Credit</label>--}}
-{{--                                        <div class="d-flex">--}}
-{{--                                            <span>$</span>--}}
-{{--                                            <span class="credit-checkout discount-show-checkout"  data-type="fixed" data-code="credit" data-name="credit">{{$credit->credits}}</span>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
                                 <div class="discountData">
                                     <div class="my-2">
                                         @if($discounts)
                                             @foreach($discounts as $discount)
                                                     @if($discount->type == 'fixed')
-                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit')}}">
+                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit-checkout')}}">
                                                             <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
                                                             <div>
                                                                 <div class="d-flex">
@@ -88,7 +78,7 @@
                                                             </div>
                                                         </div>
                                                     @else
-                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit')}}">
+                                                        <div class="d-flex justify-content-between all-discounts-apply {{$discount->discount_name == 'gift_card' ? 'gift-card' : ($discount->discount_name == 'discount' ? 'discount-data' :'credit-checkout')}}">
                                                             <label>{{$discount->discount_name == 'gift_card' ? 'Gift card' : $discount->discount_name}} : {{$discount->code}}</label>
                                                             <div>
                                                                 <div class="d-flex">
@@ -154,6 +144,72 @@
                 $('.subtotal-checkout').text(totalPrice)
                 $('.total').text(totalPrice)
                 $('.subtotal').text(totalPrice)
+
+                let subtotal = $('.subtotal-checkout').text();
+
+                $.ajax({
+                    url: route('credit.store.cart'),
+                    type: "GET",
+                    dataType: 'json',
+                    data: {
+                        subtotal : subtotal,
+                    },
+                    success: function (response) {
+                        console.log(response)
+                        if(response.discount){
+                            console.log($('.offcanvas-body').find('.discountData'))
+                            $('.offcanvas-body').find('.discountData').append(response.discount)
+                        }
+                        else{
+                            $('.credit-checkout').find('.discount-show-checkout').text(response.amount);
+                            $('.credit').find('.discount-show').text(response.amount)
+                        }
+                        discountAdd()
+                    }
+                });
+                giftCardUpdate();
+            }
+
+            function giftCardUpdate(){
+                let subtotal = $('.subtotal-checkout').text();
+                let credit =  $('.credit-checkout').find('.discount-show-checkout').text();
+                let total = 0;
+                if(credit){
+                    total = parseInt(subtotal) - parseInt(credit)
+                }
+                else{
+                    total = subtotal
+                }
+                let giftCard = $('.gift-card').find('.discount-show-checkout').data('code');
+                $('.gift-card').addClass('d-flex');
+                $('.gift-card').show();
+                $('.discount-data').addClass('d-flex');
+                $('.discount-data').show();
+                if(giftCard && total > 0){
+                    $.ajax({
+                        url: route('gift-card.update.cart'),
+                        type: "GET",
+                        dataType: 'json',
+                        data: {
+                            subtotal : total,
+                            giftCard : giftCard,
+                        },
+                        success: function (response) {
+                            console.log("Response...... = ", response);
+                            $('.gift-card').find('.discount-show').text(response.amount);
+                            $('.gift-card').find('.discount-show-checkout').text(response.amount);
+                            discountAdd()
+                        }
+                    });
+                }
+                else{
+                    $('.gift-card').removeClass('d-flex');
+                    $('.gift-card').find('.discount-show-checkout').text('0')
+                    $('.gift-card').find('.discount-show').text('0')
+                    $('.gift-card').hide();
+                    $('.discount-data').removeClass('d-flex');
+                    $('.discount-data').hide();
+                }
             }
 
             function discountAdd() {
@@ -161,12 +217,15 @@
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal-checkout').text();
                     let mainTotal = subtotalText;
-                    $('.credit').each(function() {
+                    $('.credit-checkout').each(function() {
                         let credit = $(this);
                         let amount = credit.find('.discount-show-checkout').text();
+                        console.log("amount  - " + amount)
+                        console.log("mainTotal  - " + mainTotal)
                         if(amount != null) {
                             if(amount <= subtotalText){
                                 mainTotal = mainTotal - amount;
+                                console.log("amount = " + mainTotal)
                             }
                             else{
                                 mainTotal = mainTotal - mainTotal;
@@ -176,8 +235,9 @@
                         else{
                             mainTotal = mainTotal;
                         }
+
                     });
-                    console.log(mainTotal)
+                    console.log("mainAmount = " + mainTotal)
                     $('.gift-card').each(function() {
                         let discount = $(this);
                         let amount = discount.find('.discount-show-checkout').text();
@@ -194,6 +254,11 @@
                             mainTotal = 0;
                         }
                     });
+                    if(mainTotal == 0){
+                        $('.discount-data').removeClass('d-flex');
+                        $('.discount-data').find('.discount-show-checkout').text('0');
+                        $('.discount-data').hide()
+                    }
 
                     $('.discount-data').each(function() {
                         let discount = $(this);
@@ -316,44 +381,44 @@
             count();
             discountAdd();
             $(document).on('click' , '.increment' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity-cart');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity-cart');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allIncrement(quantity , productId , variantId);
             })
             $(document).on('click' , '.increment-checkout' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity-checkout');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allIncrement(quantity , productId , variantId);
             })
 
             $(document).on('click' , '.increase' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allIncrement(quantity , productId , variantId);
             })
 
             $(document).on('click' , '.decrement' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity-cart');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity-cart');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allDecrement(quantity ,productId , variantId);
             })
 
             $(document).on('click' , '.decrement-checkout' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity-checkout');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allDecrement(quantity ,productId , variantId);
             })
 
 
             $(document).on('click' , '.decrease' , function (){
-                var quantity = $(this).closest('.d-flex').find('.quantity');
-                var productId = $(this).closest('.d-flex').data('product');
-                var variantId = $(this).closest('.d-flex').data('variant');
+                let quantity = $(this).closest('.d-flex').find('.quantity');
+                let productId = $(this).closest('.d-flex').data('product');
+                let variantId = $(this).closest('.d-flex').data('variant');
                 allDecrement(quantity ,productId , variantId);
             })
 

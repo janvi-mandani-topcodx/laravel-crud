@@ -17,7 +17,7 @@ class ProductController extends Controller
      * Display a listing of the resource.
      */
 
-    private $productRepo;
+    private $ProductRepo;
 
     public function __construct(ProductRepository $productRepository)
     {
@@ -55,6 +55,7 @@ class ProductController extends Controller
     {
         $input = $request->all();
         $this->ProductRepo->store($input);
+        return response()->json(['success' => 'product created successfully.']);
     }
 
     public function show(string $id)
@@ -91,6 +92,7 @@ class ProductController extends Controller
         }
 
         $this->ProductRepo->update($input, $product);
+        return response()->json(['success' => 'Product updated successfully.']);
     }
 
     public function destroy(string $id)

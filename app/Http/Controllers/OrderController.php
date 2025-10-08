@@ -66,23 +66,22 @@ class OrderController extends Controller
     {
         $order = Order::with(['orderItems' , 'orderDiscounts'])->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        $orderItems = $order->orderItems;
-        $orderDiscounts = $order->orderDiscounts;
         $totalPrice = 0;
-        foreach ($orderItems as $orderItem) {
-            $total = $orderItem->quantity * $orderItem->price;
-            $totalPrice += $total;
+
+        foreach ($order->orderItems as $orderItem) {
+            $totalPrice += $orderItem->quantity * $orderItem->price;
         }
-        return view('orders.show', compact('order' , 'shippingDetails' , 'orderItems' , 'orderDiscounts' , 'totalPrice'));
+
+        return view('orders.show', compact('order' , 'shippingDetails' , 'totalPrice'));
     }
 
     public function edit(string $id)
     {
         $order = Order::with('orderItems')->find($id);
         $shippingDetails = json_decode($order['shipping_details']);
-        $orderDiscounts = $order->orderDiscounts;
 
-        return view('orders.edit', compact('order', 'shippingDetails' , 'orderDiscounts'));
+
+        return view('orders.edit', compact('order', 'shippingDetails'));
     }
 
     public function update(Request $request, string $id)
@@ -187,4 +186,14 @@ class OrderController extends Controller
             }
         }
     }
+
+//    public function creditUpdateOrder(Request $request)
+//    {
+//        $credit  = OrderDiscount::where('order_id' , $request->orderId)->where('discount_name' , 'credit')->first();
+//        $credit->amount = min(auth()->user()->credits , $request->subtotal);
+//        $credit->save();
+//        return response()->json([
+//            'amount' => $credit->amount,
+//        ]);
+//    }
 }

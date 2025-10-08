@@ -30,7 +30,7 @@ class UserDemoRepository extends BaseRepository
                 $user->addMedia($file)->toMediaCollection('users-demo');
             }
         }
-        return response()->json(['success'=>'User created successfully.']);
+
     }
 
 
@@ -46,7 +46,7 @@ class UserDemoRepository extends BaseRepository
         }
 
         $userDemo->update($userData);
-        return response()->json(['success'=>'User updated successfully.']);
+
     }
 
 }

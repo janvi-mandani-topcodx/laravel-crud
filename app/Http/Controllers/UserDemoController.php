@@ -49,6 +49,7 @@ class UserDemoController extends Controller
     {
         $input = $request->all();
         $this->UserDemoRepo->store($input);
+        return response()->json(['success'=>'User created successfully.']);
     }
 
     public function show(string $id)
@@ -79,6 +80,7 @@ class UserDemoController extends Controller
             }
         }
         $this->UserDemoRepo->update($input, $userDemo);
+        return response()->json(['success'=>'User updated successfully.']);
     }
 
     public function destroy(string $id)

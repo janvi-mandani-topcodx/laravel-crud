@@ -54,11 +54,11 @@
                                             <span class="subtotal-order-edit" id=""></span>
                                         </div>
                                     </div>
-                                   <div class="discountData">
-                                       @if($orderDiscounts)
-                                           @foreach($orderDiscounts as $orderDiscount)
+                                   <div class="discountData-order">
+                                       @if($order->orderDiscounts)
+                                           @foreach($order->orderDiscounts as $orderDiscount)
                                                @if($orderDiscount->type == 'percentage')
-                                                   <div class="row discount-apply {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data')}}">
+                                                   <div class="row discount-apply {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data-order')}} {{ $orderDiscount->amount == 0 ? 'd-none' : ''}}">
                                                        <div class="col">
                                                            <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
@@ -68,7 +68,7 @@
                                                        </div>
                                                    </div>
                                                @else
-                                                   <div class="row {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data')}}">
+                                                   <div class="row {{$orderDiscount->discount_name == 'gift_card' ? 'gift-card' : ($orderDiscount->discount_name == 'credit' ? 'credit-order' : 'discount-data-order')}} {{ $orderDiscount->amount == 0 ? 'd-none' : ''}}" >
                                                        <div class="col">
                                                            <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                        </div>
@@ -112,15 +112,6 @@
                 }
             });
 
-            // function count() {
-            //     let totalCount = 0;
-            //     $('.quantity-checkout').each(function() {
-            //         let qty = parseInt($(this).text());
-            //         totalCount += qty;
-            //     });
-            //     $('.count').text(totalCount);
-            // }
-
             $(document).on('keyup', '#search' ,  function () {
                 let query = $(this).val();
                 $.ajax({
@@ -148,11 +139,12 @@
                     let total = quantity * price;
                     totalPrice += total;
                 });
+                let orderId = $('.itemData').data('order')
                 $('.subtotal-order-edit').text(totalPrice)
             }
 
             function discountAddOrder() {
-                if ($('.discountData').text() != null) {
+                if ($('.discountData-order').text() != null) {
                     let subtotalText = $('.subtotal-order-edit').text();
                     let mainTotal = subtotalText;
                     $('.credit-order').each(function() {
@@ -177,7 +169,7 @@
                         }
                     });
 
-                    $('.discount-data').each(function() {
+                    $('.discount-data-order').each(function() {
                         let discount = $(this);
                         let type = discount.find('.discount-show-checkout').data('type');
                         let amount = discount.find('.discount-show-checkout').text();
@@ -202,72 +194,10 @@
                     subtotal = $('.subtotal-order-edit').text();
                     $('.total-order-edit').text(subtotal)
                 }
-                // if($('.discountData').text() != ''){
-                //     $('.total-order-edit').text(subtotal)
-                // }
             }
-            // function allDecrement(quantity ,productId , variantId){
-            //     var currentQuantity = parseInt(quantity.text());
-            //     if(currentQuantity > 1){
-            //         var newQuantity = currentQuantity - 1;
-            //         quantity.text(newQuantity);
-            //         $('.decrement-card-'+ productId +'-'+ variantId).siblings('.quantity').text(newQuantity);
-            //         $('.decrement-checkout-'+ productId +'-'+ variantId).siblings('.quantity-checkout').text(newQuantity);
-            //         $('.decrement-item-'+ productId +'-'+ variantId).siblings('.quantity-item').text(newQuantity);
-            //         updateQuantity(productId, variantId , newQuantity)
-            //     }
-            // }
-            //
-            // function  allIncrement(quantity ,productId , variantId , orderId){
-            //     var currentQuantity = parseInt(quantity.text());
-            //     var newQuantity = currentQuantity + 1;
-            //     quantity.text(newQuantity);
-            //     $('.increment-card-'+ productId +'-' +variantId ).siblings('.quantity').text(newQuantity);
-            //     $('.increment-item-'+ productId +'-' +variantId ).siblings('.quantity-item').text(newQuantity);
-            //     $('.increment-checkout-'+ productId +'-' +variantId ).siblings('.quantity-checkout').text(newQuantity);
-            //     updateQuantity(productId, variantId , newQuantity , orderId)
-            // }
-
 
             updateTotalOrder();
             discountAddOrder()
-
-
-
-            // $(document).on('click' , '.increment-checkout' , function (){
-            //     var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
-            //     var productId = $(this).closest('.d-flex').data('product');
-            //     var variantId = $(this).closest('.d-flex').data('variant');
-            //     var orderId = $(this).parents('.itemData').data('order');
-            //     allIncrement(quantity , productId , variantId , orderId);
-            // })
-            //
-            // $(document).on('click' , '.decrement-checkout' , function (){
-            //     var quantity = $(this).closest('.d-flex').find('.quantity-checkout');
-            //     var productId = $(this).closest('.d-flex').data('product');
-            //     var variantId = $(this).closest('.d-flex').data('variant');
-            //     allDecrement(quantity ,productId , variantId);
-            // })
-
-            //
-            // function updateQuantity(productId, variantId, quantity , orderId) {
-            //     console.log(productId , variantId,quantity)
-            //     updateTotalOrder();
-            //     $.ajax({
-            //         url: route('update.item'),
-            //         type: "POST",
-            //         data: {
-            //             product_id: productId,
-            //             variant_id: variantId,
-            //             quantity: quantity,
-            //             order_id: orderId,
-            //             _token: $('meta[name="csrf-token"]').attr('content'),
-            //         },
-            //         success: function (response) {
-            //             console.log('Quantity updated');
-            //         },
-            //     });
-            // }
 
             $(document).on('click' , '.update-order-items' , function (){
                let priceData = [];

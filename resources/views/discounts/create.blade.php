@@ -87,24 +87,6 @@
                     $('#limitDiscount').hide();
                 }
             })
-
-            {{--$(document).on('click' , '#createDiscount' ,  function (e){--}}
-            {{--    e.preventDefault()--}}
-            {{--    let form = $(this).closest('form')[0];--}}
-            {{--    let formData = new FormData(form);--}}
-
-            {{--    --}}{{--$.ajax({--}}
-            {{--    --}}{{--    url: "{{route('discounts.store')}}",--}}
-            {{--    --}}{{--    method: "POST",--}}
-            {{--    --}}{{--    data: formData,--}}
-            {{--    --}}{{--    contentType: false,--}}
-            {{--    --}}{{--    processData: false,--}}
-            {{--    --}}{{--    success: function (response) {--}}
-            {{--    --}}{{--        window.location.href = '{{ route('discounts.index') }}';--}}
-            {{--    --}}{{--    }--}}
-            {{--    --}}{{--});--}}
-            {{--})--}}
-
             $(document).on('keyup', '#searchProduct' ,  function () {
                 let query = $(this).val();
                 $.ajax({

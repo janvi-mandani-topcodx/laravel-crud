@@ -114,9 +114,9 @@ class UserController extends Controller
         if ($role->hasPermissionTo('edit user')) {
                 $user = User::find($id);
                 $roles = Role::all();
-                $giftCards =  CreditLog::where('user_id', $id)->orWhere('user_id' , null)->get();
+                $credits =  CreditLog::where('user_id', $id)->get();
 
-                return view('users.edit', compact('user', 'roles' , 'giftCards'));
+                return view('users.edit', compact('user', 'roles' , 'credits'));
         }
         else{
             return redirect()->route('users.index')->with(['error' => "You don't have permission to update user."]);

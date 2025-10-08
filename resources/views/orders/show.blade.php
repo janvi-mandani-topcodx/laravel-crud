@@ -52,7 +52,7 @@
                     <div class="card shadow-2-strong card-registration my-4" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5">
                             <div class="text-muted fw-bold fs-4 my-4 text-center">Order Items</div>
-                            @foreach ($orderItems as $orderItem)
+                            @foreach ($order->orderItems as $orderItem)
                                 <div class="row my-3 bg-light">
                                     <div class="col">
                                         <img src="{{ $orderItem->product->image_url[0]}}" width="100px" height="100px">
@@ -82,10 +82,10 @@
                                     <p>${{$totalPrice}}</p>
                                 </div>
                             </div>
-                            @if($orderDiscounts)
-                                @foreach($orderDiscounts as $orderDiscount)
+                            @if($order->orderDiscounts)
+                                @foreach($order->orderDiscounts as $orderDiscount)
                                        @if($orderDiscount->type == 'percentage')
-                                            <div class="row">
+                                            <div class="row {{ $orderDiscount->amount <= 0 ? 'd-none' : ''}}">
                                                 <div class="col">
                                                     <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                 </div>
@@ -94,7 +94,7 @@
                                                 </div>
                                             </div>
                                        @else
-                                            <div class="row">
+                                            <div class="row {{ $orderDiscount->amount <= 0 ? 'd-none' : ''}}">
                                                 <div class="col">
                                                     <p>{{$orderDiscount->discount_name == 'gift_card' ? 'Gift card' : $orderDiscount->discount_name}} : {{$orderDiscount->code}}</p>
                                                 </div>
@@ -150,18 +150,7 @@
             e.preventDefault()
             let form = $(this).closest('form')[0];
             let formData = new FormData(form);
-            // let total = $('#totalAmount').text();
-            // $('.cartData').each(function () {
-            //     let productId = $(this).data('product');
-            //     let variantId = $(this).data('variant');
-            //     let quantity = $(this).find('.quantity-checkout').text();
-            //     let price = $(this).find('.cart-price-edit-checkout').text();
-            //     formData.append('price[]' , price )
-            //     formData.append('productId[]' , productId )
-            //     formData.append('variantId[]' , variantId )
-            //     formData.append('quantity[]' , quantity )
-            // });
-            // formData.append('total', total);
+
             $.ajax({
                 url: "{{route('order.update', $order->id)}}",
                 method: "POST",

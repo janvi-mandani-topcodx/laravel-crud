@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\CartDiscount;
+use App\Models\GiftCard;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
@@ -11,6 +12,7 @@ class CartController extends Controller
 {
     public function cart(Request $request){
         $html = '';
+        $discountHtml = '';
         $input = $request->all();
         $userId = auth()->id();
         $editCart = Cart::where('user_id',$userId)->where('product_id',$input['product_id'])->where('variant_id' , $input['variant_id'])->first();
@@ -23,14 +25,17 @@ class CartController extends Controller
                 ]);
         }
         else{
+
             $cart = Cart::create([
                 'user_id' => $userId,
                 'product_id' => $input['product_id'],
                 'variant_id' => $input['variant_id'],
                 'quantity' => $input['quantity'],
             ]);
-
             $existingCartCount = Cart::where('user_id' , $userId)->count();
+//            $existingCartCount = auth()->id()->carts()->count();
+
+//            $discount = CartDiscount::where('user_id' , $userId)->get();
 
             $html .= '
                     <div class="row my-3 bg-light cart-'.$cart->id.' cart-product-'.$input['product_id'].'" data-product="'.$input['product_id'].'" data-variant="'.$input['variant_id'].'" data-cart="'.$cart->id.'">
@@ -61,6 +66,17 @@ class CartController extends Controller
                         </div>
                     </div>
                 ';
+//            $discountHtml .= '
+//                     <div class="d-flex justify-content-between discount-apply credit">
+//                          <label>credit : '.$discount->code.'</label>
+//                          <div class="d-flex">
+//                               <div class="d-flex">
+//                                    <span>$</span>
+//                               </div>
+//                                <span class="discount-show" data-type="'.$discount->type.'" data-code="'.$discount->code.'" data-name="'.$discount->discount_name.'">'.$discount->amount.'</span>
+//                          </div>
+//                     </div>
+//                ';
             if ($existingCartCount < 1) {
                 $html .= '
                     <div class="position-absolute  w-100" style="bottom: 20px; left:0;">
@@ -85,7 +101,7 @@ class CartController extends Controller
             ';
             }
 
-            return response()->json(['html' => $html , 'variant' => $input['variant_id']]);
+            return response()->json(['html' => $html , 'variant' => $input['variant_id'] , 'discount' => $discountHtml]);
         }
     }
 
@@ -100,8 +116,40 @@ class CartController extends Controller
         if ($cartItem) {
             $cartItem->quantity = $request->quantity;
             $cartItem->save();
+    //            if($request->subtotal !=0){
+    //                $credit  = CartDiscount::where('user_id' , auth()->id())->where('discount_name' , 'credit')->first();
+    //                $isCredit = auth()->user()->credits;
+    //                $discountHtml = '';
+    //                if($credit == null && $isCredit != 0){
+    //                    $discount = CartDiscount::create([
+    //                        'user_id'=>auth()->id(),
+    //                        'amount' => min(auth()->user()->credits , $request->subtotal),
+    //                        'code' => 'credit',
+    //                        'type' => 'fixed',
+    //                        'discount_name' => 'credit',
+    //                    ]);
+    //                    $discountHtml .= '
+    //                     <div class="d-flex justify-content-between discount-apply credit">
+    //                          <label>credit : '.$discount->code.'</label>
+    //                          <div class="d-flex">
+    //                               <div class="d-flex">
+    //                                    <span>$</span>
+    //                               </div>
+    //                                <span class="discount-show" data-type="'.$discount->type.'" data-code="'.$discount->code.'" data-name="'.$discount->discount_name.'">'.$discount->amount.'</span>
+    //                          </div>
+    //                     </div>
+    //                ';
+    //                    return response()->json(['discount' => $discountHtml]);
+    //                }
+    //                else{
+    //                    return response()->json([
+    //                        'status' => false,
+    //                    ]);
+    //                }
+    //            }
             return response()->json(['message' => 'Quantity updated']);
         }
+
         return response()->json(['message' => 'Item not found'], 404);
     }
 
@@ -142,35 +190,49 @@ class CartController extends Controller
 
     public  function CreditStoreCart(Request $request)
     {
-        if($request->subtotal !=0){
+        if($request->subtotal != 0){
             $credit  = CartDiscount::where('user_id' , auth()->id())->where('discount_name' , 'credit')->first();
-            $isCredit = auth()->user()->credits;
-            if($credit == null && $isCredit != 0){
-//                if($request->credit <= $request->subtotal){
-                    CartDiscount::create([
-                        'user_id'=>auth()->id(),
-                        'amount' => min(auth()->user()->credits , $request->subtotal),
-                        'code' => 'credit',
-                        'type' => 'fixed',
-                        'discount_name' => 'credit',
-                    ]);
-//                }
-//                else{
-//                    CartDiscount::create([
-//                        'user_id'=>auth()->id(),
-//                        'amount' => $request->subtotal,
-//                        'code' => 'credit',
-//                        'type' => 'fixed',
-//                        'discount_name' => 'credit',
-//                    ]);
-//                }
-            }
-            else{
-                return response()->json([
-                    'status' => false,
-                ]);
-            }
+               $userCredit = auth()->user()->credits;
+               $discountHtml = '';
+               if($credit){
+                   $credit->amount = min(auth()->user()->credits , $request->subtotal);
+                   $credit->save();
+                   return response()->json([
+                       'amount' => $credit->amount,
+                   ]);
+               }
+               if(!$credit && $userCredit != 0){
+                   $discount = CartDiscount::create([
+                       'user_id'=>auth()->id(),
+                       'amount' => min(auth()->user()->credits , $request->subtotal),
+                       'code' => 'credit',
+                       'type' => 'fixed',
+                       'discount_name' => 'credit',
+                   ]);
+                   $discountHtml .= '
+                     <div class="d-flex justify-content-between discount-apply credit">
+                          <label>credit : '.$discount->code.'</label>
+                          <div class="d-flex">
+                               <div class="d-flex">
+                                    <span>$</span>
+                               </div>
+                                <span class="discount-show" data-type="'.$discount->type.'" data-code="'.$discount->code.'" data-name="'.$discount->discount_name.'">'.$discount->amount.'</span>
+                          </div>
+                     </div>
+                ';
+                   return response()->json(['discount' => $discountHtml , 'amount' => $discount->amount]);
+               }
         }
     }
 
+    public function giftCardUpdateCart(Request $request)
+    {
+        $credit  = CartDiscount::where('user_id' , auth()->id())->where('code' , $request->giftCard)->first();
+        $giftCard = GiftCard::where('code' , $request->giftCard)->first();
+        $credit->amount = min($giftCard->balance , $request->subtotal);
+        $credit->save();
+        return response()->json([
+            'amount' => $credit->amount,
+        ]);
+    }
 }

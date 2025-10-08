@@ -68,6 +68,7 @@ Route::get('delete/cart', [CartController::class, 'cartDelete'])->name('delete.c
 Route::get('delete/cart/discount', [CartController::class, 'cartDiscountDelete'])->name('delete.cart.discount');
 Route::get('delete/order/item', [OrderController::class, 'orderItemDelete'])->name('delete.order.item');
 Route::get('credit/store/cart', [CartController::class, 'CreditStoreCart'])->name('credit.store.cart');
+Route::get('gift-card/cart/update', [CartController::class, 'giftCardUpdateCart'])->name('gift-card.update.cart');
 
 
 Auth::routes(['verify' => true]);

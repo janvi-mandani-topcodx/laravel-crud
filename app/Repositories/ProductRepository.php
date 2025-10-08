@@ -33,7 +33,7 @@ class ProductRepository extends BaseRepository
         }
         $this->productVariant($productVariant, $product);
 
-        return response()->json(['success' => 'product created successfully.']);
+
     }
 
     public function productVariant($productVariant, $product)
@@ -76,7 +76,7 @@ class ProductRepository extends BaseRepository
             $product['status'] = 0;
         }
         $products->update($product);
-        return response()->json(['success' => 'User updated successfully.']);
+
     }
 }
 

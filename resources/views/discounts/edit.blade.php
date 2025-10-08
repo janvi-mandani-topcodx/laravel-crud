@@ -102,23 +102,6 @@
                 }
             })
 
-            // $(document).on('click' , '#updateDiscount' ,  function (e){
-                {{--e.preventDefault()--}}
-                {{--let form = $(this).closest('form')[0];--}}
-                {{--let formData = new FormData(form);--}}
-
-                {{--$.ajax({--}}
-                {{--    url: "{{route('discounts.update' , $discount->id)}}",--}}
-                {{--    method: "POST",--}}
-                {{--    data: formData,--}}
-                {{--    contentType: false,--}}
-                {{--    processData: false,--}}
-                {{--    success: function (response) {--}}
-                {{--        window.location.href = '{{ route('discounts.index') }}';--}}
-                {{--    }--}}
-                {{--});--}}
-            // })
-
             $(document).on('keyup', '#searchProduct' ,  function () {
                 let query = $(this).val();
                 $.ajax({

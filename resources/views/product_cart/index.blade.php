@@ -76,26 +76,133 @@
                 }
             });
 
+            function count() {
+                let totalCount = 0;
+                $('.quantity-cart').each(function() {
+                    let qty = parseInt($(this).text());
+                    totalCount += qty;
+                });
+                $('.count').text(totalCount);
+            }
+
+            function updateTotal(){
+                let totalPrice = 0;
+                $('.quantity-cart').each(function () {
+                    let quantity = parseFloat($(this).text());
+                    console.log(quantity)
+                    let price = $(this).parents('.row').find('.cart-price').text();
+                    console.log(price)
+                    let total = quantity * price;
+                    totalPrice += total;
+                });
+                $('.total').text(totalPrice)
+                $('.subtotal').text(totalPrice)
+
+                if($('.subtotal').text() == 0){
+                    console.log("ssdsssss")
+                    $('.checkoutBtn').hide();
+                    $('.discount-div').hide();
+                }
+                else{
+                    console.log("sasasasasa")
+                    $('.checkoutBtn').show();
+                    $('.discount-div').show();
+                }
 
 
-            function buttons() {
-            //     $('.card').each(function() {
-            //         // if ($(this).find('#addToCart').show()) {
-            //         //     $(this).find('#addToCart').show();
-            //         //     $(this).find('#incrementDecrement').hide();
-            //         // } else {
-            //         //     $(this).find('#addToCart').hide();
-            //         //     $(this).find('#incrementDecrement').show();
-            //         // }
-            //         // if($('.size').data('item-exists') == true){
-            //         //     $('.card').find('#addToCart').hide();
-            //         //     $('.card').find('#incrementDecrement').show();
-            //         // }
-            //         // else{
-            //         //     $('.card').find('#addToCart').show();
-            //         //     $('.card').find('#incrementDecrement').hide();
-            //         // }
-            //     });
+                let subtotal = $('.subtotal').text();
+                $.ajax({
+                    url: route('credit.store.cart'),
+                    type: "GET",
+                    dataType: 'json',
+                    data: {
+                        subtotal : subtotal,
+                    },
+                    success: function (response) {
+                        if(response.discount){
+                            console.log($('.offcanvas-body').find('.credit-add'))
+                            $('.offcanvas-body').find('.credit-add').append(response.discount)
+                        }
+                        else{
+                            console.log('update amount = ' + response.amount)
+                            $('.credit-checkout').find('.discount-show-checkout').text(response.amount);
+                            $('.credit').find('.discount-show').text(response.amount)
+                        }
+                        discountAdd();
+                    }
+                });
+                giftCardUpdate();
+            }
+
+
+            function giftCardUpdate(){
+                let subtotal = $('.subtotal').text();
+                let credit =  $('.credit').find('.discount-show').text();
+                let total = 0;
+                if(credit){
+                    total = parseInt(subtotal) - parseInt(credit)
+                }
+                else{
+                    total = subtotal
+                }
+                $('.gift-card').addClass('d-flex');
+                $('.gift-card').show();
+                $('.discount-data').addClass('d-flex');
+                $('.discount-data').show();
+                let giftCard = $('.gift-card').find('.discount-show').data('code');
+                if(giftCard && total > 0){
+                    $.ajax({
+                        url: route('gift-card.update.cart'),
+                        type: "GET",
+                        dataType: 'json',
+                        data: {
+                            subtotal : total,
+                            giftCard : giftCard,
+                        },
+                        success: function (response) {
+                            console.log("Response...... = ", response);
+                            $('.gift-card').find('.discount-show').text(response.amount);
+                            discountAdd()
+                        }
+                    });
+                }
+                else{
+                    $('.gift-card').removeClass('d-flex');
+                    $('.gift-card').hide();
+                    $('.discount-data').removeClass('d-flex');
+                    $('.discount-data').hide();
+                    $('.gift-card').find('.discount-show').text('0')
+                }
+            }
+            function discountAdd() {
+
+                if ($('.discountData').text() != null) {
+                    let subtotalText = $('.subtotal').text();
+                    let mainTotal = subtotalText;
+                    console.log("yyy" + mainTotal);
+
+                    $('.discount-apply').each(function() {
+                        let discount = $(this);
+                        let type = discount.find('.discount-show').data('type');
+                        let amount =  discount.find('.discount-show').text();
+                        console.log("calculate amount = " + amount)
+
+                        if (type === 'percentage') {
+                            let discountAmount = mainTotal * (amount / 100);
+                            console.log(discountAmount)
+                            mainTotal = mainTotal - discountAmount;
+                        } else if (type === 'fixed') {
+                            mainTotal = mainTotal - amount;
+                        }
+                        if (mainTotal < 0) {
+                            mainTotal = 0;
+                        }
+                    });
+
+
+                    $('.total').text(mainTotal);
+                    $('.total-checkout').text(mainTotal);
+                }
             }
 
             function accessVariant(){
@@ -139,70 +246,7 @@
 
             }
             accessVariant();
-
-            function count() {
-                let totalCount = 0;
-                $('.quantity-cart').each(function() {
-                    let qty = parseInt($(this).text());
-                    totalCount += qty;
-                });
-                $('.count').text(totalCount);
-            }
-
-            function updateTotal(){
-                    let totalPrice = 0;
-                    $('.quantity-cart').each(function () {
-                        let quantity = parseFloat($(this).text());
-                        console.log(quantity)
-                        let price = $(this).parents('.row').find('.cart-price').text();
-                        console.log(price)
-                        let total = quantity * price;
-                        totalPrice += total;
-                    });
-                    $('.total').text(totalPrice)
-                    $('.subtotal').text(totalPrice)
-
-                    if($('.subtotal').text() == 0){
-                        console.log("ssdsssss")
-                        $('.checkoutBtn').hide();
-                        $('.discount-div').hide();
-                    }
-                    else{
-                        console.log("sasasasasa")
-                        $('.checkoutBtn').show();
-                        $('.discount-div').show();
-                    }
-            }
-            function discountAdd() {
-                console.log($('.discountData').text());
-                if ($('.discountData').text() != null) {
-                    let subtotalText = $('.subtotal').text();
-                    let mainTotal = subtotalText;
-
-                    $('.discount-apply').each(function() {
-                        let discount = $(this);
-                        let type = discount.find('.discount-show').data('type');
-                        let amount = discount.find('.discount-show').text();
-
-                        if (type === 'percentage') {
-                            let discountAmount = mainTotal * (amount / 100);
-                            console.log(discountAmount)
-                            mainTotal = mainTotal - discountAmount;
-                        } else if (type === 'fixed') {
-                            mainTotal = mainTotal - amount;
-                        }
-                        if (mainTotal < 0) {
-                            mainTotal = 0;
-                        }
-                    });
-                    console.log(mainTotal)
-
-                    $('.total').text(mainTotal);
-                    $('.total-checkout').text(mainTotal);
-                }
-            }
             updateTotal();
-            buttons();
             discountAdd()
             count();
             $(document).on('click', '.size', function () {
@@ -217,8 +261,6 @@
                 product.data('variant' , variant);
                 $('.product-'+productId).find('.addToCart').data('id' , variant)
                 $('.product-'+productId).find('#incrementDecrement').find('.d-flex').data('variant' , variant)
-                // $('.increase').data('variant' , variant)
-                // $('.decrease').data('variant' , variant)
                 $.ajax({
                     url: route('cart.add'),
                     type: "GET",
@@ -239,6 +281,7 @@
                     },
                 });
             })
+
 
             $(document).on('click' , '#addToCart', function (){
                 let product = $(this).parents('#product');
@@ -262,6 +305,7 @@
                         quantity : 1
                     },
                     success: function (response) {
+
                         if(response.quantity){
                             let row = $('.offcanvas-body').find('.cart-' + response.cartId);
                             row.find('.quantity').text(response.quantity)
@@ -272,6 +316,7 @@
                             $('.product-'+productId).find('#incrementDecrement').show()
                         }
                         $('.offcanvas-body').find('#allCartData').append(response.html)
+
                         updateTotal();
                         count();
                         discountAdd()
@@ -279,17 +324,14 @@
                 });
             })
 
-            function increment(quantity , productId , variantId , price){
+
+            function increment(quantity , productId , variantId , price ){
                 var currentQuantity = parseInt(quantity.text());
                 var newQuantity = currentQuantity + 1;
                 quantity.text(newQuantity);
-                // console.log("aaa" + $('.increase').data('variant'))
-                // $('.increase').data('variant' , variantId).siblings('.quantity').text(newQuantity);
                 if(price == $('.product-' + productId).find('.price').text()){
-
                     console.log("productId = " + productId);
                     console.log("varianr = " + variantId);
-
                     $('.increment-card-'+ productId + '-' + variantId).siblings('.quantity').text(newQuantity);
                 }
                 $('.increment-cart-'+ productId + '-' + variantId).siblings('.quantity-cart').text(newQuantity);
@@ -358,7 +400,6 @@
                     },
                 });
             }
-
 
             $(document).on('click' , '.checkoutBtn' , function (){
                 window.location.href = route('checkout.show');

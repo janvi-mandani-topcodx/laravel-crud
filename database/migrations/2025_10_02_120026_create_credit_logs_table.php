@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('credit_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->integer('previews_balance');
+            $table->integer('previous_balance');
             $table->integer('new_balance');
+            $table->string('type');
             $table->string('description');
             $table->timestamps();
         });

@@ -8,9 +8,10 @@ class CreditLog extends Model
 {
     public $fillable = [
         'user_id',
-        'previews_balance',
+        'previous_balance',
         'new_balance',
         'description',
+        'type'
     ];
 
     public function user(){

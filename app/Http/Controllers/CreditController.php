@@ -32,12 +32,13 @@ class CreditController extends Controller
         $input = $request->all();
 
         $user = User::where('id' , $input['user_id'])->first();
-        if($user->credits != null){
+        if($user->credits){
             $credit = CreditLog::create([
                 'user_id' => $input['user_id'],
-                'description' => $input['description'],
-                'previews_balance' => $user->credits,
+                'description' => $input['description'] ?? null,
+                'previous_balance' => $user->credits,
                 'new_balance' => $input['credit_amount'],
+                'type' => $input['type'],
             ]);
             $user->credits = $user->credits + $input['credit_amount'];
             $user->save();
@@ -45,14 +46,24 @@ class CreditController extends Controller
         else{
             $credit = CreditLog::create([
                 'user_id' => $input['user_id'],
-                'description' => $input['description'],
-                'previews_balance' => 0,
+                'description' => $input['description'] ?? null,
+                'previous_balance' => 0,
                 'new_balance' => $input['credit_amount'],
+                'type' => $input['type'],
             ]);
             $userCredit = $credit->user;
             $userCredit->credits  = $input['credit_amount'];
             $userCredit->save();
         }
+
+        return response()->json([
+            'success' => true,
+            'new_balance' => $credit->new_balance,
+            'previous_balance' => $credit->previous_balance,
+            'type' => $credit->type,
+            'created_at' => $credit->created_at,
+            'description' => $credit->description,
+        ]);
     }
 
     /**
@@ -86,4 +97,6 @@ class CreditController extends Controller
     {
         //
     }
+
+
 }

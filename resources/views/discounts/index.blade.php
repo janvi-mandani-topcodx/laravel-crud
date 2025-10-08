@@ -18,14 +18,10 @@
                                         <th class="text-center">Code</th>
                                         <th class="text-center">Amount</th>
                                         <th class="text-center">Type</th>
-{{--                                        <th class="text-center">Minimum Requirements</th>--}}
-{{--                                        <th class="text-center">Minimum Amount</th>--}}
                                         <th class="text-center">Customer Eligibility</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Applies Product</th>
                                         <th class="text-center">Product</th>
-{{--                                        <th class="text-center">Discount Apply Type</th>--}}
-{{--                                        <th class="text-center">Discount Type Number</th>--}}
                                         <th class="text-center">Start Date</th>
                                         <th class="text-center">End Date</th>
                                         <th class="text-center">Status</th>
@@ -78,8 +74,6 @@
                     { data : 'code',name: 'code'},
                     { data: 'amount', name: 'amount' , type: 'string'},
                     { data: 'type', name: 'type'},
-                    // { data: 'minimum_requirements', name: 'Minimum Requirements'},
-                    // { data: 'minimum_amount', name: 'Minimum Amount'},
                     { data: 'customer_eligibility', name: 'Customer Eligibility'},
                     { data: 'customer_id', name: 'customer' },
                     { data: 'applies_product', name: 'applies product'},
@@ -87,8 +81,6 @@
                     { data: 'start_date', name: 'start date' , type: 'string'},
                     { data: 'end_date', name: 'end_date' , type: 'string'},
                     { data: 'status', name: 'status' , type: 'string'},
-                    // { data: 'discount_apply_type', name: 'Discount Apply Type'},
-                    // { data: 'discount_type_number', name: 'Discount Type Number'},
 
 
                     {

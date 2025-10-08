@@ -18,7 +18,7 @@ class GiftCardRepository extends BaseRepository
     {
         GiftCard::create([
             'code' => $data['code'],
-            'initial_balance' => 0,
+            'initial_balance' => $data['balance'],
             'balance' => $data['balance'],
             'user_id' => $data['customer_id'] ?? null,
             'notes' => $data['notes'],
