@@ -40,5 +40,5 @@
 </div>
 
 <div>
-    <button class="btn btn-success w-100 checkoutAction">Checkout</button>
+    <button class="btn btn-success w-100 checkout-action" type="button">Checkout</button>
 </div>

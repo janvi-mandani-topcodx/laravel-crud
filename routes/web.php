@@ -14,6 +14,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserDemoController;
 use App\Http\Middleware\LoginMiddleware;
@@ -43,6 +44,8 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::get('gift/user/search', [GiftCardsController::class, 'giftCardUserSearch'])->name('gift.user.search');
     Route::post('discount/check', [DiscountController::class, 'discountCodeCheck'])->name('discount.code.check');
     Route::post('items/update/{items}', [OrderController::class, 'orderItemUpdate'])->name('order.items.update');
+    Route::get('stripe/payment', [StripeController::class, 'stripeForm'])->name('stripe.form');
+    Route::post('stripe/payment', [StripeController::class, 'stripePayment'])->name('stripe.payment');
 
 //    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
 //    Route::post('order/create', [CheckoutController::class, 'orderCreate'])->name('create.order');

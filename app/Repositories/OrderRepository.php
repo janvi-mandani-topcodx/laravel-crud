@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 
 class OrderRepository extends BaseRepository
 {

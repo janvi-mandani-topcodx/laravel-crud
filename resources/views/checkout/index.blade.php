@@ -7,8 +7,18 @@
             <section class="vh-100 gradient-custom my-5">
                 <div class="" style="border-radius: 15px;">
                     <div class="card-body p-4 p-md-5">
-                       <form method="post">
-                           @include('checkout.fields')
+                       <form method="post" action="#" id="checkoutForm">
+                           <div id="checkoutField">
+                               @include('checkout.fields')
+                           </div>
+
+                           <div id="stripePayment">
+                               <div id="card-element"></div>
+                               <meta name="csrf-token" content="{{ csrf_token() }}">
+                               <button id="card-button">
+                                   Process Payment
+                               </button>
+                           </div>
                        </form>
                     </div>
                 </div>
@@ -112,6 +122,7 @@
 
 @endsection
 @section('scripts')
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
         $(document).ready(function () {
             $.ajaxSetup({
@@ -120,6 +131,7 @@
                 }
             });
 
+            $('#stripePayment').hide();
             function count() {
                 let totalCount = 0;
                 $('.quantity-cart').each(function() {
@@ -443,67 +455,157 @@
                 });
             }
 
-            $(document).on('click' , '.checkoutAction' , function (e){
-                e.preventDefault()
-                let form = $(this).closest('form')[0];
-                let formData = new FormData(form);
-                let total = $('.total-checkout').text();
-                $('.cartData').each(function () {
-                    let productId = $(this).data('product');
-                    let variantId = $(this).data('variant');
-                    let quantity = $(this).find('.quantity-checkout').text();
-                    let price = $(this).find('.cart-price').text();
-                    formData.append('price[]' , price )
-                    formData.append('productId[]' , productId )
-                    formData.append('variantId[]' , variantId )
-                    formData.append('quantity[]' , quantity )
-                });
-                $('.all-discounts-apply').each(function () {
-                    console.log($('.discount-show-checkout').text())
-                    let amount = $(this).find('.discount-show-checkout').text();
-                    let code = $(this).find('.discount-show-checkout').data('code');
-                    let type = $(this).find('.discount-show-checkout').data('type');
-                    let discountName = $(this).find('.discount-show-checkout').data('name');
-                    formData.append('amount[]' , amount)
-                    formData.append('code[]' , code)
-                    formData.append('type[]' , type);
-                    formData.append('name[]' , discountName);
-                });
-                formData.append('total', total);
-                $.ajax({
-                    url: "{{route('order.store')}}",
-                    method: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (response) {
-                        window.location.href = '{{route('order.index')}}';
-                    },
-                    error: function (response){
-                        let errors = response.responseJSON.errors;
-                        if (errors.first_name) {
-                            $('.first_name-error').text(errors.first_name[0]);
+            {{--$(document).on('click' , '#card-button' , function (e){--}}
+            {{--    e.preventDefault()--}}
+            {{--    let form = $(this).closest('form')[0];--}}
+            {{--    let formData = new FormData(form);--}}
+            {{--    let total = $('.total-checkout').text();--}}
+            //     $('.cartData').each(function () {
+            //         let productId = $(this).data('product');
+            //         let variantId = $(this).data('variant');
+            //         let quantity = $(this).find('.quantity-checkout').text();
+            //         let price = $(this).find('.cart-price').text();
+            //         formData.append('price[]' , price )
+            //         formData.append('productId[]' , productId )
+            //         formData.append('variantId[]' , variantId )
+            //         formData.append('quantity[]' , quantity )
+            //     });
+            //     $('.all-discounts-apply').each(function () {
+            //         console.log($('.discount-show-checkout').text())
+            //         let amount = $(this).find('.discount-show-checkout').text();
+            //         let code = $(this).find('.discount-show-checkout').data('code');
+            //         let type = $(this).find('.discount-show-checkout').data('type');
+            //         let discountName = $(this).find('.discount-show-checkout').data('name');
+            //         formData.append('amount[]' , amount)
+            //         formData.append('code[]' , code)
+            //         formData.append('type[]' , type);
+            //         formData.append('name[]' , discountName);
+            //     });
+            //     formData.append('total', total);
+            {{--    $.ajax({--}}
+            {{--        url: "{{route('order.store')}}",--}}
+            {{--        method: "POST",--}}
+            {{--        data: formData,--}}
+            {{--        contentType: false,--}}
+            {{--        processData: false,--}}
+            {{--        success: function (response) {--}}
+            {{--            --}}{{--window.location.href = '{{route('order.index')}}';--}}
+            {{--        },--}}
+            {{--        error: function (response){--}}
+            {{--            let errors = response.responseJSON.errors;--}}
+            {{--            if (errors.first_name) {--}}
+            {{--                $('.first_name-error').text(errors.first_name[0]);--}}
+            {{--            }--}}
+            {{--            if (errors.last_name) {--}}
+            {{--                $('.last_name-error').text(errors.last_name[0]);--}}
+            {{--            }--}}
+            {{--            if (errors.delivery) {--}}
+            {{--                $('.delivery-error').text(errors.delivery[0]);--}}
+            {{--            }--}}
+            {{--            if (errors.country) {--}}
+            {{--                $('.country-error').text(errors.country[0]);--}}
+            {{--            }--}}
+            {{--            if (errors.state) {--}}
+            {{--                $('.state-error').text(errors.state[0]);--}}
+            {{--            }--}}
+            {{--            if (errors.address) {--}}
+            {{--                $('.address-error').text(errors.address[0]);--}}
+            {{--            }--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--});--}}
+
+            $(document).on('click', '.checkout-action', function () {
+                console.log('sdfsdfsdfsdfdfsds')
+                $('#checkoutField').hide();
+                $('#stripePayment').show();
+                const stripe = Stripe("{{ config('services.stripe.stripe_key') }}");
+
+                const elements = stripe.elements();
+                const cardElement = elements.create('card');
+
+                cardElement.mount('#card-element');
+
+
+                const cardHolderName = document.getElementById('card-holder-name');
+                const cardButton = document.getElementById('card-button');
+
+
+
+                cardButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    let myForm = $('#checkoutForm')[0];
+
+                    let formData = new FormData(myForm);
+                    let total = $('.total-checkout').text();
+
+                    $('.cartData').each(function () {
+                        let productId = $(this).data('product');
+                        let variantId = $(this).data('variant');
+                        let quantity = $(this).find('.quantity-checkout').text();
+                        let price = $(this).find('.cart-price').text();
+                        formData.append('price[]' , price )
+                        formData.append('productId[]' , productId )
+                        formData.append('variantId[]' , variantId )
+                        formData.append('quantity[]' , quantity )
+                    });
+                    $('.all-discounts-apply').each(function () {
+                        let amount = $(this).find('.discount-show-checkout').text();
+                        let code = $(this).find('.discount-show-checkout').data('code');
+                        let type = $(this).find('.discount-show-checkout').data('type');
+                        let discountName = $(this).find('.discount-show-checkout').data('name');
+                        formData.append('amount[]' , amount)
+                        formData.append('code[]' , code)
+                        formData.append('type[]' , type);
+                        formData.append('name[]' , discountName);
+                    });
+                    formData.append('total', total);
+
+                    $.ajax({
+                        url: '{{ route('order.store') }}',
+                        method: "POST",
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        success: async function (data) {
+
+                            console.log(cardHolderName);
+                            try {
+                                const {error, paymentIntent} = await stripe.confirmCardPayment(data.clientSecret, {
+                                    payment_method: {
+                                        card: cardElement,
+                                        billing_details: {
+                                            // name: cardHolderName.value
+                                            name: 'testing'
+                                        }
+                                    }
+                                });
+
+                                console.log(error)
+                                console.log(paymentIntent)
+                            }catch (e) {
+                                console.log(e)
+                            }
                         }
-                        if (errors.last_name) {
-                            $('.last_name-error').text(errors.last_name[0]);
-                        }
-                        if (errors.delivery) {
-                            $('.delivery-error').text(errors.delivery[0]);
-                        }
-                        if (errors.country) {
-                            $('.country-error').text(errors.country[0]);
-                        }
-                        if (errors.state) {
-                            $('.state-error').text(errors.state[0]);
-                        }
-                        if (errors.address) {
-                            $('.address-error').text(errors.address[0]);
-                        }
-                    }
+                    });
+
+
+                    {{--const response = await fetch('{{ route('order.store') }}', {--}}
+                    {{--    method: 'POST',--}}
+                    {{--    headers: {--}}
+                    {{--        'Content-Type': 'application/json',--}}
+                    {{--        'X-CSRF-TOKEN': '{{ csrf_token() }}',--}}
+                    {{--    },--}}
+                    {{--    dataType: 'json',--}}
+                    {{--    body: JSON.stringify({ total: 1000 })--}}
+                    {{--});--}}
+                    // const data = await response.json();
+                    // console.log(response)
+
+
                 });
             });
-
-
             $(document).on('click' , '.close-product-checkout' , function (){
                 let deleteId = $(this).data('id');
                 let productId = $(this).data('product');

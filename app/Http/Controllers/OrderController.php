@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -56,7 +58,17 @@ class OrderController extends Controller
     public function store(CheckoutRequest $request)
     {
         $input = $request->all();
-        $this->OrderRepo->store($input);
+//        $this->OrderRepo->store($input);
+        Stripe::setApiKey(config('services.stripe.stripe_secret_key'));
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $input['total'] * 100,
+            'currency' => 'usd',
+            'description' => 'testing',
+            'payment_method_types' => ['card'],
+        ]);
+        return response()->json([
+            'clientSecret' => $paymentIntent->client_secret,
+        ]);
     }
 
     /**
