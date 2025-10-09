@@ -14,9 +14,9 @@
                 <section class="vh-100 gradient-custom my-5">
                     <div class="card shadow-2-strong card-registration h-75" style="border-radius: 15px;">
                         <div class="card-body p-4 p-md-5 checkoutAllItems position-relative" id="checkoutAllItems">
-                            <div class="order-item-data" style="overflow: auto ; height: 88%; overflow-x: hidden;">
+                            <div class="order-item-data" style="overflow: auto ; height: 88%; overflow-x: hidden;" data-order="{{$order->id}}">
                                 @foreach($order->orderItems as $item)
-                                    <div class="row my-3 bg-light item-{{$item->id}} itemData" data-product="{{$item->product->id}}" data-variant="{{$item->variant->id}}" data-item="{{$item->id}}" data-order="{{$item->order_id}}">
+                                    <div class="row my-3 bg-light item-{{$item->id}} itemData" data-product="{{$item->product->id}}" data-variant="{{$item->variant->id}}" data-item="{{$item->id}}" data-order="{{$order->id}}">
                                         <input type="hidden" id="orderItemEditId" name="item[]" value="{{$item->id}}">
                                         <div class="col">
                                             <img class="card-img-top rounded" src="{{$item->product->image_url[0]}}" alt="Card image cap" style="height: 100px; width: 100px;">
@@ -104,6 +104,7 @@
 
 @endsection
 @section('scripts')
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
         $(document).ready(function () {
             $.ajaxSetup({
@@ -218,23 +219,48 @@
                     editIdData.push(editId);
                 });
                 let totalAmount = $('#totalAmount').text();
+                let orderId = $('.order-item-data').data('order')
+                const stripe = Stripe('{{config('services.stripe.stripe_key')}}');
                 $.ajax({
-                    url: "{{route('order.items.update' , $order->id)}}",
+                    url: '{{ route('payment.update') }}',
                     method: "POST",
-                    data:{
-                        price: priceData,
-                        product: ProductIdData,
-                        variant: variantIdData,
-                        quantity: quantityData,
-                        editId :  editIdData,
+                    data: {
                         total : totalAmount,
-                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        order_id : orderId,
                     },
-                    success: function (response) {
-                        window.location.href = '{{route('order.index')}}';
-                    },
+                    success: async function (data) {
+                        try {
+                            const {error, paymentIntent} = await stripe.confirmCardPayment(data.clientSecret, {
+                                payment_method: {
+                                    billing_details: {
+                                        name: 'testing'
+                                    }
+                                }
+                            });
+                            console.log(paymentIntent)
+                            $.ajax({
+                                url: "{{route('order.items.update' , $order->id)}}",
+                                method: "POST",
+                                data:{
+                                    price: priceData,
+                                    product: ProductIdData,
+                                    variant: variantIdData,
+                                    quantity: quantityData,
+                                    editId :  editIdData,
+                                    total : totalAmount,
+                                    _token: $('meta[name="csrf-token"]').attr('content'),
+                                },
+                                success: function (response) {
+                                    window.location.href = '{{route('order.index')}}';
+                                },
+                            });
+                        }catch (e) {
+                            console.log(e)
+                        }
+                    }
                 });
             });
+
 
             $(document).on('click' , '#one-product' , function () {
                 let productId =  $(this).data('id')

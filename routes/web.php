@@ -46,6 +46,9 @@ Route::middleware('emailVerify' , 'auth')->group(function (){
     Route::post('items/update/{items}', [OrderController::class, 'orderItemUpdate'])->name('order.items.update');
     Route::get('stripe/payment', [StripeController::class, 'stripeForm'])->name('stripe.form');
     Route::post('stripe/payment', [StripeController::class, 'stripePayment'])->name('stripe.payment');
+    Route::get('create-client-secret', [OrderController::class, 'createClientSecret'])->name('create.client.secret');
+    Route::get('payment/success', [OrderController::class, 'paymentSuccess'])->name('payment.success');
+    Route::post('payment/update', [OrderController::class, 'paymentUpdate'])->name('payment.update');
 
 //    Route::post('/item/update', [CartController::class, 'updateItems'])->name('update.item');
 //    Route::post('order/create', [CheckoutController::class, 'orderCreate'])->name('create.order');

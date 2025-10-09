@@ -6,6 +6,7 @@ use App\Models\CartDiscount;
 use App\Models\GiftCard;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Arr;
@@ -30,6 +31,14 @@ class OrderRepository extends BaseRepository
             'delivery' => $data['delivery'],
             'total' => $data['total'],
         ]);
+
+        $payment = $order->orderPayments()->create([
+            'payment_id' => $data['payment_id'],
+            'amount' => $data['total'],
+            'refunded_amount' => 0,
+        ]);
+
+
         $this->orderDiscountStore($order , $data);
         $this->orderItemStore($order , $data);
     }

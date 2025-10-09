@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDiscount;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
@@ -52,23 +53,35 @@ class OrderController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function createClientSecret(Request $request)
+    {
+        Stripe::setApiKey(config('services.stripe.stripe_secret_key'));
+        $user = auth()->user();
+        $stripeCustomerId = $user->stripe_id;
+        if($stripeCustomerId == ''){
+            $user->createAsStripeCustomer();
+        }
+        $setupIntent = $user->createSetupIntent();
+
+        return response()->json([
+            'client_secret' => $setupIntent->client_secret,
+        ]);
+    }
+
+    public function paymentSuccess(Request $request)
+    {
+        dd($request->all());
+    }
+
     public function store(CheckoutRequest $request)
     {
         $input = $request->all();
-//        $this->OrderRepo->store($input);
-        Stripe::setApiKey(config('services.stripe.stripe_secret_key'));
-        $paymentIntent = PaymentIntent::create([
-            'amount' => $input['total'] * 100,
-            'currency' => 'usd',
-            'description' => 'testing',
-            'payment_method_types' => ['card'],
+
+        auth()->user()->charge($input['total'] * 100, 'pm_card_visa', [
+            'return_url' => 'http://127.0.0.1:8000'
         ]);
-        return response()->json([
-            'clientSecret' => $paymentIntent->client_secret,
-        ]);
+
+        $this->OrderRepo->store($input);
     }
 
     /**
@@ -94,6 +107,39 @@ class OrderController extends Controller
 
 
         return view('orders.edit', compact('order', 'shippingDetails'));
+    }
+
+
+    public function paymentUpdate(Request $request)
+    {
+        $input = $request->all();
+        Stripe::setApiKey(config('services.stripe.stripe_secret_key'));
+        $order = Order::find($input['order_id']);
+        $orderUser = $order->user;
+        $orderPayments = $order->orderPayments;
+        $orderPaymentSum = $orderPayments->sum('amount');
+        foreach ($orderPayments as $orderPayment) {
+            $amount = $input['total'] - $orderPaymentSum;
+            $paymentMethods = $orderUser->paymentMethods();
+            $paymentMethodId = null;
+            foreach ($paymentMethods as $paymentMethod) {
+                $paymentMethodId = $paymentMethod->id;
+            }
+            if ($orderPaymentSum < $input['total']) {
+                $charge = $orderUser->charge($amount * 100,  $paymentMethodId, [
+                    'return_url' => 'http://127.0.0.1:8000'
+                ]);
+                $payment = $order->orderPayments()->create([
+                    'payment_id' => $charge->id,
+                    'amount' => $amount,
+                    'refunded_amount' => 0,
+                ]);
+            }
+
+            if ($orderPaymentSum > $input['total']) {
+            }
+        }
+
     }
 
     public function update(Request $request, string $id)

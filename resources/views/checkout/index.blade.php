@@ -13,9 +13,9 @@
                            </div>
 
                            <div id="stripePayment">
-                               <div id="card-element"></div>
+                               <div id="cardElement"></div>
                                <meta name="csrf-token" content="{{ csrf_token() }}">
-                               <button id="card-button">
+                               <button id="cardButton">
                                    Process Payment
                                </button>
                            </div>
@@ -132,16 +132,17 @@
             });
 
             $('#stripePayment').hide();
+
             function count() {
                 let totalCount = 0;
-                $('.quantity-cart').each(function() {
+                $('.quantity-cart').each(function () {
                     let qty = parseInt($(this).text());
                     totalCount += qty;
                 });
                 $('.count').text(totalCount);
             }
 
-            function updateTotal(){
+            function updateTotal() {
                 let totalPrice = 0;
                 $('.quantity-cart').each(function () {
                     let quantity = parseFloat($(this).text());
@@ -151,7 +152,7 @@
                     totalPrice += total;
                 });
                 console.log(totalPrice)
-                console.log( $('.total-checkout'))
+                console.log($('.total-checkout'))
                 $('.total-checkout').text(totalPrice)
                 $('.subtotal-checkout').text(totalPrice)
                 $('.total').text(totalPrice)
@@ -164,15 +165,14 @@
                     type: "GET",
                     dataType: 'json',
                     data: {
-                        subtotal : subtotal,
+                        subtotal: subtotal,
                     },
                     success: function (response) {
                         console.log(response)
-                        if(response.discount){
+                        if (response.discount) {
                             console.log($('.offcanvas-body').find('.discountData'))
                             $('.offcanvas-body').find('.discountData').append(response.discount)
-                        }
-                        else{
+                        } else {
                             $('.credit-checkout').find('.discount-show-checkout').text(response.amount);
                             $('.credit').find('.discount-show').text(response.amount)
                         }
@@ -182,14 +182,13 @@
                 giftCardUpdate();
             }
 
-            function giftCardUpdate(){
+            function giftCardUpdate() {
                 let subtotal = $('.subtotal-checkout').text();
-                let credit =  $('.credit-checkout').find('.discount-show-checkout').text();
+                let credit = $('.credit-checkout').find('.discount-show-checkout').text();
                 let total = 0;
-                if(credit){
+                if (credit) {
                     total = parseInt(subtotal) - parseInt(credit)
-                }
-                else{
+                } else {
                     total = subtotal
                 }
                 let giftCard = $('.gift-card').find('.discount-show-checkout').data('code');
@@ -197,14 +196,14 @@
                 $('.gift-card').show();
                 $('.discount-data').addClass('d-flex');
                 $('.discount-data').show();
-                if(giftCard && total > 0){
+                if (giftCard && total > 0) {
                     $.ajax({
                         url: route('gift-card.update.cart'),
                         type: "GET",
                         dataType: 'json',
                         data: {
-                            subtotal : total,
-                            giftCard : giftCard,
+                            subtotal: total,
+                            giftCard: giftCard,
                         },
                         success: function (response) {
                             console.log("Response...... = ", response);
@@ -213,8 +212,7 @@
                             discountAdd()
                         }
                     });
-                }
-                else{
+                } else {
                     $('.gift-card').removeClass('d-flex');
                     $('.gift-card').find('.discount-show-checkout').text('0')
                     $('.gift-card').find('.discount-show').text('0')
@@ -229,36 +227,33 @@
                 if ($('.discountData').text() != null) {
                     let subtotalText = $('.subtotal-checkout').text();
                     let mainTotal = subtotalText;
-                    $('.credit-checkout').each(function() {
+                    $('.credit-checkout').each(function () {
                         let credit = $(this);
                         let amount = credit.find('.discount-show-checkout').text();
                         console.log("amount  - " + amount)
                         console.log("mainTotal  - " + mainTotal)
-                        if(amount != null) {
-                            if(amount <= subtotalText){
+                        if (amount != null) {
+                            if (amount <= subtotalText) {
                                 mainTotal = mainTotal - amount;
                                 console.log("amount = " + mainTotal)
-                            }
-                            else{
+                            } else {
                                 mainTotal = mainTotal - mainTotal;
                                 $('.discount-show-checkout').text(mainTotal);
                             }
-                        }
-                        else{
+                        } else {
                             mainTotal = mainTotal;
                         }
 
                     });
                     console.log("mainAmount = " + mainTotal)
-                    $('.gift-card').each(function() {
+                    $('.gift-card').each(function () {
                         let discount = $(this);
                         let amount = discount.find('.discount-show-checkout').text();
                         console.log("main = " + mainTotal)
-                        if(amount <= subtotalText){
+                        if (amount <= subtotalText) {
                             mainTotal = mainTotal - amount;
                             console.log("reree" + mainTotal)
-                        }
-                        else{
+                        } else {
                             discount.find('.discount-show-checkout').text(mainTotal)
                             mainTotal = mainTotal - mainTotal;
                         }
@@ -266,13 +261,13 @@
                             mainTotal = 0;
                         }
                     });
-                    if(mainTotal == 0){
+                    if (mainTotal == 0) {
                         $('.discount-data').removeClass('d-flex');
                         $('.discount-data').find('.discount-show-checkout').text('0');
                         $('.discount-data').hide()
                     }
 
-                    $('.discount-data').each(function() {
+                    $('.discount-data').each(function () {
                         let discount = $(this);
                         let type = discount.find('.discount-show-checkout').data('type');
                         let amount = discount.find('.discount-show-checkout').text();
@@ -283,7 +278,7 @@
                         } else if (type === 'fixed') {
                             mainTotal = mainTotal - amount;
                         }
-                        console.log("discountTotal = " + mainTotal )
+                        console.log("discountTotal = " + mainTotal)
                         if (mainTotal < 0) {
                             mainTotal = 0;
                         }
@@ -307,15 +302,14 @@
                         discount_code: discountCode,
                         count: count,
                         subTotal: subTotal,
-                        total : total,
+                        total: total,
                         _token: $('meta[name="csrf-token"]').attr('content'),
                     },
                     success: function (response) {
                         $('#discountCode').val('');
                         if (response.status == 'error') {
                             $('.voucher-error').text(response.message)
-                        }
-                        else if(response.status == 'success' && response.discount_amount){
+                        } else if (response.status == 'success' && response.discount_amount) {
                             if ($('.discountData').text('')) {
                                 const discount = `
                             <div class="d-flex justify-content-between discount-apply discount-data">
@@ -331,7 +325,7 @@
                                 $('.discountData').append(discount)
                             }
                         }
-                        if(response.status == 'warning'){
+                        if (response.status == 'warning') {
                             $('.voucher-error').text(response.message)
                             const discount = `
                             <div class="d-flex justify-content-between discount-apply discount-data">
@@ -345,7 +339,7 @@
                             $('.discountData').append(discount)
                         }
 
-                        if(response.status == 'success'  &&  response.discount == 'gift card'){
+                        if (response.status == 'success' && response.discount == 'gift card') {
                             const giftCardDiscount = `
                             <div class="d-flex justify-content-between discount-apply gift-card">
                                 <label>Gift Card : ${response.code}</label>
@@ -368,75 +362,76 @@
             });
 
 
-            function allDecrement(quantity ,productId , variantId){
+            function allDecrement(quantity, productId, variantId) {
                 var currentQuantity = parseInt(quantity.text());
-                if(currentQuantity > 1){
+                if (currentQuantity > 1) {
                     var newQuantity = currentQuantity - 1;
                     quantity.text(newQuantity);
-                    $('.decrement-card-'+ productId +'-'+ variantId).siblings('.quantity').text(newQuantity);
-                    $('.decrement-checkout-'+ productId +'-'+ variantId).siblings('.quantity-checkout').text(newQuantity);
-                    $('.decrement-cart-'+ productId +'-'+ variantId).siblings('.quantity-cart').text(newQuantity);
-                    updateQuantity(productId, variantId , newQuantity)
+                    $('.decrement-card-' + productId + '-' + variantId).siblings('.quantity').text(newQuantity);
+                    $('.decrement-checkout-' + productId + '-' + variantId).siblings('.quantity-checkout').text(newQuantity);
+                    $('.decrement-cart-' + productId + '-' + variantId).siblings('.quantity-cart').text(newQuantity);
+                    updateQuantity(productId, variantId, newQuantity)
                 }
             }
 
-            function  allIncrement(quantity ,productId , variantId){
+            function allIncrement(quantity, productId, variantId) {
                 var currentQuantity = parseInt(quantity.text());
                 var newQuantity = currentQuantity + 1;
                 quantity.text(newQuantity);
-                $('.increment-card-'+ productId +'-' +variantId ).siblings('.quantity').text(newQuantity);
-                $('.increment-cart-'+ productId +'-' +variantId ).siblings('.quantity-cart').text(newQuantity);
-                $('.increment-checkout-'+ productId +'-' +variantId ).siblings('.quantity-checkout').text(newQuantity);
-                updateQuantity(productId, variantId , newQuantity)
+                $('.increment-card-' + productId + '-' + variantId).siblings('.quantity').text(newQuantity);
+                $('.increment-cart-' + productId + '-' + variantId).siblings('.quantity-cart').text(newQuantity);
+                $('.increment-checkout-' + productId + '-' + variantId).siblings('.quantity-checkout').text(newQuantity);
+                updateQuantity(productId, variantId, newQuantity)
             }
+
             updateTotal();
             count();
             discountAdd();
-            $(document).on('click' , '.increment' , function (){
+            $(document).on('click', '.increment', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity-cart');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allIncrement(quantity , productId , variantId);
+                allIncrement(quantity, productId, variantId);
             })
-            $(document).on('click' , '.increment-checkout' , function (){
+            $(document).on('click', '.increment-checkout', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity-checkout');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allIncrement(quantity , productId , variantId);
+                allIncrement(quantity, productId, variantId);
             })
 
-            $(document).on('click' , '.increase' , function (){
+            $(document).on('click', '.increase', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allIncrement(quantity , productId , variantId);
+                allIncrement(quantity, productId, variantId);
             })
 
-            $(document).on('click' , '.decrement' , function (){
+            $(document).on('click', '.decrement', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity-cart');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allDecrement(quantity ,productId , variantId);
+                allDecrement(quantity, productId, variantId);
             })
 
-            $(document).on('click' , '.decrement-checkout' , function (){
+            $(document).on('click', '.decrement-checkout', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity-checkout');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allDecrement(quantity ,productId , variantId);
+                allDecrement(quantity, productId, variantId);
             })
 
 
-            $(document).on('click' , '.decrease' , function (){
+            $(document).on('click', '.decrease', function () {
                 let quantity = $(this).closest('.d-flex').find('.quantity');
                 let productId = $(this).closest('.d-flex').data('product');
                 let variantId = $(this).closest('.d-flex').data('variant');
-                allDecrement(quantity ,productId , variantId);
+                allDecrement(quantity, productId, variantId);
             })
 
 
             function updateQuantity(productId, variantId, quantity) {
-                console.log(productId , variantId,quantity)
+                console.log(productId, variantId, quantity)
                 updateTotal();
                 count();
                 discountAdd();
@@ -455,82 +450,30 @@
                 });
             }
 
-            {{--$(document).on('click' , '#card-button' , function (e){--}}
-            {{--    e.preventDefault()--}}
-            {{--    let form = $(this).closest('form')[0];--}}
-            {{--    let formData = new FormData(form);--}}
-            {{--    let total = $('.total-checkout').text();--}}
-            //     $('.cartData').each(function () {
-            //         let productId = $(this).data('product');
-            //         let variantId = $(this).data('variant');
-            //         let quantity = $(this).find('.quantity-checkout').text();
-            //         let price = $(this).find('.cart-price').text();
-            //         formData.append('price[]' , price )
-            //         formData.append('productId[]' , productId )
-            //         formData.append('variantId[]' , variantId )
-            //         formData.append('quantity[]' , quantity )
-            //     });
-            //     $('.all-discounts-apply').each(function () {
-            //         console.log($('.discount-show-checkout').text())
-            //         let amount = $(this).find('.discount-show-checkout').text();
-            //         let code = $(this).find('.discount-show-checkout').data('code');
-            //         let type = $(this).find('.discount-show-checkout').data('type');
-            //         let discountName = $(this).find('.discount-show-checkout').data('name');
-            //         formData.append('amount[]' , amount)
-            //         formData.append('code[]' , code)
-            //         formData.append('type[]' , type);
-            //         formData.append('name[]' , discountName);
-            //     });
-            //     formData.append('total', total);
-            {{--    $.ajax({--}}
-            {{--        url: "{{route('order.store')}}",--}}
-            {{--        method: "POST",--}}
-            {{--        data: formData,--}}
-            {{--        contentType: false,--}}
-            {{--        processData: false,--}}
-            {{--        success: function (response) {--}}
-            {{--            --}}{{--window.location.href = '{{route('order.index')}}';--}}
-            {{--        },--}}
-            {{--        error: function (response){--}}
-            {{--            let errors = response.responseJSON.errors;--}}
-            {{--            if (errors.first_name) {--}}
-            {{--                $('.first_name-error').text(errors.first_name[0]);--}}
-            {{--            }--}}
-            {{--            if (errors.last_name) {--}}
-            {{--                $('.last_name-error').text(errors.last_name[0]);--}}
-            {{--            }--}}
-            {{--            if (errors.delivery) {--}}
-            {{--                $('.delivery-error').text(errors.delivery[0]);--}}
-            {{--            }--}}
-            {{--            if (errors.country) {--}}
-            {{--                $('.country-error').text(errors.country[0]);--}}
-            {{--            }--}}
-            {{--            if (errors.state) {--}}
-            {{--                $('.state-error').text(errors.state[0]);--}}
-            {{--            }--}}
-            {{--            if (errors.address) {--}}
-            {{--                $('.address-error').text(errors.address[0]);--}}
-            {{--            }--}}
-            {{--        }--}}
-            {{--    });--}}
-            {{--});--}}
 
-            $(document).on('click', '.checkout-action', function () {
-                console.log('sdfsdfsdfsdfdfsds')
+
+            $(document).on('click', '#checkoutAction',  function () {
                 $('#checkoutField').hide();
                 $('#stripePayment').show();
+
                 const stripe = Stripe("{{ config('services.stripe.stripe_key') }}");
+                let elements = null;
+                let paymentElement = null;
 
-                const elements = stripe.elements();
-                const cardElement = elements.create('card');
+                $.ajax({
+                    url: "{{ route('create.client.secret') }}",
+                    method: "GET",
+                    success: function (response) {
+                        elements = stripe.elements({ clientSecret: response.client_secret });
+                        paymentElement = elements.create('payment');
+                        paymentElement.mount('#cardElement');
+                    },
+                    error: function (response) {
 
-                cardElement.mount('#card-element');
+                    }
+                });
 
-
-                const cardHolderName = document.getElementById('card-holder-name');
-                const cardButton = document.getElementById('card-button');
-
-
+                const cardButton = document.getElementById('cardButton');
 
                 cardButton.addEventListener('click', async (e) => {
                     e.preventDefault();
@@ -545,65 +488,69 @@
                         let variantId = $(this).data('variant');
                         let quantity = $(this).find('.quantity-checkout').text();
                         let price = $(this).find('.cart-price').text();
-                        formData.append('price[]' , price )
-                        formData.append('productId[]' , productId )
-                        formData.append('variantId[]' , variantId )
-                        formData.append('quantity[]' , quantity )
+                        formData.append('price[]', price)
+                        formData.append('productId[]', productId)
+                        formData.append('variantId[]', variantId)
+                        formData.append('quantity[]', quantity)
                     });
                     $('.all-discounts-apply').each(function () {
                         let amount = $(this).find('.discount-show-checkout').text();
                         let code = $(this).find('.discount-show-checkout').data('code');
                         let type = $(this).find('.discount-show-checkout').data('type');
                         let discountName = $(this).find('.discount-show-checkout').data('name');
-                        formData.append('amount[]' , amount)
-                        formData.append('code[]' , code)
-                        formData.append('type[]' , type);
-                        formData.append('name[]' , discountName);
+                        formData.append('amount[]', amount)
+                        formData.append('code[]', code)
+                        formData.append('type[]', type);
+                        formData.append('name[]', discountName);
                     });
                     formData.append('total', total);
 
-                    $.ajax({
-                        url: '{{ route('order.store') }}',
-                        method: "POST",
-                        contentType: false,
-                        processData: false,
-                        data: formData,
-                        success: async function (data) {
-
-                            console.log(cardHolderName);
-                            try {
-                                const {error, paymentIntent} = await stripe.confirmCardPayment(data.clientSecret, {
-                                    payment_method: {
-                                        card: cardElement,
-                                        billing_details: {
-                                            // name: cardHolderName.value
-                                            name: 'testing'
-                                        }
-                                    }
-                                });
-
-                                console.log(error)
-                                console.log(paymentIntent)
-                            }catch (e) {
-                                console.log(e)
-                            }
-                        }
+                    const {setupIntent, error} = await stripe.confirmSetup({
+                        elements,
+                        confirmParams: {
+                            return_url: '{{ route('payment.success') }}',
+                        },
+                        redirect: "if_required",
                     });
 
+                    console.log(setupIntent);
 
-                    {{--const response = await fetch('{{ route('order.store') }}', {--}}
-                    {{--    method: 'POST',--}}
-                    {{--    headers: {--}}
-                    {{--        'Content-Type': 'application/json',--}}
-                    {{--        'X-CSRF-TOKEN': '{{ csrf_token() }}',--}}
-                    {{--    },--}}
-                    {{--    dataType: 'json',--}}
-                    {{--    body: JSON.stringify({ total: 1000 })--}}
-                    {{--});--}}
-                    // const data = await response.json();
-                    // console.log(response)
-
-
+                    if (error) {
+                        console.log(error)
+                    } else if (setupIntent.status === 'succeeded') {
+                        formData.append('payment_id', setupIntent.payment_method)
+                        $.ajax({
+                            url: "{{route('order.store')}}",
+                            method: "POST",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function (response) {
+                                window.location.href = '{{route('order.index')}}';
+                            },
+                            error: function (response) {
+                                let errors = response.responseJSON.errors;
+                                if (errors.first_name) {
+                                    $('.first_name-error').text(errors.first_name[0]);
+                                }
+                                if (errors.last_name) {
+                                    $('.last_name-error').text(errors.last_name[0]);
+                                }
+                                if (errors.delivery) {
+                                    $('.delivery-error').text(errors.delivery[0]);
+                                }
+                                if (errors.country) {
+                                    $('.country-error').text(errors.country[0]);
+                                }
+                                if (errors.state) {
+                                    $('.state-error').text(errors.state[0]);
+                                }
+                                if (errors.address) {
+                                    $('.address-error').text(errors.address[0]);
+                                }
+                            }
+                        });
+                    }
                 });
             });
             $(document).on('click' , '.close-product-checkout' , function (){
